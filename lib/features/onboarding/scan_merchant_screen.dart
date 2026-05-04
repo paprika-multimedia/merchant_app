@@ -62,7 +62,7 @@ class _ScanMerchantScreenState extends ConsumerState<ScanMerchantScreen> {
         idempotencyKey: const Uuid().v4(),
       );
       // Update session with new merchant
-      final session = ref.read(sessionProvider).valueOrNull;
+      final session = ref.read(sessionProvider).value;
       if (session != null) {
         final updated = [...session.merchants, merchant];
         ref.read(sessionProvider.notifier).updateMerchants(updated);

@@ -82,7 +82,6 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
   Widget _onScannerError(
     BuildContext ctx,
     MobileScannerException error,
-    Widget? child,
   ) {
     final isDenied =
         error.errorCode == MobileScannerErrorCode.permissionDenied;
@@ -247,7 +246,7 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
   Widget build(BuildContext context) {
     final merchant = ref
         .watch(sessionProvider)
-        .valueOrNull
+        .value
         ?.merchants
         .where((m) => m.id == widget.merchantId)
         .firstOrNull;
@@ -467,7 +466,7 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        t.cpmScanLabel(merchant: merchant?.name ?? ''),
+                        t.cpmScanLabel(merchant?.name ?? ''),
                         style: const TextStyle(
                           fontFamily: AppTokens.fontDisplay,
                           fontSize: 11,
@@ -718,7 +717,7 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
             ),
             child: AppButton(
               label: _canCharge
-                  ? t.cpmChargeWithAmount(amount: fmt.format(_amount))
+                  ? t.cpmChargeWithAmount(fmt.format(_amount))
                   : t.cpmCharge,
               variant: AppButtonVariant.primary,
               size: AppButtonSize.lg,

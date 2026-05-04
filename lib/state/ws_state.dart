@@ -30,7 +30,7 @@ class WsStateNotifier extends Notifier<WsStatus> {
   WsStatus build() {
     // React to session changes
     final session = ref.watch(sessionProvider);
-    if (session.valueOrNull != null) {
+    if (session.value != null) {
       _ensureStarted();
     } else {
       _stop();

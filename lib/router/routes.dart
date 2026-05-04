@@ -21,7 +21,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/welcome',
     redirect: (context, state) async {
-      final session = ref.read(sessionProvider).valueOrNull;
+      final session = ref.read(sessionProvider).value;
       final isOnboarding = state.matchedLocation.startsWith('/welcome') ||
           state.matchedLocation.startsWith('/scan/company') ||
           state.matchedLocation.startsWith('/code/company');

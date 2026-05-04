@@ -74,7 +74,7 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
           _code,
           idempotencyKey: const Uuid().v4(),
         );
-        final session = ref.read(sessionProvider).valueOrNull;
+        final session = ref.read(sessionProvider).value;
         if (session != null) {
           ref.read(sessionProvider.notifier).updateMerchants(
             [...session.merchants, merchant],

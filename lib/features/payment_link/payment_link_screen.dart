@@ -87,7 +87,7 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
     final link = _txn?.linkUrl ?? '';
     final merchant = ref
             .read(sessionProvider)
-            .valueOrNull
+            .value
             ?.merchants
             .firstWhere((m) => m.id == widget.merchantId,
                 orElse: () => throw StateError('merchant'))

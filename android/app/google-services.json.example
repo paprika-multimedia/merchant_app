@@ -1,0 +1,39 @@
+{
+  "_INSTRUCTIONS": [
+    "This is a placeholder. To enable Firebase push notifications:",
+    "1. Create a Firebase project at https://console.firebase.google.com",
+    "2. Add an Android app with package name: com.paprika.paprika_merchant",
+    "3. Download google-services.json from the Firebase console",
+    "4. Place it at: android/app/google-services.json",
+    "5. Add the google-services Gradle plugin to android/app/build.gradle.kts:",
+    "     plugins { id(\"com.google.gms.google-services\") }",
+    "   and in android/settings.gradle.kts plugins block:",
+    "     id(\"com.google.gms.google-services\") version \"4.4.2\" apply false",
+    "6. Run WITHOUT --dart-define=ENABLE_FIREBASE=false (or set it to true)",
+    "",
+    "For simulator-only development, skip this file entirely and use:",
+    "  flutter run --dart-define=ENABLE_FIREBASE=false ..."
+  ],
+  "project_info": {
+    "project_number": "REPLACE_WITH_PROJECT_NUMBER",
+    "project_id": "REPLACE_WITH_PROJECT_ID",
+    "storage_bucket": "REPLACE_WITH_PROJECT_ID.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "REPLACE_WITH_MOBILESDK_APP_ID",
+        "android_client_info": {
+          "package_name": "com.paprika.paprika_merchant"
+        }
+      },
+      "api_key": [{ "current_key": "REPLACE_WITH_API_KEY" }],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -11,7 +11,15 @@ import '../storage/secure_storage.dart';
 /// where flow is one of: 'qris', 'link', 'cpm'.
 ///
 /// Falls back to flow-specific defaults when list is empty.
-class RecentAmountsNotifier extends FamilyNotifier<List<int>, (String, String)> {
+///
+/// Usage:
+///   ref.watch(recentAmountsProvider(('mch_id', 'qris')))
+class RecentAmountsNotifier extends Notifier<List<int>> {
+  /// The (merchantId, flow) tuple — injected via constructor by the family factory.
+  RecentAmountsNotifier(this._arg);
+
+  final (String, String) _arg;
+
   static const _maxItems = 5;
 
   static const _defaults = {
@@ -21,16 +29,16 @@ class RecentAmountsNotifier extends FamilyNotifier<List<int>, (String, String)> 
   };
 
   @override
-  List<int> build((String, String) arg) {
+  List<int> build() {
     // Load asynchronously; initial state is defaults
     _load();
-    final (_, flow) = arg;
+    final (_, flow) = _arg;
     return _defaults[flow] ?? [5000, 10000, 25000, 50000, 100000];
   }
 
   Future<void> _load() async {
     final storage = ref.read(secureStorageProvider);
-    final (merchantId, flow) = arg;
+    final (merchantId, flow) = _arg;
     final key = SecureStorage.recentAmountsKey(merchantId, flow);
     final raw = await storage.read(key);
     if (raw != null) {
@@ -54,7 +62,7 @@ class RecentAmountsNotifier extends FamilyNotifier<List<int>, (String, String)> 
     state = updated;
 
     final storage = ref.read(secureStorageProvider);
-    final (merchantId, flow) = arg;
+    final (merchantId, flow) = _arg;
     await storage.write(
       SecureStorage.recentAmountsKey(merchantId, flow),
       jsonEncode(updated),
@@ -62,7 +70,10 @@ class RecentAmountsNotifier extends FamilyNotifier<List<int>, (String, String)> 
   }
 }
 
+/// Family provider for per-merchant, per-flow recent amounts.
+///
+/// Arg: `(merchantId, flow)` where flow is 'qris', 'link', or 'cpm'.
 final recentAmountsProvider = NotifierProvider.family<
     RecentAmountsNotifier,
     List<int>,
-    (String, String)>(RecentAmountsNotifier.new);
+    (String, String)>((arg) => RecentAmountsNotifier(arg));

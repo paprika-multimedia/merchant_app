@@ -119,7 +119,7 @@ class SessionNotifier extends AsyncNotifier<SessionData?> {
 
   /// Updates the merchant list (e.g. after claiming a new merchant).
   void updateMerchants(List<Merchant> merchants) {
-    final current = state.valueOrNull;
+    final current = state.value;
     if (current == null) return;
     state = AsyncValue.data(SessionData(
       company: current.company,
@@ -130,7 +130,7 @@ class SessionNotifier extends AsyncNotifier<SessionData?> {
 
   /// Updates a single merchant in the list (e.g. on merchant.updated WS event).
   void updateMerchant(Merchant merchant) {
-    final current = state.valueOrNull;
+    final current = state.value;
     if (current == null) return;
     final updated = current.merchants.map((m) {
       return m.id == merchant.id ? merchant : m;
@@ -144,7 +144,7 @@ class SessionNotifier extends AsyncNotifier<SessionData?> {
 
   /// Removes a merchant from the list (e.g. on merchant.removed WS event).
   void removeMerchant(String merchantId) {
-    final current = state.valueOrNull;
+    final current = state.value;
     if (current == null) return;
     final updated =
         current.merchants.where((m) => m.id != merchantId).toList();

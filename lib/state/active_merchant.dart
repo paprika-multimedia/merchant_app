@@ -37,7 +37,7 @@ final activeMerchantIdProvider =
 /// Convenience provider that resolves the active merchant object from session.
 final activeMerchantProvider = Provider<Merchant?>((ref) {
   final merchantId = ref.watch(activeMerchantIdProvider);
-  final session = ref.watch(sessionProvider).valueOrNull;
+  final session = ref.watch(sessionProvider).value;
   if (merchantId == null || session == null) return null;
   try {
     return session.merchants.firstWhere((m) => m.id == merchantId);

@@ -14,45 +14,45 @@ dependencies:
     sdk: flutter
 
   # State, routing, HTTP
-  flutter_riverpod: ^2.6.1
-  go_router: ^14.6.2
+  flutter_riverpod: ^3.3.1
+  go_router: ^17.2.3
   dio: ^5.7.0
 
   # Models & codegen
-  freezed_annotation: ^2.4.4
+  freezed_annotation: ^3.1.0
   json_annotation: ^4.9.0
 
   # Storage
-  flutter_secure_storage: ^9.2.2
+  flutter_secure_storage: ^10.0.0
   shared_preferences: ^2.3.3
 
   # Realtime + QR
   web_socket_channel: ^3.0.1
-  mobile_scanner: ^5.2.3
+  mobile_scanner: ^7.2.0
   qr_flutter: ^4.1.0
 
   # Utilities
   uuid: ^4.5.1
   intl: ^0.20.2
-  package_info_plus: ^8.1.1
+  package_info_plus: ^9.0.1
   url_launcher: ^6.3.1
   flutter_svg: ^2.0.10
   flutter_animate: ^4.5.0
 
   # Push notifications
-  firebase_core: ^3.8.0
-  firebase_messaging: ^15.1.5
+  firebase_core: ^4.7.0
+  firebase_messaging: ^16.2.0
 
   # Spoken-amount announcement
   flutter_tts: ^4.2.0
-  audio_session: ^0.1.21
+  audio_session: ^0.2.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
   build_runner: ^2.4.13
-  freezed: ^2.5.7
+  freezed: ^3.2.5
   json_serializable: ^6.9.0
   mocktail: ^1.0.4
   flutter_launcher_icons: ^0.14.1
@@ -63,19 +63,14 @@ flutter:
 
   generate: true
 
-  # assets:
-  # Asset directories must contain at least one file before uncommenting.
-  # Add actual image/sound assets then uncomment:
-  #   - assets/images/
-  #   - assets/sounds/
+  assets:
+    - assets/images/
+    - assets/sounds/
 
-  # fonts:
-  # Inter and JetBrains Mono font files must be placed at the paths below
-  # before building. Uncomment when font files are present.
-  #
-  # - family: Inter
-  #   fonts:
-  #     - asset: assets/fonts/Inter-Variable.ttf
-  # - family: JetBrainsMono
-  #   fonts:
-  #     - asset: assets/fonts/JetBrainsMono-Variable.ttf
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Variable.ttf
+    - family: JetBrainsMono
+      fonts:
+        - asset: assets/fonts/JetBrainsMono-Variable.ttf

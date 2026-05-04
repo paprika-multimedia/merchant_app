@@ -59,7 +59,7 @@ class _DashboardMerchantScreenState
   }
 
   Merchant? get _merchant {
-    final session = ref.read(sessionProvider).valueOrNull;
+    final session = ref.read(sessionProvider).value;
     if (session == null) return null;
     try {
       return session.merchants
@@ -73,7 +73,7 @@ class _DashboardMerchantScreenState
   Widget build(BuildContext context) {
     final t = AppL10n.of(context);
     // Watch session for merchant.updated events
-    final merchant = ref.watch(sessionProvider).valueOrNull?.merchants
+    final merchant = ref.watch(sessionProvider).value?.merchants
         .where((m) => m.id == widget.merchantId)
         .firstOrNull;
 
@@ -85,7 +85,7 @@ class _DashboardMerchantScreenState
 
     final fmt = NumberFormat('#,###', 'id_ID');
     final canScan = merchant.capabilities.scanCpm;
-    final session = ref.watch(sessionProvider).valueOrNull;
+    final session = ref.watch(sessionProvider).value;
     final merchants = session?.merchants ?? [];
 
     return Scaffold(

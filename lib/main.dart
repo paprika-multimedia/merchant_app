@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app.dart';
+import 'config/app_config.dart';
 import 'services/payment_announcer.dart';
 import 'state/session.dart';
 import 'storage/secure_storage.dart';
@@ -11,15 +12,20 @@ import 'storage/secure_storage.dart';
 ///
 /// Initialisation order (must be sequential, each can fail gracefully):
 /// 1. Flutter engine binding
-/// 2. Firebase (core, messaging)
+/// 2. Firebase (core, messaging) — skipped when ENABLE_FIREBASE=false
 /// 3. TTS / audio session via PaymentAnnouncer
 /// 4. Locale hydration from secure storage → seed localeProvider
 /// 5. Launch the widget tree with ProviderScope
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 2. Firebase — failure here is non-fatal; push notifications simply won't work.
-  await _initFirebase();
+  // 2. Firebase — guarded by the ENABLE_FIREBASE compile-time flag.
+  //    Pass --dart-define=ENABLE_FIREBASE=false to skip entirely (simulator dev).
+  //    Even when enabled, failure here is non-fatal — push notifications simply
+  //    won't work, but the rest of the app functions normally.
+  if (AppConfig.enableFirebase) {
+    await _initFirebase();
+  }
 
   // 3. TTS / audio session
   await PaymentAnnouncer.instance.init();
@@ -52,10 +58,19 @@ class _SeedableLocaleNotifier extends LocaleNotifier {
   String build() => _initial;
 }
 
+/// Attempts to initialize Firebase.
+///
+/// Non-fatal — if google-services.json / GoogleService-Info.plist are absent,
+/// Firebase throws and we swallow the error. The app continues without push.
 Future<void> _initFirebase() async {
   try {
     await Firebase.initializeApp();
-  } catch (_) {
-    // Not fatal — app runs without push in development or emulator
+  } catch (e) {
+    // Intentionally non-fatal. Common causes:
+    //   • google-services.json / GoogleService-Info.plist not present
+    //   • Running on a device without Google Play Services
+    // The app works normally; push notifications are unavailable.
+    // ignore: avoid_print
+    debugPrint('[Firebase] init failed — push notifications disabled: $e');
   }
 }

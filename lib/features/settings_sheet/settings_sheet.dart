@@ -18,7 +18,7 @@ class SettingsSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = AppL10n.of(context);
     final locale = ref.watch(localeProvider);
-    final session = ref.watch(sessionProvider).valueOrNull;
+    final session = ref.watch(sessionProvider).value;
     final companyName = session?.company.name ?? '';
 
     return Padding(

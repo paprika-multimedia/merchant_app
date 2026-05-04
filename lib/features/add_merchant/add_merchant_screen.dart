@@ -18,7 +18,7 @@ class AddMerchantScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = AppL10n.of(context);
-    final session = ref.watch(sessionProvider).valueOrNull;
+    final session = ref.watch(sessionProvider).value;
     final companyName = session?.company.name ?? '';
 
     return Scaffold(
