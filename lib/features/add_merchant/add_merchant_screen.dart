@@ -157,41 +157,32 @@ class AddMerchantScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
 
-            // Tip
+            // Tip — bold "Tip." prefix, no emoji (project no-emoji rule)
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
                 color: AppTokens.accentWash,
                 borderRadius: BorderRadius.circular(AppTokens.radiusMd),
               ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('💡 ',
-                      style: TextStyle(fontSize: 16)),
-                  Expanded(
-                    child: RichText(
-                      text: TextSpan(
-                        style: const TextStyle(
-                          fontFamily: AppTokens.fontDisplay,
-                          fontSize: 13,
-                          color: AppTokens.inkSecondary,
-                          height: 1.5,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: '${t.addmerchantTipLabel} ',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w700,
-                              color: AppTokens.accentDeep,
-                            ),
-                          ),
-                          TextSpan(text: t.addmerchantTipBody),
-                        ],
+              child: RichText(
+                text: TextSpan(
+                  style: const TextStyle(
+                    fontFamily: AppTokens.fontDisplay,
+                    fontSize: 13,
+                    color: AppTokens.inkSecondary,
+                    height: 1.5,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: '${t.addmerchantTipLabel} ',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        color: AppTokens.accentDeep,
                       ),
                     ),
-                  ),
-                ],
+                    TextSpan(text: t.addmerchantTipBody),
+                  ],
+                ),
               ),
             ),
           ],

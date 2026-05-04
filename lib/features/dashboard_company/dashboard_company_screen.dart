@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/merchant.dart';
 import '../../primitives/card.dart';
-import '../../primitives/chip.dart';
 import '../../primitives/icons.dart';
 import '../../primitives/merchant_avatar.dart';
 import '../../state/session.dart';
@@ -58,33 +57,17 @@ class DashboardCompanyScreen extends ConsumerWidget {
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
                     child: Row(
                       children: [
-                        // Company pill
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: AppTokens.accent,
-                            borderRadius:
-                                BorderRadius.circular(AppTokens.radiusSm),
-                          ),
-                          child: Text(
-                            company.name,
-                            style: const TextStyle(
-                              fontFamily: AppTokens.fontDisplay,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
+                        // Company header bar — 40px, accent bg, Store icon + overline + name
+                        Expanded(
+                          child: _CompanyHeaderBar(
+                            companyName: company.name,
+                            label: t.codeCompanyLabel,
                           ),
                         ),
-                        const Spacer(),
-                        // Settings
-                        IconButton(
-                          icon: const SettingsIcon(
-                            size: 20,
-                            color: AppTokens.inkSecondary,
-                          ),
-                          onPressed: () => showModalBottomSheet(
+                        const SizedBox(width: 10),
+                        // Settings button — 40×40, surface bg, border
+                        GestureDetector(
+                          onTap: () => showModalBottomSheet(
                             context: context,
                             isScrollControlled: true,
                             useSafeArea: true,
@@ -95,7 +78,21 @@ class DashboardCompanyScreen extends ConsumerWidget {
                             ),
                             builder: (_) => const SettingsSheet(),
                           ),
-                          tooltip: t.settingsTitle,
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: AppTokens.surface,
+                              borderRadius:
+                                  BorderRadius.circular(AppTokens.radiusSm),
+                              border: Border.all(color: AppTokens.border),
+                            ),
+                            alignment: Alignment.center,
+                            child: const SettingsIcon(
+                              size: 18,
+                              color: AppTokens.ink,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -362,8 +359,25 @@ class _MerchantRow extends StatelessWidget {
   const _MerchantRow({required this.merchant});
   final Merchant merchant;
 
+  /// Short relative time string from ISO timestamp.
+  /// Returns e.g. "2m", "1h", "Yesterday", or "—" if null.
+  static String _relativeTime(String? isoAt) {
+    if (isoAt == null) return '—';
+    final at = DateTime.tryParse(isoAt);
+    if (at == null) return '—';
+    final diff = DateTime.now().difference(at);
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m';
+    if (diff.inHours < 24) return '${diff.inHours}h';
+    if (diff.inDays == 1) return 'Yesterday';
+    return '${diff.inDays}d';
+  }
+
   @override
   Widget build(BuildContext context) {
+    final t = AppL10n.of(context);
+    final timeStr = _relativeTime(merchant.lastTransactionAt);
+    final hasLastTx = merchant.lastTransactionAt != null;
+
     return GestureDetector(
       onTap: () =>
           context.push('/dashboard/merchant/${merchant.id}'),
@@ -373,6 +387,7 @@ class _MerchantRow extends StatelessWidget {
           children: [
             MerchantAvatar(name: merchant.name, size: 44),
             const SizedBox(width: 12),
+            // Left column: name + #code
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -382,34 +397,143 @@ class _MerchantRow extends StatelessWidget {
                     style: const TextStyle(
                       fontFamily: AppTokens.fontDisplay,
                       fontSize: 15,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
                       color: AppTokens.ink,
+                      letterSpacing: -0.2,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 3),
                   Text(
-                    'IDR ${NumberFormat('#,###', 'id_ID').format(merchant.todayTotal)}',
+                    merchant.code.isNotEmpty ? merchant.code : '',
                     style: const TextStyle(
-                      fontFamily: AppTokens.fontDisplay,
-                      fontSize: 13,
+                      fontFamily: AppTokens.fontMono,
+                      fontSize: 12,
                       color: AppTokens.inkSecondary,
                     ),
                   ),
                 ],
               ),
             ),
-            if (merchant.unreadCount > 0)
-              AppChip(
-                label: '${merchant.unreadCount}',
-                tone: ChipTone.accent,
-                leading: const Icon(Icons.circle, size: 6),
-              ),
+            // Right column: last · time + amount (or —)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  hasLastTx
+                      ? '${t.txLast} · $timeStr'
+                      : t.txNone,
+                  style: const TextStyle(
+                    fontFamily: AppTokens.fontDisplay,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: AppTokens.inkTertiary,
+                    letterSpacing: 0.4,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                // No lastTxAmount on model yet — show "—" as placeholder
+                Text(
+                  '—',
+                  style: TextStyle(
+                    fontFamily: AppTokens.fontDisplay,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: hasLastTx
+                        ? AppTokens.ink
+                        : AppTokens.inkTertiary,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(width: 8),
             const ChevronIcon(
-              color: AppTokens.inkDisabled,
-              size: 20,
+              color: AppTokens.inkTertiary,
+              size: 14,
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// 40px full-width header bar: Store icon + "COMPANY" overline + company name.
+///
+/// Mirrors AppShell header in screens-dashboard.jsx (isCompanyLevel=true state,
+/// background: T.accent, color: #fff).
+class _CompanyHeaderBar extends StatelessWidget {
+  const _CompanyHeaderBar({
+    required this.companyName,
+    required this.label,
+  });
+
+  final String companyName;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 40,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: AppTokens.accent,
+        borderRadius: BorderRadius.circular(AppTokens.radiusSm),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x141A0F0C),
+            blurRadius: 2,
+            offset: Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Store icon sub-container 26×26
+          Container(
+            width: 26,
+            height: 26,
+            decoration: BoxDecoration(
+              color: Colors.white24,
+              borderRadius: BorderRadius.circular(7),
+            ),
+            alignment: Alignment.center,
+            child: const StoreIcon(size: 16, color: Colors.white),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  label.toUpperCase(),
+                  style: const TextStyle(
+                    fontFamily: AppTokens.fontDisplay,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white70,
+                    letterSpacing: 0.8,
+                    height: 1,
+                  ),
+                ),
+                Text(
+                  companyName,
+                  style: const TextStyle(
+                    fontFamily: AppTokens.fontDisplay,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                    letterSpacing: -0.1,
+                    height: 1.2,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

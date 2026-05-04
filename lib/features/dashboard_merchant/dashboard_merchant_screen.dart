@@ -211,14 +211,26 @@ class _DashboardMerchantScreenState
                         color: AppTokens.ink,
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      t.dashMerchantTxns(merchant.todayCount),
-                      style: const TextStyle(
-                        fontFamily: AppTokens.fontDisplay,
-                        fontSize: 13,
-                        color: AppTokens.inkSecondary,
-                      ),
+                    const SizedBox(height: 14),
+                    // 2-up BigStat grid — transactions + avg ticket
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _BigStat(
+                            label: t.dashCompanyStatTxns,
+                            value: '${merchant.todayCount}',
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _BigStat(
+                            label: t.dashMerchantAvg,
+                            value: merchant.todayCount > 0
+                                ? 'IDR ${fmt.format((merchant.todayTotal / merchant.todayCount).round())}'
+                                : 'IDR 0',
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -503,6 +515,53 @@ class _TxnRow extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// White tile stat — mirrors BigStat in screens-dashboard.jsx (onAccent=true).
+class _BigStat extends StatelessWidget {
+  const _BigStat({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppTokens.radiusSm),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label.toUpperCase(),
+            style: const TextStyle(
+              fontFamily: AppTokens.fontDisplay,
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: AppTokens.inkTertiary,
+              letterSpacing: 0.6,
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            value,
+            style: const TextStyle(
+              fontFamily: AppTokens.fontDisplay,
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: AppTokens.ink,
+              letterSpacing: -0.2,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
