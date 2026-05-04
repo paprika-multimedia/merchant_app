@@ -8,7 +8,7 @@ part 'payer.g.dart';
 /// For CPM transactions the server intentionally omits payer_name on mobile
 /// sessions. This model never stores or surfaces payer_name.
 @freezed
-class Payer with _$Payer {
+abstract class Payer with _$Payer {
   const factory Payer({
     /// Masked phone from issuer — optional, may be omitted by acquirer.
     @JsonKey(name: 'masked_phone') String? maskedPhone,
@@ -23,7 +23,7 @@ class Payer with _$Payer {
 ///
 /// payer_name is intentionally absent: server strips it from mobile sessions.
 @freezed
-class CpmInfo with _$CpmInfo {
+abstract class CpmInfo with _$CpmInfo {
   const factory CpmInfo({
     /// Display-ready bank/wallet name.
     @JsonKey(name: 'issuer_name') required String issuerName,

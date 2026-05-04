@@ -5,7 +5,7 @@ part 'company.g.dart';
 
 /// Company resource — mirrors Spec.md §2.1 verbatim.
 @freezed
-class Company with _$Company {
+abstract class Company with _$Company {
   const factory Company({
     required String id,
     required String name,

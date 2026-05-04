@@ -7,7 +7,7 @@ part 'merchant.g.dart';
 ///
 /// Unknown keys are tolerated — the object is open-ended per spec.
 @freezed
-class MerchantCapabilities with _$MerchantCapabilities {
+abstract class MerchantCapabilities with _$MerchantCapabilities {
   const factory MerchantCapabilities({
     @JsonKey(name: 'scan_cpm') @Default(false) bool scanCpm,
     @JsonKey(name: 'cpm_ceiling') int? cpmCeiling,
@@ -19,7 +19,7 @@ class MerchantCapabilities with _$MerchantCapabilities {
 
 /// Merchant resource — mirrors Spec.md §2.2 verbatim.
 @freezed
-class Merchant with _$Merchant {
+abstract class Merchant with _$Merchant {
   const factory Merchant({
     required String id,
     @JsonKey(name: 'company_id') required String companyId,

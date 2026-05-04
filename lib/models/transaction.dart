@@ -24,7 +24,7 @@ enum TransactionType {
 
 /// Transaction resource — mirrors Spec.md §2.3 verbatim.
 @freezed
-class Transaction with _$Transaction {
+abstract class Transaction with _$Transaction {
   const factory Transaction({
     required String id,
     @JsonKey(name: 'merchant_id') required String merchantId,
