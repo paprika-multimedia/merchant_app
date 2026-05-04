@@ -8,8 +8,9 @@ import '../../models/merchant.dart';
 import '../../primitives/card.dart';
 import '../../primitives/icons.dart';
 import '../../primitives/merchant_avatar.dart';
-import '../../state/session.dart';
 import '../../state/active_merchant.dart';
+import '../../state/last_tx_amount.dart';
+import '../../state/session.dart';
 import '../../theme/tokens.dart';
 import '../settings_sheet/settings_sheet.dart';
 
@@ -367,7 +368,7 @@ class _MerchantChip extends ConsumerWidget {
   }
 }
 
-class _MerchantRow extends StatelessWidget {
+class _MerchantRow extends ConsumerWidget {
   const _MerchantRow({required this.merchant});
   final Merchant merchant;
 
@@ -385,10 +386,12 @@ class _MerchantRow extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final t = AppL10n.of(context);
     final timeStr = _relativeTime(merchant.lastTransactionAt);
     final hasLastTx = merchant.lastTransactionAt != null;
+    final lastAmount = ref.watch(lastTxAmountProvider(merchant.id));
+    final fmt = NumberFormat('#,###', 'id_ID');
 
     return GestureDetector(
       onTap: () =>
@@ -426,7 +429,7 @@ class _MerchantRow extends StatelessWidget {
                 ],
               ),
             ),
-            // Right column: last · time + amount (or —)
+            // Right column: last · time + amount from local store
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
@@ -443,9 +446,8 @@ class _MerchantRow extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                // No lastTxAmount on model yet — show "—" as placeholder
                 Text(
-                  '—',
+                  'IDR ${fmt.format(lastAmount)}',
                   style: TextStyle(
                     fontFamily: AppTokens.fontDisplay,
                     fontSize: 15,

@@ -17,6 +17,7 @@ import '../../primitives/field.dart';
 import '../../primitives/icons.dart';
 import '../../primitives/keypad.dart';
 import '../../primitives/screen_header.dart';
+import '../../state/last_tx_amount.dart';
 import '../../state/recent_amounts.dart';
 import '../../state/session.dart';
 import '../../theme/tokens.dart';
@@ -135,6 +136,9 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
       await ref
           .read(recentAmountsProvider((widget.merchantId, 'link')).notifier)
           .push(_amount);
+      await ref
+          .read(lastTxAmountProvider(widget.merchantId).notifier)
+          .setLast(_amount);
 
       setState(() {
         _txn = txn;

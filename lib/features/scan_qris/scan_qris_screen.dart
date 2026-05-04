@@ -17,6 +17,7 @@ import '../../net/dio_client.dart';
 import '../../primitives/button.dart';
 import '../../primitives/icons.dart';
 import '../../primitives/screen_header.dart';
+import '../../state/last_tx_amount.dart';
 import '../../state/recent_amounts.dart';
 import '../../state/session.dart';
 import '../../theme/tokens.dart';
@@ -156,10 +157,13 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
       final txn = result['transaction'] as Map<String, dynamic>?;
       final ref_ = txn?['ref'] as String?;
 
-      // Push amount to recents
+      // Push amount to recents and record as last transaction amount
       await ref
           .read(recentAmountsProvider((widget.merchantId, 'cpm')).notifier)
           .push(_amount);
+      await ref
+          .read(lastTxAmountProvider(widget.merchantId).notifier)
+          .setLast(_amount);
 
       // Announce payment via TTS
       // Note: payment_announcer.dart handles this via WS event; no direct call needed here

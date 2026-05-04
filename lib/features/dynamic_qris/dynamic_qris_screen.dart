@@ -5,7 +5,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../brand/paprika_mark.dart';
@@ -20,6 +24,7 @@ import '../../primitives/field.dart';
 import '../../primitives/icons.dart';
 import '../../primitives/keypad.dart';
 import '../../primitives/screen_header.dart';
+import '../../state/last_tx_amount.dart';
 import '../../state/recent_amounts.dart';
 import '../../state/session.dart';
 import '../../theme/tokens.dart';
@@ -111,10 +116,13 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
       final qr = result['qr_payload'] as String;
       final exp = DateTime.parse(result['expires_at'] as String);
 
-      // Push amount to recents
+      // Push amount to recents and record as last transaction amount
       await ref
           .read(recentAmountsProvider((widget.merchantId, 'qris')).notifier)
           .push(_amount);
+      await ref
+          .read(lastTxAmountProvider(widget.merchantId).notifier)
+          .setLast(_amount);
 
       setState(() {
         _txn = txn;
@@ -133,6 +141,80 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
         // Keep the same _idempotencyKey so retry reuses it
       });
     }
+  }
+
+  // ─── Share ───────────────────────────────────────────────────────────────────
+
+  Future<void> _share() async {
+    final payload = _qrPayload;
+    if (payload == null) return;
+    try {
+      await Share.share(payload, subject: 'Paprika QRIS');
+    } catch (e) {
+      debugPrint('Share failed: $e');
+    }
+  }
+
+  // ─── Print ───────────────────────────────────────────────────────────────────
+
+  Future<void> _print(String merchantName, NumberFormat fmt) async {
+    final payload = _qrPayload;
+    if (payload == null) return;
+    try {
+      await Printing.layoutPdf(
+        onLayout: (PdfPageFormat format) async {
+          final doc = pw.Document();
+          final qrImage = await _buildQrPdfImage(payload);
+          doc.addPage(
+            pw.Page(
+              pageFormat: format,
+              build: (pw.Context ctx) {
+                return pw.Center(
+                  child: pw.Column(
+                    mainAxisAlignment: pw.MainAxisAlignment.center,
+                    children: [
+                      pw.Text(
+                        merchantName,
+                        style: const pw.TextStyle(fontSize: 20),
+                      ),
+                      pw.SizedBox(height: 8),
+                      pw.Text(
+                        'IDR ${fmt.format(_amount)}',
+                        style: pw.TextStyle(
+                          fontSize: 16,
+                          fontWeight: pw.FontWeight.bold,
+                        ),
+                      ),
+                      pw.SizedBox(height: 16),
+                      pw.Image(qrImage, width: 200, height: 200),
+                    ],
+                  ),
+                );
+              },
+            ),
+          );
+          return doc.save();
+        },
+      );
+    } catch (e) {
+      debugPrint('Print failed: $e');
+    }
+  }
+
+  /// Renders the QR payload into a [pw.ImageProvider] for use in a PDF page.
+  Future<pw.ImageProvider> _buildQrPdfImage(String payload) async {
+    // Use the barcode package (transitively available via pdf) to render a QR
+    // code as raw image bytes via the printing package's raster helper.
+    final qrPainter = QrPainter(
+      data: payload,
+      version: QrVersions.auto,
+      eyeStyle: const QrEyeStyle(eyeShape: QrEyeShape.square),
+      dataModuleStyle: const QrDataModuleStyle(
+        dataModuleShape: QrDataModuleShape.square,
+      ),
+    );
+    final imageData = await qrPainter.toImageData(512);
+    return pw.MemoryImage(imageData!.buffer.asUint8List());
   }
 
   void _startExpireTimer() {
@@ -226,7 +308,7 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
             Expanded(
               child: switch (_step) {
                 _QrisStep.amount => _buildAmount(t, fmt, const []),
-                _QrisStep.qr => _buildQr(t, fmt),
+                _QrisStep.qr => _buildQr(t, fmt, merchantName),
                 _QrisStep.paid => _buildPaid(t, fmt),
               },
             ),
@@ -382,7 +464,7 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
 
   // ─── QR step ─────────────────────────────────────────────────────────────
 
-  Widget _buildQr(AppL10n t, NumberFormat fmt) {
+  Widget _buildQr(AppL10n t, NumberFormat fmt, String merchantName) {
     final isExpired = _txn?.status == TransactionStatus.expired;
     final remaining = _expiresAt?.difference(DateTime.now()) ?? Duration.zero;
     final mins = remaining.inMinutes;
@@ -453,8 +535,7 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
                   label: t.qrisShare,
                   variant: AppButtonVariant.secondary,
                   leading: const ShareIcon(size: 16, color: AppTokens.ink),
-                  // TODO: wire share intent (share_plus or url_launcher)
-                  onPressed: () {},
+                  onPressed: _share,
                 ),
               ),
               const SizedBox(width: 8),
@@ -463,8 +544,7 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
                   label: t.qrisPrint,
                   variant: AppButtonVariant.secondary,
                   leading: const PrintIcon(size: 16, color: AppTokens.ink),
-                  // TODO: wire print
-                  onPressed: () {},
+                  onPressed: () => _print(merchantName, fmt),
                 ),
               ),
               const SizedBox(width: 8),
