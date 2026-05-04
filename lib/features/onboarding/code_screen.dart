@@ -10,6 +10,7 @@ import '../../net/api/sessions_api.dart';
 import '../../primitives/button.dart';
 import '../../primitives/code_input.dart';
 import '../../primitives/icons.dart';
+import '../../primitives/screen_header.dart';
 import '../../state/session.dart';
 import '../../state/active_merchant.dart';
 import '../../theme/tokens.dart';
@@ -22,11 +23,7 @@ enum CodeScreenKind { company, merchant }
 /// Used for both company-code entry (step 1) and merchant-code entry (step 2).
 /// Passes [addMode] through for the merchant flow.
 class CodeScreen extends ConsumerStatefulWidget {
-  const CodeScreen({
-    super.key,
-    required this.kind,
-    this.addMode = false,
-  });
+  const CodeScreen({super.key, required this.kind, this.addMode = false});
 
   final CodeScreenKind kind;
   final bool addMode;
@@ -71,15 +68,15 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
         context.push('/code/merchant');
       } else {
         // Merchant claim
-        final merchant = await MerchantsApi(dio).claim(
-          _code,
-          idempotencyKey: const Uuid().v4(),
-        );
+        final merchant = await MerchantsApi(
+          dio,
+        ).claim(_code, idempotencyKey: const Uuid().v4());
         final session = ref.read(sessionProvider).value;
         if (session != null) {
-          ref.read(sessionProvider.notifier).updateMerchants(
-            [...session.merchants, merchant],
-          );
+          ref.read(sessionProvider.notifier).updateMerchants([
+            ...session.merchants,
+            merchant,
+          ]);
         }
         await ref
             .read(activeMerchantIdProvider.notifier)
@@ -104,92 +101,92 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
   Widget build(BuildContext context) {
     final t = AppL10n.of(context);
     final isMerchant = widget.kind == CodeScreenKind.merchant;
-    final title =
-        isMerchant ? t.codeTitleMerchant : t.codeTitleCompany;
     final sub = isMerchant ? t.codeSubMerchant : t.codeSubCompany;
     final step = isMerchant ? 2 : 1;
 
     return Scaffold(
       backgroundColor: AppTokens.bg,
-      appBar: AppBar(
-        backgroundColor: AppTokens.bg,
-        elevation: 0,
-        leading: IconButton(
-          icon: const BackIcon(size: 20, color: AppTokens.ink),
-          onPressed: () => context.pop(),
-          tooltip: t.commonBack,
-        ),
-        title: Text(
-          widget.addMode ? t.codeAdd : t.codeStep(step),
-          style: const TextStyle(
-            fontFamily: AppTokens.fontDisplay,
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-            color: AppTokens.inkSecondary,
-          ),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(22, 16, 22, 0),
+      body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontFamily: AppTokens.fontDisplay,
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
-                color: AppTokens.ink,
+            PaprikaScreenHeader(
+              onBack: () => context.pop(),
+              overline: widget.addMode
+                  ? null
+                  : Text(t.codeStep(step).toUpperCase()),
+              title: Text(
+                widget.addMode
+                    ? t.codeAdd
+                    : (isMerchant ? t.codeTitleMerchant : t.codeTitleCompany),
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              sub,
-              style: const TextStyle(
-                fontFamily: AppTokens.fontDisplay,
-                fontSize: 14,
-                color: AppTokens.inkSecondary,
-                height: 1.5,
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(22, 16, 22, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isMerchant ? t.codeTitleMerchant : t.codeTitleCompany,
+                      style: const TextStyle(
+                        fontFamily: AppTokens.fontDisplay,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        color: AppTokens.ink,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      sub,
+                      style: const TextStyle(
+                        fontFamily: AppTokens.fontDisplay,
+                        fontSize: 14,
+                        color: AppTokens.inkSecondary,
+                        height: 1.5,
+                      ),
+                    ),
+                    // Fix 6a: confirmed-company chip on merchant code step
+                    if (isMerchant) ...[
+                      const SizedBox(height: 16),
+                      _ConfirmedCompanyCard(ref: ref, t: t),
+                    ],
+                    const SizedBox(height: 28),
+                    CodeInput(
+                      onChanged: (v) => setState(() => _code = v),
+                      error: _error,
+                    ),
+                    const Spacer(),
+                    AppButton(
+                      label: t.codeContinue,
+                      variant: AppButtonVariant.primary,
+                      size: AppButtonSize.lg,
+                      block: true,
+                      disabled: !_canContinue,
+                      onPressed: _onContinue,
+                    ),
+                    const SizedBox(height: 12),
+                    Center(
+                      child: AppButton(
+                        label: t.codeCamera,
+                        variant: AppButtonVariant.ghost,
+                        onPressed: () {
+                          if (isMerchant) {
+                            context.pushReplacement(
+                              '/scan/merchant',
+                              extra: {'addMode': widget.addMode},
+                            );
+                          } else {
+                            context.pushReplacement('/scan/company');
+                          }
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 28),
+                  ],
+                ),
               ),
             ),
-            // Fix 6a: confirmed-company chip on merchant code step
-            if (isMerchant) ...[
-              const SizedBox(height: 16),
-              _ConfirmedCompanyCard(ref: ref, t: t),
-            ],
-            const SizedBox(height: 28),
-            CodeInput(
-              onChanged: (v) => setState(() => _code = v),
-              error: _error,
-            ),
-            const Spacer(),
-            AppButton(
-              label: t.codeContinue,
-              variant: AppButtonVariant.primary,
-              size: AppButtonSize.lg,
-              block: true,
-              disabled: !_canContinue,
-              onPressed: _onContinue,
-            ),
-            const SizedBox(height: 12),
-            Center(
-              child: AppButton(
-                label: t.codeCamera,
-                variant: AppButtonVariant.ghost,
-                onPressed: () {
-                  if (isMerchant) {
-                    context.pushReplacement(
-                      '/scan/merchant',
-                      extra: {'addMode': widget.addMode},
-                    );
-                  } else {
-                    context.pushReplacement('/scan/company');
-                  }
-                },
-              ),
-            ),
-            const SizedBox(height: 28),
           ],
         ),
       ),

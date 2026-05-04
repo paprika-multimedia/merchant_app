@@ -1,12 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../brand/paprika_mark.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/transaction.dart';
 import '../../net/api/merchants_api.dart';
@@ -18,6 +20,7 @@ import '../../primitives/chip.dart';
 import '../../primitives/field.dart';
 import '../../primitives/icons.dart';
 import '../../primitives/keypad.dart';
+import '../../primitives/screen_header.dart';
 import '../../state/recent_amounts.dart';
 import '../../theme/tokens.dart';
 
@@ -32,8 +35,7 @@ class DynamicQrisScreen extends ConsumerStatefulWidget {
   final String merchantId;
 
   @override
-  ConsumerState<DynamicQrisScreen> createState() =>
-      _DynamicQrisScreenState();
+  ConsumerState<DynamicQrisScreen> createState() => _DynamicQrisScreenState();
 }
 
 class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
@@ -68,7 +70,9 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
 
   void _onBackspace() {
     if (_amountStr.isNotEmpty) {
-      setState(() => _amountStr = _amountStr.substring(0, _amountStr.length - 1));
+      setState(
+        () => _amountStr = _amountStr.substring(0, _amountStr.length - 1),
+      );
     }
   }
 
@@ -101,8 +105,9 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
         idempotencyKey: _idempotencyKey!,
       );
 
-      final txn =
-          Transaction.fromJson(result['transaction'] as Map<String, dynamic>);
+      final txn = Transaction.fromJson(
+        result['transaction'] as Map<String, dynamic>,
+      );
       final qr = result['qr_payload'] as String;
       final exp = DateTime.parse(result['expires_at'] as String);
 
@@ -162,10 +167,9 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
     }
     try {
       final dio = await ref.read(dioProvider.future);
-      await TransactionsApi(dio).cancel(
-        txnId,
-        idempotencyKey: const Uuid().v4(),
-      );
+      await TransactionsApi(
+        dio,
+      ).cancel(txnId, idempotencyKey: const Uuid().v4());
     } catch (_) {}
     _expireTimer?.cancel();
     setState(() {
@@ -180,46 +184,44 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
   Widget build(BuildContext context) {
     final t = AppL10n.of(context);
     final fmt = NumberFormat('#,###', 'id_ID');
-    final recents =
-        ref.watch(recentAmountsProvider((widget.merchantId, 'qris')));
+    final recents = ref.watch(
+      recentAmountsProvider((widget.merchantId, 'qris')),
+    );
+
+    final VoidCallback backAction = _step == _QrisStep.paid
+        ? () => context.go('/dashboard/merchant/${widget.merchantId}')
+        : () {
+            if (_step == _QrisStep.qr) {
+              _cancel();
+            } else {
+              context.pop();
+            }
+          };
 
     return Scaffold(
       backgroundColor: AppTokens.bg,
-      appBar: AppBar(
-        backgroundColor: AppTokens.bg,
-        elevation: 0,
-        leading: IconButton(
-          icon: const CloseIcon(size: 20, color: AppTokens.ink),
-          onPressed: _step == _QrisStep.paid
-              ? () => context.go(
-                    '/dashboard/merchant/${widget.merchantId}')
-              : () {
-                  if (_step == _QrisStep.qr) {
-                    _cancel();
-                  } else {
-                    context.pop();
-                  }
-                },
-        ),
-        title: Text(
-          switch (_step) {
-            _QrisStep.amount => t.qrisHeaderAmount,
-            _QrisStep.qr => t.qrisHeaderWaiting,
-            _QrisStep.paid => t.qrisHeaderPaid,
-          },
-          style: const TextStyle(
-            fontFamily: AppTokens.fontDisplay,
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-            color: AppTokens.ink,
-          ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            PaprikaScreenHeader(
+              onBack: backAction,
+              overline: Text(t.qrisTitle.toUpperCase()),
+              title: Text(switch (_step) {
+                _QrisStep.amount => t.qrisHeaderAmount,
+                _QrisStep.qr => t.qrisHeaderWaiting,
+                _QrisStep.paid => t.qrisHeaderPaid,
+              }),
+            ),
+            Expanded(
+              child: switch (_step) {
+                _QrisStep.amount => _buildAmount(t, fmt, recents),
+                _QrisStep.qr => _buildQr(t, fmt),
+                _QrisStep.paid => _buildPaid(t, fmt),
+              },
+            ),
+          ],
         ),
       ),
-      body: switch (_step) {
-        _QrisStep.amount => _buildAmount(t, fmt, recents),
-        _QrisStep.qr => _buildQr(t, fmt),
-        _QrisStep.paid => _buildPaid(t, fmt),
-      },
     );
   }
 
@@ -256,11 +258,14 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
                               onTap: _clearAmount,
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 4),
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
                                 decoration: BoxDecoration(
                                   color: AppTokens.surfaceAlt,
                                   borderRadius: BorderRadius.circular(
-                                      AppTokens.radiusXs),
+                                    AppTokens.radiusXs,
+                                  ),
                                 ),
                                 child: Text(
                                   t.qrisAmountClear,
@@ -291,9 +296,7 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
                           ),
                           Expanded(
                             child: Text(
-                              _amount > 0
-                                  ? fmt.format(_amount)
-                                  : '0',
+                              _amount > 0 ? fmt.format(_amount) : '0',
                               textAlign: TextAlign.right,
                               style: TextStyle(
                                 fontFamily: AppTokens.fontDisplay,
@@ -316,8 +319,7 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
                   spacing: 8,
                   children: recents.map((a) {
                     return GestureDetector(
-                      onTap: () =>
-                          setState(() => _amountStr = a.toString()),
+                      onTap: () => setState(() => _amountStr = a.toString()),
                       child: AppChip(
                         label: fmt.format(a),
                         tone: ChipTone.neutral,
@@ -340,7 +342,9 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
                     child: Text(
                       _error!,
                       style: const TextStyle(
-                          color: AppTokens.danger, fontSize: 13),
+                        color: AppTokens.danger,
+                        fontSize: 13,
+                      ),
                     ),
                   ),
               ],
@@ -379,8 +383,7 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
 
   Widget _buildQr(AppL10n t, NumberFormat fmt) {
     final isExpired = _txn?.status == TransactionStatus.expired;
-    final remaining =
-        _expiresAt?.difference(DateTime.now()) ?? Duration.zero;
+    final remaining = _expiresAt?.difference(DateTime.now()) ?? Duration.zero;
     final mins = remaining.inMinutes;
     final secs = remaining.inSeconds % 60;
 
@@ -391,12 +394,9 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
           AppCard(
             child: Column(
               children: [
+                // QR with PaprikaMark center overlay
                 if (_qrPayload != null)
-                  QrImageView(
-                    data: _qrPayload!,
-                    size: 240,
-                    backgroundColor: Colors.white,
-                  )
+                  _QrWithMark(payload: _qrPayload!)
                 else
                   const SizedBox(height: 240),
                 const SizedBox(height: 12),
@@ -432,7 +432,8 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
                       )
                     : Text(
                         t.qrisExpiresLive(
-                            '$mins:${secs.toString().padLeft(2, '0')}'),
+                          '$mins:${secs.toString().padLeft(2, '0')}',
+                        ),
                         style: const TextStyle(
                           fontFamily: AppTokens.fontDisplay,
                           fontSize: 13,
@@ -442,17 +443,50 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
+          // Share / Print / Copy action row
           Row(
             children: [
               Expanded(
                 child: AppButton(
-                  label: t.qrisCancel,
+                  label: t.qrisShare,
                   variant: AppButtonVariant.secondary,
-                  onPressed: _cancel,
+                  leading: const ShareIcon(size: 16, color: AppTokens.ink),
+                  // TODO: wire share intent (share_plus or url_launcher)
+                  onPressed: () {},
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: AppButton(
+                  label: t.qrisPrint,
+                  variant: AppButtonVariant.secondary,
+                  leading: const PrintIcon(size: 16, color: AppTokens.ink),
+                  // TODO: wire print
+                  onPressed: () {},
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: AppButton(
+                  label: t.qrisCopy,
+                  variant: AppButtonVariant.secondary,
+                  leading: const CopyIcon(size: 16, color: AppTokens.ink),
+                  onPressed: () {
+                    if (_qrPayload != null) {
+                      Clipboard.setData(ClipboardData(text: _qrPayload!));
+                    }
+                  },
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 12),
+          AppButton(
+            label: t.qrisCancel,
+            variant: AppButtonVariant.secondary,
+            block: true,
+            onPressed: _cancel,
           ),
         ],
       ),
@@ -511,16 +545,9 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
                       label: t.qrisRowMethod,
                       value: 'QRIS · ${_txn!.payer!.issuerName!}',
                     ),
-                  _DetailRow(
-                    label: t.qrisRowRef,
-                    value: _txn!.ref,
-                    mono: true,
-                  ),
+                  _DetailRow(label: t.qrisRowRef, value: _txn!.ref, mono: true),
                   if (_txn!.paidAt != null)
-                    _DetailRow(
-                      label: t.qrisRowAt,
-                      value: _txn!.paidAt!,
-                    ),
+                    _DetailRow(label: t.qrisRowAt, value: _txn!.paidAt!),
                 ],
               ),
             ),
@@ -547,6 +574,55 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
               _note = '';
               _idempotencyKey = null;
             }),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// QR code with a centered [PaprikaMark] overlay (white-background rounded tile).
+///
+/// Size: 240×240. Mark overlay: ~18% of QR width → 44px tile (including padding).
+/// Border: [AppTokens.border] hairline ring, 6px radius.
+class _QrWithMark extends StatelessWidget {
+  const _QrWithMark({required this.payload});
+
+  final String payload;
+
+  @override
+  Widget build(BuildContext context) {
+    const qrSize = 240.0;
+    const overlaySize = 44.0; // ~18% of 240
+
+    return SizedBox(
+      width: qrSize,
+      height: qrSize,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          QrImageView(
+            data: payload,
+            size: qrSize,
+            backgroundColor: Colors.white,
+          ),
+          Container(
+            width: overlaySize,
+            height: overlaySize,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: AppTokens.border, width: 1),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x1E000000),
+                  blurRadius: 6,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            alignment: Alignment.center,
+            child: const PaprikaMark(size: 28, tile: false),
           ),
         ],
       ),
@@ -588,8 +664,7 @@ class _DetailRow extends StatelessWidget {
               value,
               textAlign: TextAlign.right,
               style: TextStyle(
-                fontFamily:
-                    mono ? AppTokens.fontMono : AppTokens.fontDisplay,
+                fontFamily: mono ? AppTokens.fontMono : AppTokens.fontDisplay,
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: AppTokens.ink,

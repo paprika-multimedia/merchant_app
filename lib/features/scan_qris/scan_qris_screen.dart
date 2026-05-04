@@ -16,6 +16,7 @@ import '../../net/api/merchants_api.dart';
 import '../../net/dio_client.dart';
 import '../../primitives/button.dart';
 import '../../primitives/icons.dart';
+import '../../primitives/screen_header.dart';
 import '../../state/recent_amounts.dart';
 import '../../state/session.dart';
 import '../../theme/tokens.dart';
@@ -83,12 +84,8 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
   }
 
   /// Called when MobileScanner encounters an error (including permission denied).
-  Widget _onScannerError(
-    BuildContext ctx,
-    MobileScannerException error,
-  ) {
-    final isDenied =
-        error.errorCode == MobileScannerErrorCode.permissionDenied;
+  Widget _onScannerError(BuildContext ctx, MobileScannerException error) {
+    final isDenied = error.errorCode == MobileScannerErrorCode.permissionDenied;
     if (isDenied && !_cameraPermissionDenied) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) setState(() => _cameraPermissionDenied = true);
@@ -217,8 +214,7 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
   void _onDigit(String d) {
     setState(() {
       if (_amountStr.isEmpty && d == '0') return;
-      final raw =
-          (_amountStr + d).replaceFirst(RegExp(r'^0+'), '');
+      final raw = (_amountStr + d).replaceFirst(RegExp(r'^0+'), '');
       if (raw.length > 10) return; // cap at 10 digits
       _amountStr = raw;
     });
@@ -226,8 +222,9 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
 
   void _onBackspace() {
     if (_amountStr.isNotEmpty) {
-      setState(() =>
-          _amountStr = _amountStr.substring(0, _amountStr.length - 1));
+      setState(
+        () => _amountStr = _amountStr.substring(0, _amountStr.length - 1),
+      );
     }
   }
 
@@ -430,8 +427,9 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
   Widget _buildConfirmStep(BuildContext context, Merchant? merchant) {
     final t = AppL10n.of(context);
     final fmt = NumberFormat('#,###', 'id_ID');
-    final recents =
-        ref.watch(recentAmountsProvider((widget.merchantId, 'cpm')));
+    final recents = ref.watch(
+      recentAmountsProvider((widget.merchantId, 'cpm')),
+    );
 
     return Scaffold(
       backgroundColor: AppTokens.bg,
@@ -461,8 +459,11 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
                         ),
                       ],
                     ),
-                    child: const Icon(Icons.arrow_back,
-                        color: AppTokens.ink, size: 18),
+                    child: const Icon(
+                      Icons.arrow_back,
+                      color: AppTokens.ink,
+                      size: 18,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -506,38 +507,45 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
                 children: [
                   // QRIS valid pill
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: AppTokens.successSoft,
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 18,
-                          height: 18,
-                          decoration: const BoxDecoration(
-                            color: AppTokens.success,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const CheckIcon(
-                              color: Colors.white, size: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          t.cpmValid,
-                          style: const TextStyle(
-                            fontFamily: AppTokens.fontDisplay,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: AppTokens.success,
-                          ),
+                        decoration: BoxDecoration(
+                          color: AppTokens.successSoft,
+                          borderRadius: BorderRadius.circular(999),
                         ),
-                      ],
-                    ),
-                  ).animate().fadeIn(duration: 200.ms).scale(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 18,
+                              height: 18,
+                              decoration: const BoxDecoration(
+                                color: AppTokens.success,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const CheckIcon(
+                                color: Colors.white,
+                                size: 12,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              t.cpmValid,
+                              style: const TextStyle(
+                                fontFamily: AppTokens.fontDisplay,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: AppTokens.success,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                      .animate()
+                      .fadeIn(duration: 200.ms)
+                      .scale(
                         begin: const Offset(0.92, 0.92),
                         end: const Offset(1, 1),
                         duration: 200.ms,
@@ -587,7 +595,8 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
                                 child: Container(
                                   height: 24,
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 10),
+                                    horizontal: 10,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: AppTokens.surfaceAlt,
                                     borderRadius: BorderRadius.circular(12),
@@ -622,9 +631,7 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              _amountStr.isNotEmpty
-                                  ? fmt.format(_amount)
-                                  : '0',
+                              _amountStr.isNotEmpty ? fmt.format(_amount) : '0',
                               style: TextStyle(
                                 fontFamily: AppTokens.fontDisplay,
                                 fontSize: 44,
@@ -649,8 +656,7 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
                     runSpacing: 8,
                     children: recents.map((v) {
                       return GestureDetector(
-                        onTap: () => setState(() =>
-                            _amountStr = v.toString()),
+                        onTap: () => setState(() => _amountStr = v.toString()),
                         child: Container(
                           height: 34,
                           padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -684,8 +690,11 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.error_outline,
-                              color: AppTokens.danger, size: 16),
+                          const Icon(
+                            Icons.error_outline,
+                            color: AppTokens.danger,
+                            size: 16,
+                          ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
@@ -755,15 +764,17 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
                 children: [
                   // Paprika-pop checkmark
                   Container(
-                    width: 84,
-                    height: 84,
-                    decoration: const BoxDecoration(
-                      color: AppTokens.successSoft,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const CheckIcon(
-                        color: AppTokens.success, size: 42),
-                  )
+                        width: 84,
+                        height: 84,
+                        decoration: const BoxDecoration(
+                          color: AppTokens.successSoft,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const CheckIcon(
+                          color: AppTokens.success,
+                          size: 42,
+                        ),
+                      )
                       .animate()
                       .scale(
                         begin: const Offset(0.5, 0.5),
@@ -822,7 +833,9 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 14),
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
                       decoration: BoxDecoration(
                         color: AppTokens.surface,
                         borderRadius: BorderRadius.circular(14),
@@ -835,16 +848,20 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
                             value: t.cpmSuccessMethod,
                           ),
                           const Divider(
-                              height: 1, thickness: 1, color: AppTokens.border),
+                            height: 1,
+                            thickness: 1,
+                            color: AppTokens.border,
+                          ),
                           _DetailRow(
                             label: t.cpmRowMerchant,
                             value: merchant?.name ?? '',
                           ),
                           if (_txnRef != null) ...[
                             const Divider(
-                                height: 1,
-                                thickness: 1,
-                                color: AppTokens.border),
+                              height: 1,
+                              thickness: 1,
+                              color: AppTokens.border,
+                            ),
                             _DetailRow(
                               label: t.cpmRowRef,
                               value: _txnRef!,
@@ -918,9 +935,7 @@ class _ViewfinderOverlay extends StatelessWidget {
         children: [
           // Semi-transparent black frame (the "mask" around viewfinder)
           Positioned.fill(
-            child: CustomPaint(
-              painter: _ViewfinderMaskPainter(),
-            ),
+            child: CustomPaint(painter: _ViewfinderMaskPainter()),
           ),
 
           // Corner brackets
@@ -946,11 +961,7 @@ class _ViewfinderOverlay extends StatelessWidget {
           ),
 
           // Animated scanline
-          Positioned(
-            left: 18,
-            right: 18,
-            child: _ScanLine(),
-          ),
+          Positioned(left: 18, right: 18, child: _ScanLine()),
         ],
       ),
     );
@@ -1026,39 +1037,27 @@ class _ScanLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 2,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.transparent,
-            AppTokens.accent,
-            Colors.transparent,
-          ],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppTokens.accent.withValues(alpha: 0.6),
-            blurRadius: 16,
+          height: 2,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.transparent,
+                AppTokens.accent,
+                Colors.transparent,
+              ],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppTokens.accent.withValues(alpha: 0.6),
+                blurRadius: 16,
+              ),
+            ],
           ),
-        ],
-      ),
-    )
-        .animate(
-          onPlay: (c) => c.repeat(),
         )
-        .moveY(
-          begin: 0,
-          end: 200,
-          duration: 1600.ms,
-          curve: Curves.easeInOut,
-        )
+        .animate(onPlay: (c) => c.repeat())
+        .moveY(begin: 0, end: 200, duration: 1600.ms, curve: Curves.easeInOut)
         .then()
-        .moveY(
-          begin: 200,
-          end: 0,
-          duration: 1600.ms,
-          curve: Curves.easeInOut,
-        );
+        .moveY(begin: 200, end: 0, duration: 1600.ms, curve: Curves.easeInOut);
   }
 }
 
@@ -1108,54 +1107,51 @@ class _NoPermissionView extends StatelessWidget {
     final t = AppL10n.of(context);
     return Scaffold(
       backgroundColor: AppTokens.bg,
-      appBar: AppBar(
-        backgroundColor: AppTokens.bg,
-        elevation: 0,
-        leading: IconButton(
-          icon: const CloseIcon(size: 20, color: AppTokens.ink),
-          onPressed: () => context.go('/dashboard/merchant/$merchantId'),
-        ),
-        title: Text(
-          t.cpmTitle,
-          style: const TextStyle(
-            fontFamily: AppTokens.fontDisplay,
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-            color: AppTokens.ink,
-          ),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(32),
+      body: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 72,
-              height: 72,
-              decoration: BoxDecoration(
-                color: AppTokens.surfaceAlt,
-                borderRadius: BorderRadius.circular(36),
-              ),
-              child: const CameraIcon(
-                  color: AppTokens.inkSecondary, size: 36),
+            PaprikaScreenHeader(
+              onBack: () => context.go('/dashboard/merchant/$merchantId'),
+              title: Text(t.cpmTitle),
             ),
-            const SizedBox(height: 20),
-            Text(
-              t.scanPermissionCta,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontFamily: AppTokens.fontDisplay,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: AppTokens.ink,
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 72,
+                      height: 72,
+                      decoration: BoxDecoration(
+                        color: AppTokens.surfaceAlt,
+                        borderRadius: BorderRadius.circular(36),
+                      ),
+                      child: const CameraIcon(
+                        color: AppTokens.inkSecondary,
+                        size: 36,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      t.scanPermissionCta,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontFamily: AppTokens.fontDisplay,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppTokens.ink,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    AppButton(
+                      label: t.scanOpenSettings,
+                      variant: AppButtonVariant.primary,
+                      onPressed: _openAppSettings,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            AppButton(
-              label: t.scanOpenSettings,
-              variant: AppButtonVariant.primary,
-              onPressed: _openAppSettings,
             ),
           ],
         ),
@@ -1188,12 +1184,7 @@ class _AmountKeypad extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final keys = [
-      '1', '2', '3',
-      '4', '5', '6',
-      '7', '8', '9',
-      '000', '0', '⌫',
-    ];
+    final keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '000', '0', '⌫'];
 
     return GridView.builder(
       shrinkWrap: true,
@@ -1228,8 +1219,11 @@ class _AmountKeypad extends StatelessWidget {
             ),
             alignment: Alignment.center,
             child: isBackspace
-                ? const Icon(Icons.backspace_outlined,
-                    color: AppTokens.ink, size: 20)
+                ? const Icon(
+                    Icons.backspace_outlined,
+                    color: AppTokens.ink,
+                    size: 20,
+                  )
                 : Text(
                     key,
                     style: const TextStyle(
@@ -1279,9 +1273,7 @@ class _DetailRow extends StatelessWidget {
           Text(
             value,
             style: TextStyle(
-              fontFamily: mono
-                  ? AppTokens.fontMono
-                  : AppTokens.fontDisplay,
+              fontFamily: mono ? AppTokens.fontMono : AppTokens.fontDisplay,
               fontSize: 13,
               fontWeight: FontWeight.w600,
               color: AppTokens.ink,

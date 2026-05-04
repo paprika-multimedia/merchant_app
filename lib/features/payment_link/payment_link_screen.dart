@@ -16,6 +16,7 @@ import '../../primitives/chip.dart';
 import '../../primitives/field.dart';
 import '../../primitives/icons.dart';
 import '../../primitives/keypad.dart';
+import '../../primitives/screen_header.dart';
 import '../../state/recent_amounts.dart';
 import '../../state/session.dart';
 import '../../theme/tokens.dart';
@@ -31,8 +32,7 @@ class PaymentLinkScreen extends ConsumerStatefulWidget {
   final String merchantId;
 
   @override
-  ConsumerState<PaymentLinkScreen> createState() =>
-      _PaymentLinkScreenState();
+  ConsumerState<PaymentLinkScreen> createState() => _PaymentLinkScreenState();
 }
 
 class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
@@ -70,8 +70,9 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
 
   void _onBackspace() {
     if (_amountStr.isNotEmpty) {
-      setState(() =>
-          _amountStr = _amountStr.substring(0, _amountStr.length - 1));
+      setState(
+        () => _amountStr = _amountStr.substring(0, _amountStr.length - 1),
+      );
     }
   }
 
@@ -93,12 +94,15 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
         ? t.linkMessageAmountSuffix(fmt.format(_amount))
         : '';
     final link = _txn?.linkUrl ?? '';
-    final merchant = ref
+    final merchant =
+        ref
             .read(sessionProvider)
             .value
             ?.merchants
-            .firstWhere((m) => m.id == widget.merchantId,
-                orElse: () => throw StateError('merchant'))
+            .firstWhere(
+              (m) => m.id == widget.merchantId,
+              orElse: () => throw StateError('merchant'),
+            )
             .name ??
         '';
     return '$greeting\n${t.linkMessageBody(what, amt, link, merchant)}';
@@ -124,8 +128,9 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
             : null,
         idempotencyKey: _idempotencyKey!,
       );
-      final txn =
-          Transaction.fromJson(result['transaction'] as Map<String, dynamic>);
+      final txn = Transaction.fromJson(
+        result['transaction'] as Map<String, dynamic>,
+      );
 
       await ref
           .read(recentAmountsProvider((widget.merchantId, 'link')).notifier)
@@ -149,44 +154,45 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
   Widget build(BuildContext context) {
     final t = AppL10n.of(context);
     final fmt = NumberFormat('#,###', 'id_ID');
-    final recents =
-        ref.watch(recentAmountsProvider((widget.merchantId, 'link')));
+    final recents = ref.watch(
+      recentAmountsProvider((widget.merchantId, 'link')),
+    );
 
     return Scaffold(
       backgroundColor: AppTokens.bg,
-      appBar: AppBar(
-        backgroundColor: AppTokens.bg,
-        elevation: 0,
-        leading: IconButton(
-          icon: const CloseIcon(size: 20, color: AppTokens.ink),
-          onPressed: () =>
-              context.go('/dashboard/merchant/${widget.merchantId}'),
-        ),
-        title: Text(
-          _step == _LinkStep.form ? t.linkHeaderCreate : t.linkHeaderShare,
-          style: const TextStyle(
-            fontFamily: AppTokens.fontDisplay,
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-            color: AppTokens.ink,
-          ),
-        ),
-      ),
-      body: Stack(
-        children: [
-          _step == _LinkStep.form
-              ? _buildForm(t, fmt, recents)
-              : _buildSuccess(t, fmt),
-          // Fullscreen QR overlay
-          if (_showQrOverlay && _txn?.linkUrl != null)
-            _QrOverlay(
-              linkUrl: _txn!.linkUrl!,
-              title: _txn!.title,
-              amount: _amount,
-              fmt: fmt,
-              onClose: () => setState(() => _showQrOverlay = false),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Column(
+              children: [
+                PaprikaScreenHeader(
+                  onBack: () =>
+                      context.go('/dashboard/merchant/${widget.merchantId}'),
+                  overline: Text(t.linkTitle.toUpperCase()),
+                  title: Text(
+                    _step == _LinkStep.form
+                        ? t.linkHeaderCreate
+                        : t.linkHeaderShare,
+                  ),
+                ),
+                Expanded(
+                  child: _step == _LinkStep.form
+                      ? _buildForm(t, fmt, recents)
+                      : _buildSuccess(t, fmt),
+                ),
+              ],
             ),
-        ],
+            // Fullscreen QR overlay
+            if (_showQrOverlay && _txn?.linkUrl != null)
+              _QrOverlay(
+                linkUrl: _txn!.linkUrl!,
+                title: _txn!.title,
+                amount: _amount,
+                fmt: fmt,
+                onClose: () => setState(() => _showQrOverlay = false),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -223,11 +229,14 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
                               onTap: () => setState(() => _amountStr = ''),
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 4),
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
                                 decoration: BoxDecoration(
                                   color: AppTokens.surfaceAlt,
                                   borderRadius: BorderRadius.circular(
-                                      AppTokens.radiusXs),
+                                    AppTokens.radiusXs,
+                                  ),
                                 ),
                                 child: Text(
                                   t.qrisAmountClear,
@@ -247,13 +256,15 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
                         crossAxisAlignment: CrossAxisAlignment.baseline,
                         textBaseline: TextBaseline.alphabetic,
                         children: [
-                          const Text('IDR ',
-                              style: TextStyle(
-                                fontFamily: AppTokens.fontDisplay,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                color: AppTokens.inkSecondary,
-                              )),
+                          const Text(
+                            'IDR ',
+                            style: TextStyle(
+                              fontFamily: AppTokens.fontDisplay,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: AppTokens.inkSecondary,
+                            ),
+                          ),
                           Expanded(
                             child: Text(
                               _amount > 0 ? fmt.format(_amount) : '0',
@@ -278,8 +289,7 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
                   spacing: 8,
                   children: recents.map((a) {
                     return GestureDetector(
-                      onTap: () =>
-                          setState(() => _amountStr = a.toString()),
+                      onTap: () => setState(() => _amountStr = a.toString()),
                       child: AppChip(
                         label: fmt.format(a),
                         tone: ChipTone.neutral,
@@ -315,9 +325,13 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
                 if (_error != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 8),
-                    child: Text(_error!,
-                        style: const TextStyle(
-                            color: AppTokens.danger, fontSize: 13)),
+                    child: Text(
+                      _error!,
+                      style: const TextStyle(
+                        color: AppTokens.danger,
+                        fontSize: 13,
+                      ),
+                    ),
                   ),
               ],
             ),
@@ -383,27 +397,34 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(_txn!.title,
-                    style: const TextStyle(
-                      fontFamily: AppTokens.fontDisplay,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
-                      color: AppTokens.ink,
-                    )),
+                Text(
+                  _txn!.title,
+                  style: const TextStyle(
+                    fontFamily: AppTokens.fontDisplay,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: AppTokens.ink,
+                  ),
+                ),
                 if (_txn!.customer != null)
-                  Text(_txn!.customer!,
-                      style: const TextStyle(
-                          fontFamily: AppTokens.fontDisplay,
-                          fontSize: 14,
-                          color: AppTokens.inkSecondary)),
-                const SizedBox(height: 8),
-                Text('IDR ${fmt.format(_txn!.amount)}',
+                  Text(
+                    _txn!.customer!,
                     style: const TextStyle(
                       fontFamily: AppTokens.fontDisplay,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w800,
-                      color: AppTokens.accent,
-                    )),
+                      fontSize: 14,
+                      color: AppTokens.inkSecondary,
+                    ),
+                  ),
+                const SizedBox(height: 8),
+                Text(
+                  'IDR ${fmt.format(_txn!.amount)}',
+                  style: const TextStyle(
+                    fontFamily: AppTokens.fontDisplay,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w800,
+                    color: AppTokens.accent,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 AppChip(
                   label: t.linkLive,
@@ -427,7 +448,9 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
                       ),
                       IconButton(
                         icon: const CopyIcon(
-                            size: 18, color: AppTokens.inkSecondary),
+                          size: 18,
+                          color: AppTokens.inkSecondary,
+                        ),
                         onPressed: () => Clipboard.setData(
                           ClipboardData(text: _txn!.linkUrl!),
                         ),
@@ -441,13 +464,15 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
           const SizedBox(height: 16),
 
           // Message to share
-          Text(t.linkMessage,
-              style: const TextStyle(
-                fontFamily: AppTokens.fontDisplay,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: AppTokens.inkSecondary,
-              )),
+          Text(
+            t.linkMessage,
+            style: const TextStyle(
+              fontFamily: AppTokens.fontDisplay,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppTokens.inkSecondary,
+            ),
+          ),
           const SizedBox(height: 8),
           AppCard(
             child: Column(
@@ -485,12 +510,14 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
                     ],
                   ],
                 ),
-                Text(t.linkMessageHelp,
-                    style: const TextStyle(
-                      fontFamily: AppTokens.fontDisplay,
-                      fontSize: 12,
-                      color: AppTokens.inkTertiary,
-                    )),
+                Text(
+                  t.linkMessageHelp,
+                  style: const TextStyle(
+                    fontFamily: AppTokens.fontDisplay,
+                    fontSize: 12,
+                    color: AppTokens.inkTertiary,
+                  ),
+                ),
               ],
             ),
           ),
@@ -505,7 +532,9 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
                   variant: AppButtonVariant.primary,
                   onPressed: () {
                     if (_txn?.linkUrl != null) {
-                      Share.share(_msg); // Placeholder — real share via url_launcher
+                      Share.share(
+                        _msg,
+                      ); // Placeholder — real share via url_launcher
                     }
                   },
                 ),
@@ -562,25 +591,33 @@ class _QrOverlay extends StatelessWidget {
                   children: [
                     QrImageView(data: linkUrl, size: 240),
                     const SizedBox(height: 12),
-                    Text(title,
-                        style: const TextStyle(
-                            fontFamily: AppTokens.fontDisplay,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700)),
-                    Text('IDR ${fmt.format(amount)}',
-                        style: const TextStyle(
-                            fontFamily: AppTokens.fontDisplay,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800,
-                            color: AppTokens.accent)),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontFamily: AppTokens.fontDisplay,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Text(
+                      'IDR ${fmt.format(amount)}',
+                      style: const TextStyle(
+                        fontFamily: AppTokens.fontDisplay,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: AppTokens.accent,
+                      ),
+                    ),
                     const SizedBox(height: 8),
-                    Text(linkUrl,
-                        style: const TextStyle(
-                          fontFamily: AppTokens.fontMono,
-                          fontSize: 11,
-                          color: AppTokens.accent,
-                        ),
-                        textAlign: TextAlign.center),
+                    Text(
+                      linkUrl,
+                      style: const TextStyle(
+                        fontFamily: AppTokens.fontMono,
+                        fontSize: 11,
+                        color: AppTokens.accent,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ],
                 ),
               ),
@@ -629,40 +666,49 @@ class _InvoiceField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(t.linkFieldInvoice,
-            style: const TextStyle(
-              fontFamily: AppTokens.fontDisplay,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: AppTokens.inkSecondary,
-            )),
+        Text(
+          t.linkFieldInvoice,
+          style: const TextStyle(
+            fontFamily: AppTokens.fontDisplay,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: AppTokens.inkSecondary,
+          ),
+        ),
         const SizedBox(height: 8),
         if (autoInvoice)
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: AppTokens.accentSoft,
                   borderRadius: BorderRadius.circular(AppTokens.radiusXs),
                 ),
-                child: Text(t.linkFieldInvoiceAuto,
-                    style: const TextStyle(
-                      fontFamily: AppTokens.fontMono,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: AppTokens.accentDeep,
-                    )),
+                child: Text(
+                  t.linkFieldInvoiceAuto,
+                  style: const TextStyle(
+                    fontFamily: AppTokens.fontMono,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: AppTokens.accentDeep,
+                  ),
+                ),
               ),
               const Spacer(),
               TextButton(
                 onPressed: () => onToggle(false),
-                child: Text(t.linkFieldInvoiceClear,
-                    style: const TextStyle(
-                      fontFamily: AppTokens.fontDisplay,
-                      fontSize: 12,
-                      color: AppTokens.inkSecondary,
-                    )),
+                child: Text(
+                  t.linkFieldInvoiceClear,
+                  style: const TextStyle(
+                    fontFamily: AppTokens.fontDisplay,
+                    fontSize: 12,
+                    color: AppTokens.inkSecondary,
+                  ),
+                ),
               ),
             ],
           )
@@ -680,22 +726,26 @@ class _InvoiceField extends StatelessWidget {
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () => onToggle(true),
-                  child: Text(t.linkFieldInvoiceRegen,
-                      style: const TextStyle(
-                        fontFamily: AppTokens.fontDisplay,
-                        fontSize: 12,
-                        color: AppTokens.inkSecondary,
-                      )),
+                  child: Text(
+                    t.linkFieldInvoiceRegen,
+                    style: const TextStyle(
+                      fontFamily: AppTokens.fontDisplay,
+                      fontSize: 12,
+                      color: AppTokens.inkSecondary,
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
-        Text(t.linkFieldInvoiceHelp,
-            style: const TextStyle(
-              fontFamily: AppTokens.fontDisplay,
-              fontSize: 12,
-              color: AppTokens.inkTertiary,
-            )),
+        Text(
+          t.linkFieldInvoiceHelp,
+          style: const TextStyle(
+            fontFamily: AppTokens.fontDisplay,
+            fontSize: 12,
+            color: AppTokens.inkTertiary,
+          ),
+        ),
       ],
     );
   }
