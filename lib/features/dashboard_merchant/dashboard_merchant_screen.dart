@@ -10,8 +10,6 @@ import '../../net/api/merchants_api.dart';
 import '../../net/dio_client.dart';
 import '../../primitives/card.dart';
 import '../../primitives/chip.dart';
-import '../../primitives/merchant_avatar.dart';
-import '../../state/active_merchant.dart';
 import '../../state/session.dart';
 import '../../theme/tokens.dart';
 import '../remove_merchant_sheet/remove_merchant_sheet.dart';
@@ -56,17 +54,6 @@ class _DashboardMerchantScreenState
       final dio = await ref.read(dioProvider.future);
       await MerchantsApi(dio).markSeen(widget.merchantId);
     } catch (_) {}
-  }
-
-  Merchant? get _merchant {
-    final session = ref.read(sessionProvider).value;
-    if (session == null) return null;
-    try {
-      return session.merchants
-          .firstWhere((m) => m.id == widget.merchantId);
-    } catch (_) {
-      return null;
-    }
   }
 
   @override

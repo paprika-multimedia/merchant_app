@@ -345,7 +345,7 @@ class _SettingsRow extends StatelessWidget {
             ),
             Icon(Icons.chevron_right,
                 color: danger
-                    ? AppTokens.danger.withOpacity(0.5)
+                    ? AppTokens.danger.withValues(alpha: 0.5)
                     : AppTokens.inkDisabled),
           ],
         ),

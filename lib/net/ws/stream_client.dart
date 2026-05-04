@@ -11,7 +11,7 @@ import 'events.dart';
 ///
 /// Protocol (Spec §5.1):
 /// 1. Connect to [AppConfig.wsUrl] — NO token in URL.
-/// 2. Send { "type": "auth", "token": "<session_token>" } as first frame.
+/// 2. Send `{ "type": "auth", "token": "<session_token>" }` as first frame.
 /// 3. Await { "type": "auth.ok" } — anything else → close + retry.
 /// 4. Listen for events; reset 25s heartbeat watchdog on every frame.
 /// 5. On disconnect: backoff 1s → 30s capped, repeat from step 1.

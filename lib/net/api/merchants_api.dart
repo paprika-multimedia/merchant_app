@@ -70,10 +70,10 @@ class MerchantsApi {
     final r = await _dio.get<Map<String, dynamic>>(
       '/merchants/$merchantId/transactions',
       queryParameters: {
-        if (cursor != null) 'cursor': cursor,
+        if (cursor != null) 'cursor': cursor, // ignore: use_null_aware_elements
         'limit': limit,
-        if (status != null) 'status': status,
-        if (type != null) 'type': type,
+        if (status != null) 'status': status, // ignore: use_null_aware_elements
+        if (type != null) 'type': type, // ignore: use_null_aware_elements
       },
     );
     final data = r.data!['data'] as List<dynamic>;

@@ -73,7 +73,7 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
   void _onTripleZero() {
     setState(() {
       if (_amountStr.isEmpty) return;
-      _amountStr = (_amountStr + '000').replaceFirst(RegExp(r'^0+'), '');
+      _amountStr = ('${_amountStr}000').replaceFirst(RegExp(r'^0+'), '');
     });
   }
 

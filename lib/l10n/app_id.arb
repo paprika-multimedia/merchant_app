@@ -16,6 +16,7 @@
   "scanGallery": "Galeri",
   "scanCodeFallback": "Masukkan kode saja",
   "scanPermissionCta": "Aktifkan kamera di Pengaturan",
+  "scanOpenSettings": "Buka Pengaturan",
 
   "codeStep": "Langkah {n} dari 2",
   "@codeStep": {

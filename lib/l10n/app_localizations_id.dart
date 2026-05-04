@@ -53,6 +53,9 @@ class AppL10nId extends AppL10n {
   String get scanPermissionCta => 'Aktifkan kamera di Pengaturan';
 
   @override
+  String get scanOpenSettings => 'Buka Pengaturan';
+
+  @override
   String codeStep(int n) {
     return 'Langkah $n dari 2';
   }

@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -5,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../l10n/app_localizations.dart';
@@ -232,7 +235,7 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
   void _onTripleZero() {
     setState(() {
       if (_amountStr.isEmpty) return;
-      final raw = (_amountStr + '000').replaceFirst(RegExp(r'^0+'), '');
+      final raw = ('${_amountStr}000').replaceFirst(RegExp(r'^0+'), '');
       if (raw.length > 10) return;
       _amountStr = raw;
     });
@@ -450,7 +453,7 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: AppTokens.border.withOpacity(1),
+                          color: AppTokens.border.withValues(alpha: 1),
                           spreadRadius: 1,
                           blurRadius: 0,
                         ),
@@ -1032,7 +1035,7 @@ class _ScanLine extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: AppTokens.accent.withOpacity(0.6),
+            color: AppTokens.accent.withValues(alpha: 0.6),
             blurRadius: 16,
           ),
         ],
@@ -1145,22 +1148,23 @@ class _NoPermissionView extends StatelessWidget {
                 color: AppTokens.ink,
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              // Instructs the user to enable camera manually in system settings.
-              // Runtime: wire to app_settings package or platform channel.
-              t.scanPermissionCta,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontFamily: AppTokens.fontDisplay,
-                fontSize: 14,
-                color: AppTokens.inkSecondary,
-              ),
+            const SizedBox(height: 16),
+            AppButton(
+              label: t.scanOpenSettings,
+              variant: AppButtonVariant.primary,
+              onPressed: _openAppSettings,
             ),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _openAppSettings() async {
+    final uri = Platform.isIOS
+        ? Uri.parse('app-settings:')
+        : Uri.parse('package:com.paprika.paprika_merchant');
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 }
 

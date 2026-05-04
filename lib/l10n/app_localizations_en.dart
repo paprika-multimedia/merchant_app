@@ -52,6 +52,9 @@ class AppL10nEn extends AppL10n {
   String get scanPermissionCta => 'Enable camera in Settings';
 
   @override
+  String get scanOpenSettings => 'Open Settings';
+
+  @override
   String codeStep(int n) {
     return 'Step $n of 2';
   }

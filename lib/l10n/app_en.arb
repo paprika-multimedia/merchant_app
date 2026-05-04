@@ -16,6 +16,7 @@
   "scanGallery": "Gallery",
   "scanCodeFallback": "Enter code instead",
   "scanPermissionCta": "Enable camera in Settings",
+  "scanOpenSettings": "Open Settings",
 
   "codeStep": "Step {n} of 2",
   "@codeStep": {

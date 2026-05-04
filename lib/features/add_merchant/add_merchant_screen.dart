@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../l10n/app_localizations.dart';
-import '../../primitives/button.dart';
 import '../../primitives/card.dart';
 import '../../state/session.dart';
 import '../../theme/tokens.dart';

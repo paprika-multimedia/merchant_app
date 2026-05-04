@@ -181,6 +181,12 @@ abstract class AppL10n {
   /// **'Aktifkan kamera di Pengaturan'**
   String get scanPermissionCta;
 
+  /// No description provided for @scanOpenSettings.
+  ///
+  /// In id, this message translates to:
+  /// **'Buka Pengaturan'**
+  String get scanOpenSettings;
+
   /// No description provided for @codeStep.
   ///
   /// In id, this message translates to:

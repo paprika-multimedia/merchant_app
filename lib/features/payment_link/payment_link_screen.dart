@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:uuid/uuid.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../models/transaction.dart';
@@ -70,7 +69,7 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
   void _onTripleZero() {
     setState(() {
       if (_amountStr.isEmpty) return;
-      _amountStr = (_amountStr + '000').replaceFirst(RegExp(r'^0+'), '');
+      _amountStr = ('${_amountStr}000').replaceFirst(RegExp(r'^0+'), '');
     });
   }
 
@@ -559,7 +558,7 @@ class _QrOverlay extends StatelessWidget {
     return GestureDetector(
       onTap: onClose,
       child: Container(
-        color: Colors.black.withOpacity(0.92),
+        color: Colors.black.withValues(alpha: 0.92),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,

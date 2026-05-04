@@ -67,7 +67,7 @@ class AppButton extends StatelessWidget {
       AppButtonVariant.danger => (
           AppTokens.dangerSoft,
           AppTokens.danger,
-          AppTokens.danger.withOpacity(0.13),
+          AppTokens.danger.withValues(alpha: 0.13),
         ),
     };
 
@@ -83,7 +83,7 @@ class AppButton extends StatelessWidget {
             fontWeight: FontWeight.w600,
             fontSize: fs,
             letterSpacing: -0.1,
-            color: disabled ? fg.withOpacity(0.4) : fg,
+            color: disabled ? fg.withValues(alpha: 0.4) : fg,
           ),
         ),
         if (trailing != null) ...[const SizedBox(width: 8), trailing!],

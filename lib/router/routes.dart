@@ -32,15 +32,15 @@ final routerProvider = Provider<GoRouter>((ref) {
       // ─── Onboarding ─────────────────────────────────────────────────────────
       GoRoute(
         path: '/welcome',
-        builder: (_, __) => const WelcomeScreen(),
+        builder: (_, _) => const WelcomeScreen(),
       ),
       GoRoute(
         path: '/scan/company',
-        builder: (_, __) => const ScanCompanyScreen(),
+        builder: (_, _) => const ScanCompanyScreen(),
       ),
       GoRoute(
         path: '/code/company',
-        builder: (_, __) => const CodeScreen(kind: CodeScreenKind.company),
+        builder: (_, _) => const CodeScreen(kind: CodeScreenKind.company),
       ),
       GoRoute(
         path: '/scan/merchant',
@@ -67,7 +67,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       // ─── Dashboards ─────────────────────────────────────────────────────────
       GoRoute(
         path: '/dashboard/company',
-        builder: (_, __) => const DashboardCompanyScreen(),
+        builder: (_, _) => const DashboardCompanyScreen(),
       ),
       GoRoute(
         path: '/dashboard/merchant/:id',
@@ -77,7 +77,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/add-merchant',
-        builder: (_, __) => const AddMerchantScreen(),
+        builder: (_, _) => const AddMerchantScreen(),
       ),
 
       // ─── Payment actions ─────────────────────────────────────────────────────
