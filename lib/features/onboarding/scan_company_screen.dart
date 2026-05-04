@@ -6,6 +6,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../l10n/app_localizations.dart';
 import '../../theme/tokens.dart';
 import '../../primitives/button.dart';
+import '../../primitives/icons.dart';
 import '_scanner_overlay.dart';
 
 /// Scan Company QR screen — Handoff §4.2.
@@ -85,14 +86,14 @@ class _ScanCompanyScreenState extends ConsumerState<ScanCompanyScreen> {
                         // Torch toggle
                         _ScannerAction(
                           label: t.scanTorch,
-                          icon: Icons.flash_on,
+                          icon: const FlashIcon(color: Colors.white, size: 28),
                           onTap: () => _scanner.toggleTorch(),
                         ),
                         const SizedBox(width: AppTokens.sp28),
                         // Gallery picker
                         _ScannerAction(
                           label: t.scanGallery,
-                          icon: Icons.photo_library_outlined,
+                          icon: const GalleryIcon(color: Colors.white, size: 28),
                           onTap: () => _scanner.analyzeImage(''),
                         ),
                       ],
@@ -119,7 +120,7 @@ class _ScanCompanyScreenState extends ConsumerState<ScanCompanyScreen> {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    icon: const BackIcon(size: 20, color: Colors.white),
                     onPressed: () => context.pop(),
                     tooltip: t.commonBack,
                   ),
@@ -141,7 +142,7 @@ class _ScannerAction extends StatelessWidget {
   });
 
   final String label;
-  final IconData icon;
+  final Widget icon;
   final VoidCallback onTap;
 
   @override
@@ -150,7 +151,7 @@ class _ScannerAction extends StatelessWidget {
       onTap: onTap,
       child: Column(
         children: [
-          Icon(icon, color: Colors.white, size: 28),
+          icon,
           const SizedBox(height: 4),
           Text(
             label,

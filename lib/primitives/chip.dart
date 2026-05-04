@@ -51,8 +51,10 @@ class AppChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (leading != null) ...[
+            // Pass color override but NOT size — callers that pass Icon(size: 6)
+            // for status dots must not have their size overridden.
             IconTheme(
-              data: IconThemeData(color: fg, size: fs + 2),
+              data: IconThemeData(color: fg, size: null),
               child: leading!,
             ),
             const SizedBox(width: 4),

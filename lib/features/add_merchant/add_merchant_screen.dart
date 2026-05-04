@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../primitives/card.dart';
+import '../../primitives/icons.dart';
 import '../../state/session.dart';
 import '../../theme/tokens.dart';
 
@@ -26,7 +27,7 @@ class AddMerchantScreen extends ConsumerWidget {
         backgroundColor: AppTokens.bg,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: AppTokens.ink),
+          icon: const CloseIcon(size: 20, color: AppTokens.ink),
           onPressed: () => context.go('/dashboard/company'),
           tooltip: t.commonClose,
         ),
@@ -81,8 +82,7 @@ class AddMerchantScreen extends ConsumerWidget {
                       color: AppTokens.accentSoft,
                       borderRadius: BorderRadius.circular(AppTokens.radiusSm),
                     ),
-                    child: const Icon(Icons.qr_code_scanner,
-                        color: AppTokens.accent),
+                    child: const QrIcon(color: AppTokens.accent),
                   ),
                   const SizedBox(width: 14),
                   Expanded(
@@ -105,8 +105,8 @@ class AddMerchantScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  const Icon(Icons.chevron_right,
-                      color: AppTokens.inkDisabled),
+                  const ChevronIcon(
+                      size: 20, color: AppTokens.inkDisabled),
                 ],
               ),
             ),
@@ -127,8 +127,7 @@ class AddMerchantScreen extends ConsumerWidget {
                       color: AppTokens.surfaceAlt,
                       borderRadius: BorderRadius.circular(AppTokens.radiusSm),
                     ),
-                    child: const Icon(Icons.keyboard,
-                        color: AppTokens.inkSecondary),
+                    child: const KeyboardIcon(color: AppTokens.inkSecondary),
                   ),
                   const SizedBox(width: 14),
                   Expanded(
@@ -151,8 +150,8 @@ class AddMerchantScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  const Icon(Icons.chevron_right,
-                      color: AppTokens.inkDisabled),
+                  const ChevronIcon(
+                      size: 20, color: AppTokens.inkDisabled),
                 ],
               ),
             ),

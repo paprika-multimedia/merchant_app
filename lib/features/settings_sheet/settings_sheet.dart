@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../primitives/button.dart';
+import '../../primitives/icons.dart';
 import '../../state/session.dart';
 import '../../theme/tokens.dart';
 
@@ -124,7 +125,7 @@ class SettingsSheet extends ConsumerWidget {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.logout, color: AppTokens.danger, size: 20),
+                  const LogoutIcon(size: 20, color: AppTokens.danger),
                   const SizedBox(width: 12),
                   Text(
                     t.settingsLogout,

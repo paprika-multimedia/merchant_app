@@ -10,6 +10,7 @@ class AppField extends StatefulWidget {
     this.label,
     this.placeholder,
     this.value,
+    this.controller,
     this.onChanged,
     this.prefix,
     this.suffix,
@@ -24,11 +25,16 @@ class AppField extends StatefulWidget {
     this.focusNode,
     this.autofocus = false,
     this.maxLength,
+    this.maxLines = 1,
   });
 
   final String? label;
   final String? placeholder;
+  /// External value — when set, the internal controller tracks this value.
+  /// Only one of [value] or [controller] should be set.
   final String? value;
+  /// External controller — takes precedence over [value] when both are set.
+  final TextEditingController? controller;
   final ValueChanged<String>? onChanged;
   final String? prefix;
   final String? suffix;
@@ -43,6 +49,7 @@ class AppField extends StatefulWidget {
   final FocusNode? focusNode;
   final bool autofocus;
   final int? maxLength;
+  final int? maxLines;
 
   @override
   State<AppField> createState() => _AppFieldState();
@@ -50,6 +57,39 @@ class AppField extends StatefulWidget {
 
 class _AppFieldState extends State<AppField> {
   bool _focused = false;
+  // Internal controller — only created when [widget.controller] is null and
+  // [widget.value] is non-null so we can own its lifecycle.
+  TextEditingController? _internalController;
+
+  TextEditingController? get _effectiveController =>
+      widget.controller ?? _internalController;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.controller == null && widget.value != null) {
+      _internalController = TextEditingController(text: widget.value);
+    }
+  }
+
+  @override
+  void didUpdateWidget(AppField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If the caller controls via [value] (no external controller), sync only
+    // when the value has changed to avoid cursor-jump on every keystroke.
+    if (widget.controller == null && widget.value != null) {
+      _internalController ??= TextEditingController(text: widget.value);
+      if (widget.value != _internalController!.text) {
+        _internalController!.text = widget.value!;
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _internalController?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,8 +121,7 @@ class _AppFieldState extends State<AppField> {
           duration: const Duration(milliseconds: 120),
           decoration: BoxDecoration(
             color: AppTokens.surface,
-            borderRadius:
-                BorderRadius.circular(AppTokens.radiusMd),
+            borderRadius: BorderRadius.circular(AppTokens.radiusMd),
             border: Border.all(color: borderColor, width: borderWidth),
           ),
           padding: EdgeInsets.symmetric(
@@ -107,9 +146,7 @@ class _AppFieldState extends State<AppField> {
                 child: Focus(
                   onFocusChange: (f) => setState(() => _focused = f),
                   child: TextField(
-                    controller: widget.value != null
-                        ? TextEditingController(text: widget.value)
-                        : null,
+                    controller: _effectiveController,
                     onChanged: widget.onChanged,
                     readOnly: widget.readOnly,
                     focusNode: widget.focusNode,
@@ -118,6 +155,8 @@ class _AppFieldState extends State<AppField> {
                     textCapitalization: widget.textCapitalization,
                     inputFormatters: widget.inputFormatters,
                     maxLength: widget.maxLength,
+                    maxLines: widget.maxLines,
+                    minLines: 1,
                     decoration: InputDecoration(
                       hintText: widget.placeholder,
                       hintStyle: TextStyle(

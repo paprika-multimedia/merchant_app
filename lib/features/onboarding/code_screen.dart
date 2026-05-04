@@ -9,6 +9,7 @@ import '../../net/api/merchants_api.dart';
 import '../../net/api/sessions_api.dart';
 import '../../primitives/button.dart';
 import '../../primitives/code_input.dart';
+import '../../primitives/icons.dart';
 import '../../state/session.dart';
 import '../../state/active_merchant.dart';
 import '../../theme/tokens.dart';
@@ -114,7 +115,7 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
         backgroundColor: AppTokens.bg,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppTokens.ink),
+          icon: const BackIcon(size: 20, color: AppTokens.ink),
           onPressed: () => context.pop(),
           tooltip: t.commonBack,
         ),
@@ -152,6 +153,11 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
                 height: 1.5,
               ),
             ),
+            // Fix 6a: confirmed-company chip on merchant code step
+            if (isMerchant) ...[
+              const SizedBox(height: 16),
+              _ConfirmedCompanyCard(ref: ref, t: t),
+            ],
             const SizedBox(height: 28),
             CodeInput(
               onChanged: (v) => setState(() => _code = v),
@@ -186,6 +192,88 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
             const SizedBox(height: 28),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Confirmed-company context card shown on the merchant code step.
+///
+/// Visual matches screens-onboarding.jsx confirmedCompany block:
+/// surface + border container, store icon in accentSoft box, company label
+/// + name, monospace short code.
+class _ConfirmedCompanyCard extends StatelessWidget {
+  const _ConfirmedCompanyCard({required this.ref, required this.t});
+
+  final WidgetRef ref;
+  final AppL10n t;
+
+  @override
+  Widget build(BuildContext context) {
+    final session = ref.watch(sessionProvider).value;
+    if (session == null) return const SizedBox.shrink();
+    final company = session.company;
+    // Show first 8 chars of the code as a short identifier (matches JSX visual)
+    final shortCode = company.code.length >= 8
+        ? company.code.substring(0, 8)
+        : company.code;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppTokens.surface,
+        borderRadius: BorderRadius.circular(AppTokens.radiusMd),
+        border: Border.all(color: AppTokens.border),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              color: AppTokens.accentSoft,
+              borderRadius: BorderRadius.circular(AppTokens.sp8),
+            ),
+            alignment: Alignment.center,
+            child: const StoreIcon(size: 16, color: AppTokens.accentDeep),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  t.codeCompanyLabel.toUpperCase(),
+                  style: const TextStyle(
+                    fontFamily: AppTokens.fontDisplay,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: AppTokens.inkTertiary,
+                    letterSpacing: 0.4,
+                  ),
+                ),
+                Text(
+                  company.name,
+                  style: const TextStyle(
+                    fontFamily: AppTokens.fontDisplay,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppTokens.ink,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            shortCode,
+            style: const TextStyle(
+              fontFamily: AppTokens.fontMono,
+              fontSize: 12,
+              color: AppTokens.inkTertiary,
+            ),
+          ),
+        ],
       ),
     );
   }

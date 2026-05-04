@@ -8,6 +8,7 @@ import '../../net/api/merchants_api.dart';
 import '../../net/dio_client.dart';
 import '../../primitives/button.dart';
 import '../../primitives/field.dart';
+import '../../primitives/icons.dart';
 import '../../state/session.dart';
 import '../../theme/tokens.dart';
 
@@ -101,7 +102,7 @@ class _RemoveMerchantSheetState extends ConsumerState<RemoveMerchantSheet> {
         const SizedBox(height: 20),
         // Share QR (placeholder)
         _SettingsRow(
-          icon: Icons.qr_code,
+          iconWidget: const QrIcon(size: 20, color: AppTokens.ink),
           label: t.merchantShareQr,
           sub: t.merchantShareQrSub,
           onTap: () {},
@@ -119,7 +120,7 @@ class _RemoveMerchantSheetState extends ConsumerState<RemoveMerchantSheet> {
         ),
         const SizedBox(height: 8),
         _SettingsRow(
-          icon: Icons.delete_outline,
+          iconWidget: const TrashIcon(size: 20, color: AppTokens.danger),
           label: t.merchantRemove,
           sub: t.merchantRemoveSub(widget.merchant.name),
           danger: true,
@@ -170,6 +171,33 @@ class _RemoveMerchantSheetState extends ConsumerState<RemoveMerchantSheet> {
           onChanged: (v) => setState(() => _confirmText = v),
           error: _error,
         ),
+        const SizedBox(height: 12),
+        // Fix 6c — re-link note below the type-name field
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppTokens.surfaceAlt,
+            borderRadius: BorderRadius.circular(AppTokens.radiusSm),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const InfoIcon(size: 16, color: AppTokens.inkSecondary),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  t.merchantRemoveNote,
+                  style: const TextStyle(
+                    fontFamily: AppTokens.fontDisplay,
+                    fontSize: 13,
+                    color: AppTokens.inkSecondary,
+                    height: 1.4,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
         const SizedBox(height: 16),
         AppButton(
           label: t.merchantRemove,
@@ -206,7 +234,7 @@ class _RemoveMerchantSheetState extends ConsumerState<RemoveMerchantSheet> {
               color: AppTokens.successSoft,
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.check, color: AppTokens.success, size: 28),
+            child: const CheckIcon(color: AppTokens.success, size: 28),
           ),
         ),
         const SizedBox(height: 16),
@@ -291,14 +319,14 @@ class _DragHandle extends StatelessWidget {
 
 class _SettingsRow extends StatelessWidget {
   const _SettingsRow({
-    required this.icon,
+    required this.iconWidget,
     required this.label,
     required this.sub,
     required this.onTap,
     this.danger = false,
   });
 
-  final IconData icon;
+  final Widget iconWidget;
   final String label;
   final String sub;
   final VoidCallback onTap;
@@ -316,8 +344,7 @@ class _SettingsRow extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(icon,
-                color: danger ? AppTokens.danger : AppTokens.ink, size: 20),
+            iconWidget,
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -343,7 +370,8 @@ class _SettingsRow extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(Icons.chevron_right,
+            ChevronIcon(
+                size: 20,
                 color: danger
                     ? AppTokens.danger.withValues(alpha: 0.5)
                     : AppTokens.inkDisabled),

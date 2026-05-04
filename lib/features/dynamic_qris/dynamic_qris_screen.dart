@@ -15,6 +15,8 @@ import '../../net/dio_client.dart';
 import '../../primitives/button.dart';
 import '../../primitives/card.dart';
 import '../../primitives/chip.dart';
+import '../../primitives/field.dart';
+import '../../primitives/icons.dart';
 import '../../primitives/keypad.dart';
 import '../../state/recent_amounts.dart';
 import '../../theme/tokens.dart';
@@ -187,7 +189,7 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
         backgroundColor: AppTokens.bg,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: AppTokens.ink),
+          icon: const CloseIcon(size: 20, color: AppTokens.ink),
           onPressed: _step == _QrisStep.paid
               ? () => context.go(
                     '/dashboard/merchant/${widget.merchantId}')
@@ -326,29 +328,11 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
                 ),
                 const SizedBox(height: 16),
                 // Note field
-                TextField(
-                  decoration: InputDecoration(
-                    hintText: t.qrisNotePh,
-                    labelText: t.qrisNote,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppTokens.radiusMd),
-                      borderSide: const BorderSide(color: AppTokens.border),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppTokens.radiusMd),
-                      borderSide: const BorderSide(color: AppTokens.border),
-                    ),
-                    filled: true,
-                    fillColor: AppTokens.surface,
-                  ),
+                AppField(
+                  label: t.qrisNote,
+                  placeholder: t.qrisNotePh,
                   onChanged: (v) => setState(() => _note = v),
                   maxLength: 80,
-                  maxLines: 1,
-                  style: const TextStyle(
-                    fontFamily: AppTokens.fontDisplay,
-                    fontSize: 15,
-                    color: AppTokens.ink,
-                  ),
                 ),
                 if (_error != null)
                   Padding(
@@ -490,7 +474,7 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
               color: AppTokens.successSoft,
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.check, color: AppTokens.success, size: 40),
+            child: const CheckIcon(color: AppTokens.success, size: 40),
           ),
           const SizedBox(height: 16),
           Text(

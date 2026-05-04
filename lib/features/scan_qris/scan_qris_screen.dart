@@ -15,6 +15,7 @@ import '../../models/merchant.dart';
 import '../../net/api/merchants_api.dart';
 import '../../net/dio_client.dart';
 import '../../primitives/button.dart';
+import '../../primitives/icons.dart';
 import '../../state/recent_amounts.dart';
 import '../../state/session.dart';
 import '../../theme/tokens.dart';
@@ -96,11 +97,9 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
     return ColoredBox(
       color: const Color(0xFF0E0A09),
       child: Center(
-        child: Icon(
-          isDenied ? Icons.camera_alt_outlined : Icons.error_outline,
-          color: Colors.white54,
-          size: 48,
-        ),
+        child: isDenied
+            ? const CameraIcon(color: Colors.white54, size: 48)
+            : const Icon(Icons.error_outline, color: Colors.white54, size: 48),
       ),
     );
   }
@@ -304,7 +303,7 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
               child: Row(
                 children: [
                   _GlassButton(
-                    icon: Icons.close,
+                    iconWidget: const CloseIcon(color: Colors.white, size: 18),
                     onTap: () =>
                         context.go('/dashboard/merchant/${widget.merchantId}'),
                   ),
@@ -338,7 +337,10 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
                   ),
                   const SizedBox(width: 10),
                   _GlassButton(
-                    icon: _torchOn ? Icons.flash_on : Icons.flash_off,
+                    iconWidget: FlashIcon(
+                      color: _torchOn ? AppTokens.accent : Colors.white,
+                      size: 18,
+                    ),
                     onTap: _toggleTorch,
                   ),
                 ],
@@ -520,7 +522,7 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
                             color: AppTokens.success,
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.check,
+                          child: const CheckIcon(
                               color: Colors.white, size: 12),
                         ),
                         const SizedBox(width: 8),
@@ -759,7 +761,7 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
                       color: AppTokens.successSoft,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.check,
+                    child: const CheckIcon(
                         color: AppTokens.success, size: 42),
                   )
                       .animate()
@@ -1065,9 +1067,9 @@ class _ScanLine extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _GlassButton extends StatelessWidget {
-  const _GlassButton({required this.icon, this.onTap});
+  const _GlassButton({required this.iconWidget, this.onTap});
 
-  final IconData icon;
+  final Widget iconWidget;
   final VoidCallback? onTap;
 
   @override
@@ -1077,11 +1079,12 @@ class _GlassButton extends StatelessWidget {
       child: Container(
         width: 40,
         height: 40,
-        decoration: BoxDecoration(
-          color: const Color(0x1AFFFFFF),
+        decoration: const BoxDecoration(
+          color: Color(0x1AFFFFFF),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: Colors.white, size: 18),
+        alignment: Alignment.center,
+        child: iconWidget,
       ),
     );
   }
@@ -1109,7 +1112,7 @@ class _NoPermissionView extends StatelessWidget {
         backgroundColor: AppTokens.bg,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: AppTokens.ink),
+          icon: const CloseIcon(size: 20, color: AppTokens.ink),
           onPressed: () => context.go('/dashboard/merchant/$merchantId'),
         ),
         title: Text(
@@ -1134,7 +1137,7 @@ class _NoPermissionView extends StatelessWidget {
                 color: AppTokens.surfaceAlt,
                 borderRadius: BorderRadius.circular(36),
               ),
-              child: const Icon(Icons.camera_alt_outlined,
+              child: const CameraIcon(
                   color: AppTokens.inkSecondary, size: 36),
             ),
             const SizedBox(height: 20),

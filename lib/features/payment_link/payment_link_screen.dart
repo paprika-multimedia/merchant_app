@@ -13,6 +13,8 @@ import '../../net/dio_client.dart';
 import '../../primitives/button.dart';
 import '../../primitives/card.dart';
 import '../../primitives/chip.dart';
+import '../../primitives/field.dart';
+import '../../primitives/icons.dart';
 import '../../primitives/keypad.dart';
 import '../../state/recent_amounts.dart';
 import '../../state/session.dart';
@@ -48,6 +50,13 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
   bool _showQrOverlay = false;
   bool _msgEdited = false;
   String _msg = '';
+  final TextEditingController _msgController = TextEditingController();
+
+  @override
+  void dispose() {
+    _msgController.dispose();
+    super.dispose();
+  }
 
   int get _amount => int.tryParse(_amountStr) ?? 0;
   bool get _canCreate => _amount > 0 && _title.trim().isNotEmpty && !_loading;
@@ -149,7 +158,7 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
         backgroundColor: AppTokens.bg,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: AppTokens.ink),
+          icon: const CloseIcon(size: 20, color: AppTokens.ink),
           onPressed: () =>
               context.go('/dashboard/merchant/${widget.merchantId}'),
         ),
@@ -347,35 +356,22 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
     required ValueChanged<String> onChanged,
     int? maxLength,
   }) {
-    return TextField(
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: placeholder,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppTokens.radiusMd),
-          borderSide: const BorderSide(color: AppTokens.border),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppTokens.radiusMd),
-          borderSide: const BorderSide(color: AppTokens.border),
-        ),
-        filled: true,
-        fillColor: AppTokens.surface,
-        counterText: '',
-      ),
+    return AppField(
+      label: label,
+      placeholder: placeholder,
       onChanged: onChanged,
       maxLength: maxLength,
-      style: const TextStyle(
-        fontFamily: AppTokens.fontDisplay,
-        fontSize: 15,
-        color: AppTokens.ink,
-      ),
     );
   }
 
   Widget _buildSuccess(AppL10n t, NumberFormat fmt) {
     if (_txn == null) return const SizedBox.shrink();
-    if (!_msgEdited) _msg = _buildDefaultMsg(t, fmt);
+    if (!_msgEdited) {
+      _msg = _buildDefaultMsg(t, fmt);
+      if (_msgController.text != _msg) {
+        _msgController.text = _msg;
+      }
+    }
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -430,7 +426,7 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.copy,
+                        icon: const CopyIcon(
                             size: 18, color: AppTokens.inkSecondary),
                         onPressed: () => Clipboard.setData(
                           ClipboardData(text: _txn!.linkUrl!),
@@ -457,20 +453,13 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextField(
-                  controller: TextEditingController(text: _msg),
+                AppField(
+                  controller: _msgController,
                   onChanged: (v) {
                     _msg = v;
                     _msgEdited = true;
                   },
                   maxLines: null,
-                  decoration: const InputDecoration(border: InputBorder.none),
-                  style: const TextStyle(
-                    fontFamily: AppTokens.fontDisplay,
-                    fontSize: 14,
-                    color: AppTokens.ink,
-                    height: 1.5,
-                  ),
                 ),
                 const SizedBox(height: 8),
                 Row(
@@ -680,23 +669,12 @@ class _InvoiceField extends StatelessWidget {
         else
           Column(
             children: [
-              TextField(
-                decoration: InputDecoration(
-                  hintText: t.linkFieldInvoicePh,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppTokens.radiusMd),
-                  ),
-                  filled: true,
-                  fillColor: AppTokens.surface,
-                  counterText: '',
-                ),
+              AppField(
+                placeholder: t.linkFieldInvoicePh,
                 onChanged: onChanged,
                 maxLength: 40,
                 textCapitalization: TextCapitalization.characters,
-                style: const TextStyle(
-                  fontFamily: AppTokens.fontMono,
-                  fontSize: 14,
-                ),
+                monospace: true,
               ),
               Align(
                 alignment: Alignment.centerRight,

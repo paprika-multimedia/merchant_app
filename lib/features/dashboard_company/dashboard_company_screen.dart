@@ -7,6 +7,7 @@ import '../../l10n/app_localizations.dart';
 import '../../models/merchant.dart';
 import '../../primitives/card.dart';
 import '../../primitives/chip.dart';
+import '../../primitives/icons.dart';
 import '../../primitives/merchant_avatar.dart';
 import '../../state/session.dart';
 import '../../state/active_merchant.dart';
@@ -79,8 +80,8 @@ class DashboardCompanyScreen extends ConsumerWidget {
                         const Spacer(),
                         // Settings
                         IconButton(
-                          icon: const Icon(
-                            Icons.settings_outlined,
+                          icon: const SettingsIcon(
+                            size: 20,
                             color: AppTokens.inkSecondary,
                           ),
                           onPressed: () => showModalBottomSheet(
@@ -127,7 +128,7 @@ class DashboardCompanyScreen extends ConsumerWidget {
                             borderRadius:
                                 BorderRadius.circular(AppTokens.radiusSm),
                           ),
-                          child: const Icon(Icons.add,
+                          child: const PlusIcon(
                               size: 18, color: AppTokens.inkSecondary),
                         ),
                       ),
@@ -246,6 +247,71 @@ class DashboardCompanyScreen extends ConsumerWidget {
                   ),
                 ),
 
+              // Fix 6b — notifications promo card
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                sliver: SliverToBoxAdapter(
+                  child: GestureDetector(
+                    onTap: () {
+                      // TODO: wire to notification permission
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(AppTokens.sp16),
+                      decoration: BoxDecoration(
+                        color: AppTokens.accentWash,
+                        borderRadius:
+                            BorderRadius.circular(AppTokens.radiusLg),
+                        border: Border.all(color: AppTokens.accentSoft),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 34,
+                            height: 34,
+                            decoration: BoxDecoration(
+                              color: AppTokens.accentSoft,
+                              borderRadius:
+                                  BorderRadius.circular(AppTokens.sp10),
+                            ),
+                            alignment: Alignment.center,
+                            child: const BellIcon(
+                              size: 18,
+                              color: AppTokens.accentDeep,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  t.dashCompanyNotif,
+                                  style: const TextStyle(
+                                    fontFamily: AppTokens.fontDisplay,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppTokens.accentInk,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  t.dashCompanyNotifSub,
+                                  style: const TextStyle(
+                                    fontFamily: AppTokens.fontDisplay,
+                                    fontSize: 12,
+                                    color: AppTokens.inkSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
               const SliverPadding(
                   padding: EdgeInsets.only(bottom: 32)),
             ],
@@ -338,8 +404,7 @@ class _MerchantRow extends StatelessWidget {
                 tone: ChipTone.accent,
                 leading: const Icon(Icons.circle, size: 6),
               ),
-            const Icon(
-              Icons.chevron_right,
+            const ChevronIcon(
               color: AppTokens.inkDisabled,
               size: 20,
             ),

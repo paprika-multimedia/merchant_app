@@ -10,6 +10,7 @@ import '../../net/api/merchants_api.dart';
 import '../../net/dio_client.dart';
 import '../../primitives/card.dart';
 import '../../primitives/chip.dart';
+import '../../primitives/icons.dart';
 import '../../state/session.dart';
 import '../../theme/tokens.dart';
 import '../remove_merchant_sheet/remove_merchant_sheet.dart';
@@ -111,8 +112,8 @@ class _DashboardMerchantScreenState
                     const Spacer(),
                     // Merchant options
                     IconButton(
-                      icon: const Icon(Icons.more_horiz,
-                          color: AppTokens.inkSecondary),
+                      icon: const MoreIcon(
+                          size: 20, color: AppTokens.inkSecondary),
                       onPressed: () => showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
@@ -161,7 +162,7 @@ class _DashboardMerchantScreenState
                         borderRadius:
                             BorderRadius.circular(AppTokens.radiusSm),
                       ),
-                      child: const Icon(Icons.add,
+                      child: const PlusIcon(
                           size: 18, color: AppTokens.inkSecondary),
                     ),
                   ),
@@ -235,7 +236,8 @@ class _DashboardMerchantScreenState
                     child: _ActionTile(
                       label: t.actionQris,
                       sub: t.actionQrisSub,
-                      icon: Icons.qr_code,
+                      iconWidget: const QrIcon(
+                          size: 22, color: AppTokens.accent),
                       accent: true,
                       onTap: () => context.push(
                         '/dynamic-qris',
@@ -248,7 +250,8 @@ class _DashboardMerchantScreenState
                     child: _ActionTile(
                       label: t.actionLink,
                       sub: t.actionLinkSub,
-                      icon: Icons.link,
+                      iconWidget: const LinkIcon(
+                          size: 22, color: AppTokens.ink),
                       onTap: () => context.push(
                         '/payment-link',
                         extra: {'merchantId': merchant.id},
@@ -260,7 +263,8 @@ class _DashboardMerchantScreenState
                     child: _ActionTile(
                       label: t.actionScan,
                       sub: canScan ? t.actionScanSub : t.actionScanDisabled,
-                      icon: Icons.camera_alt_outlined,
+                      iconWidget: const CameraIcon(
+                          size: 22, color: AppTokens.ink),
                       disabled: !canScan,
                       onTap: canScan
                           ? () => context.push(
@@ -373,7 +377,7 @@ class _ActionTile extends StatelessWidget {
   const _ActionTile({
     required this.label,
     required this.sub,
-    required this.icon,
+    required this.iconWidget,
     this.accent = false,
     this.disabled = false,
     this.onTap,
@@ -381,7 +385,7 @@ class _ActionTile extends StatelessWidget {
 
   final String label;
   final String sub;
-  final IconData icon;
+  final Widget iconWidget;
   final bool accent;
   final bool disabled;
   final VoidCallback? onTap;
@@ -403,9 +407,7 @@ class _ActionTile extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(icon,
-                  size: 22,
-                  color: accent ? AppTokens.accent : AppTokens.ink),
+              iconWidget,
               const Spacer(),
               Text(
                 label,
