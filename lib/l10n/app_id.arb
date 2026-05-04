@@ -15,6 +15,8 @@
   "scanTorch": "Senter",
   "scanGallery": "Galeri",
   "scanCodeFallback": "Masukkan kode saja",
+  "scanSelectImage": "Pilih gambar",
+  "scanImageNoQr": "Tidak ada QR pada gambar",
   "scanPermissionCta": "Aktifkan kamera di Pengaturan",
   "scanOpenSettings": "Buka Pengaturan",
 

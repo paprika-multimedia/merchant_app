@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../l10n/app_localizations.dart';
-import '../../theme/tokens.dart';
 import '../../primitives/button.dart';
 import '../../primitives/icons.dart';
+import '../../theme/tokens.dart';
 import '_scanner_overlay.dart';
 
 /// Scan Company QR screen — Handoff §4.2.
 ///
 /// Detects any QR with payload matching `paprika://company/<CODE>`.
 /// On match: vibrate and navigate to scan/merchant.
+///
+/// Bottom-sheet chrome: white rounded card (borderRadius 26, T.surface,
+/// drop shadow, left 12 / right 12 / bottom 34) containing a 3-col
+/// SmallAction row (Torch / Gallery / Keyboard) and a primary "Select image"
+/// button. Matches screens-onboarding.jsx ScreenScanCompany.
 class ScanCompanyScreen extends ConsumerStatefulWidget {
   const ScanCompanyScreen({super.key});
 
@@ -38,10 +44,27 @@ class _ScanCompanyScreenState extends ConsumerState<ScanCompanyScreen> {
       if (match != null) {
         _detected = true;
         final code = match.group(1)!;
-        // Navigate forward carrying the detected code
         context.push('/scan/merchant', extra: {'companyCode': code});
         return;
       }
+    }
+  }
+
+  /// Opens image picker, analyzes image for QR, dispatches on match.
+  Future<void> _pickAndScanImage() async {
+    final t = AppL10n.of(context);
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+    if (picked == null) return;
+
+    // analyzeImage returns BarcodeCapture? — null means no barcode found
+    final capture = await _scanner.analyzeImage(picked.path);
+    if (capture != null && capture.barcodes.isNotEmpty) {
+      _onDetect(capture);
+    } else if (mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(t.scanImageNoQr)));
     }
   }
 
@@ -53,78 +76,88 @@ class _ScanCompanyScreenState extends ConsumerState<ScanCompanyScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          MobileScanner(
-            controller: _scanner,
-            onDetect: _onDetect,
-          ),
-          ScannerOverlay(
-            title: t.scanCompanyTitle,
-            subtitle: t.scanCompanySub,
-          ),
-          // Bottom sheet controls
+          MobileScanner(controller: _scanner, onDetect: _onDetect),
+          ScannerOverlay(title: t.scanCompanyTitle, subtitle: t.scanCompanySub),
+
+          // Close button (top-right), matching JSX CircleBtn
           Positioned(
-            left: 0,
+            top: 0,
             right: 0,
-            bottom: 0,
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(
-                AppTokens.sp22,
-                AppTokens.sp16,
-                AppTokens.sp22,
-                AppTokens.sp28,
-              ),
-              decoration: const BoxDecoration(
-                color: Colors.black54,
-              ),
-              child: SafeArea(
-                top: false,
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Torch toggle
-                        _ScannerAction(
-                          label: t.scanTorch,
-                          icon: const FlashIcon(color: Colors.white, size: 28),
-                          onTap: () => _scanner.toggleTorch(),
-                        ),
-                        const SizedBox(width: AppTokens.sp28),
-                        // Gallery picker
-                        _ScannerAction(
-                          label: t.scanGallery,
-                          icon: const GalleryIcon(color: Colors.white, size: 28),
-                          onTap: () => _scanner.analyzeImage(''),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppTokens.sp16),
-                    AppButton(
-                      label: t.scanCodeFallback,
-                      variant: AppButtonVariant.secondary,
-                      onPressed: () => context.pushReplacement('/code/company'),
-                    ),
-                  ],
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(0, 8, 16, 0),
+                child: _CircleBtn(
+                  onTap: () => context.pop(),
+                  child: const CloseIcon(size: 18, color: Colors.white),
                 ),
               ),
             ),
           ),
-          // Back button
+
+          // Bottom sheet chrome — white card, borderRadius 26, l/r 12, bottom 34
           Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(AppTokens.sp16),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: IconButton(
-                    icon: const BackIcon(size: 20, color: Colors.white),
-                    onPressed: () => context.pop(),
-                    tooltip: t.commonBack,
+            left: 12,
+            right: 12,
+            bottom: 34,
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppTokens.surface,
+                borderRadius: BorderRadius.circular(26),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x40000000),
+                    blurRadius: 30,
+                    offset: Offset(0, 10),
                   ),
-                ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // 3-column SmallAction row: Torch / Gallery / Keyboard
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _SmallAction(
+                          icon: const FlashIcon(size: 18, color: AppTokens.ink),
+                          label: t.scanTorch,
+                          onTap: () => _scanner.toggleTorch(),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _SmallAction(
+                          icon: const GalleryIcon(
+                            size: 18,
+                            color: AppTokens.ink,
+                          ),
+                          label: t.scanGallery,
+                          onTap: _pickAndScanImage,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _SmallAction(
+                          icon: const KeyboardIcon(
+                            size: 18,
+                            color: AppTokens.ink,
+                          ),
+                          label: t.welcomeCode,
+                          onTap: () => context.pushReplacement('/code/company'),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  // Primary button: Select image (also triggers gallery)
+                  AppButton(
+                    label: t.scanSelectImage,
+                    variant: AppButtonVariant.primary,
+                    block: true,
+                    onPressed: _pickAndScanImage,
+                  ),
+                ],
               ),
             ),
           ),
@@ -134,34 +167,71 @@ class _ScanCompanyScreenState extends ConsumerState<ScanCompanyScreen> {
   }
 }
 
-class _ScannerAction extends StatelessWidget {
-  const _ScannerAction({
-    required this.label,
+// ─── Shared bottom-sheet primitives ──────────────────────────────────────────
+
+/// Glass circle button for camera overlay top bar (matches JSX CircleBtn).
+class _CircleBtn extends StatelessWidget {
+  const _CircleBtn({required this.child, this.onTap});
+
+  final Widget child;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 38,
+        height: 38,
+        decoration: BoxDecoration(
+          color: const Color(0x29FFFFFF), // rgba(255,255,255,0.16)
+          shape: BoxShape.circle,
+        ),
+        alignment: Alignment.center,
+        child: child,
+      ),
+    );
+  }
+}
+
+/// 56px-tall surfaceAlt tile with icon above label — matches JSX SmallAction.
+class _SmallAction extends StatelessWidget {
+  const _SmallAction({
     required this.icon,
+    required this.label,
     required this.onTap,
   });
 
-  final String label;
   final Widget icon;
+  final String label;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Column(
-        children: [
-          icon,
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontFamily: AppTokens.fontDisplay,
+      child: Container(
+        height: 56,
+        decoration: BoxDecoration(
+          color: AppTokens.surfaceAlt,
+          borderRadius: BorderRadius.circular(AppTokens.radiusSm),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Opacity(opacity: 0.8, child: icon),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: const TextStyle(
+                fontFamily: AppTokens.fontDisplay,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: AppTokens.inkSecondary,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

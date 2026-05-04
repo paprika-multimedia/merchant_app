@@ -53,10 +53,9 @@ class _RemoveMerchantSheetState extends ConsumerState<RemoveMerchantSheet> {
     });
     try {
       final dio = await ref.read(dioProvider.future);
-      await MerchantsApi(dio).remove(
-        widget.merchant.id,
-        confirmName: _confirmText.trim(),
-      );
+      await MerchantsApi(
+        dio,
+      ).remove(widget.merchant.id, confirmName: _confirmText.trim());
       ref.read(sessionProvider.notifier).removeMerchant(widget.merchant.id);
       setState(() => _step = _SheetStep.success);
     } catch (e) {
@@ -324,7 +323,7 @@ class _DragHandle extends StatelessWidget {
         width: 36,
         height: 4,
         decoration: BoxDecoration(
-          color: AppTokens.border,
+          color: AppTokens.borderStrong,
           borderRadius: BorderRadius.circular(2),
         ),
       ),
@@ -438,10 +437,11 @@ class _SettingsRow extends StatelessWidget {
               ),
             ),
             ChevronIcon(
-                size: 20,
-                color: danger
-                    ? AppTokens.danger.withValues(alpha: 0.5)
-                    : AppTokens.inkDisabled),
+              size: 20,
+              color: danger
+                  ? AppTokens.danger.withValues(alpha: 0.5)
+                  : AppTokens.inkDisabled,
+            ),
           ],
         ),
       ),

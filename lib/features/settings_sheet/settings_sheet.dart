@@ -39,31 +39,57 @@ class SettingsSheet extends ConsumerWidget {
               width: 36,
               height: 4,
               decoration: BoxDecoration(
-                color: AppTokens.border,
+                color: AppTokens.borderStrong,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
           ),
           const SizedBox(height: 16),
-          Text(
-            t.settingsTitle.toUpperCase(),
-            style: const TextStyle(
-              fontFamily: AppTokens.fontDisplay,
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-              color: AppTokens.inkTertiary,
-              letterSpacing: 1,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            companyName,
-            style: const TextStyle(
-              fontFamily: AppTokens.fontDisplay,
-              fontSize: 17,
-              fontWeight: FontWeight.w700,
-              color: AppTokens.ink,
-            ),
+          // Header row: icon plate + overline/company name (Fix 6 — restore icon plate)
+          Row(
+            children: [
+              // 36×36 surfaceAlt rounded square containing SettingsIcon
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: AppTokens.surfaceAlt,
+                  borderRadius: BorderRadius.circular(AppTokens.radiusSm),
+                ),
+                alignment: Alignment.center,
+                child: const SettingsIcon(size: 18, color: AppTokens.ink),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      t.settingsTitle.toUpperCase(),
+                      style: const TextStyle(
+                        fontFamily: AppTokens.fontDisplay,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: AppTokens.inkTertiary,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                    Text(
+                      companyName,
+                      style: const TextStyle(
+                        fontFamily: AppTokens.fontDisplay,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: AppTokens.ink,
+                        letterSpacing: -0.2,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 20),
 
@@ -86,18 +112,22 @@ class SettingsSheet extends ConsumerWidget {
             ),
             child: Row(
               children: [
-                Expanded(child: _LangTab(
-                  label: '🇮🇩 ${t.settingsLangId}',
-                  active: locale == 'id',
-                  onTap: () =>
-                      ref.read(localeProvider.notifier).setLocale('id'),
-                )),
-                Expanded(child: _LangTab(
-                  label: '🇬🇧 ${t.settingsLangEn}',
-                  active: locale == 'en',
-                  onTap: () =>
-                      ref.read(localeProvider.notifier).setLocale('en'),
-                )),
+                Expanded(
+                  child: _LangTab(
+                    label: '🇮🇩 ${t.settingsLangId}',
+                    active: locale == 'id',
+                    onTap: () =>
+                        ref.read(localeProvider.notifier).setLocale('id'),
+                  ),
+                ),
+                Expanded(
+                  child: _LangTab(
+                    label: '🇬🇧 ${t.settingsLangEn}',
+                    active: locale == 'en',
+                    onTap: () =>
+                        ref.read(localeProvider.notifier).setLocale('en'),
+                  ),
+                ),
               ],
             ),
           ),
@@ -131,8 +161,7 @@ class SettingsSheet extends ConsumerWidget {
                     height: 34,
                     decoration: BoxDecoration(
                       color: AppTokens.dangerSoft,
-                      borderRadius:
-                          BorderRadius.circular(AppTokens.radiusSm),
+                      borderRadius: BorderRadius.circular(AppTokens.radiusSm),
                     ),
                     alignment: Alignment.center,
                     child: const LogoutIcon(size: 18, color: AppTokens.danger),
@@ -245,7 +274,7 @@ class _LangTab extends StatelessWidget {
                     color: Color(0x0A000000),
                     blurRadius: 4,
                     offset: Offset(0, 1),
-                  )
+                  ),
                 ]
               : null,
         ),

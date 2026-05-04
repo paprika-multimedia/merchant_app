@@ -49,6 +49,12 @@ class AppL10nEn extends AppL10n {
   String get scanCodeFallback => 'Enter code instead';
 
   @override
+  String get scanSelectImage => 'Select image';
+
+  @override
+  String get scanImageNoQr => 'No QR code in image';
+
+  @override
   String get scanPermissionCta => 'Enable camera in Settings';
 
   @override

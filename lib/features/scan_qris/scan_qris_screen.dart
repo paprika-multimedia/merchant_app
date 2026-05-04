@@ -435,65 +435,11 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
           // Status bar padding
           SizedBox(height: MediaQuery.of(context).padding.top),
 
-          // Header
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: _backToScan,
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: AppTokens.surface,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppTokens.border.withValues(alpha: 1),
-                          spreadRadius: 1,
-                          blurRadius: 0,
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.arrow_back,
-                      color: AppTokens.ink,
-                      size: 18,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        t.cpmScanLabel(merchant?.name ?? ''),
-                        style: const TextStyle(
-                          fontFamily: AppTokens.fontDisplay,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: AppTokens.inkTertiary,
-                          letterSpacing: 1,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        t.cpmAmountChargeTitle,
-                        style: const TextStyle(
-                          fontFamily: AppTokens.fontDisplay,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w700,
-                          color: AppTokens.ink,
-                          letterSpacing: -0.3,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+          // Header — PaprikaScreenHeader replaces hand-rolled header (Fix 3+4)
+          PaprikaScreenHeader(
+            onBack: _backToScan,
+            overline: Text(t.cpmScanLabel(merchant?.name ?? '')),
+            title: Text(t.cpmAmountChargeTitle),
           ),
 
           Expanded(
@@ -859,11 +805,8 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
                     size: AppButtonSize.lg,
                     block: true,
                     onPressed: () {
-                      ref
-                          .read(sessionProvider.notifier)
-                          .refreshMerchants();
-                      context.go(
-                          '/dashboard/merchant/${widget.merchantId}');
+                      ref.read(sessionProvider.notifier).refreshMerchants();
+                      context.go('/dashboard/merchant/${widget.merchantId}');
                     },
                   ),
                   const SizedBox(height: 10),
@@ -873,9 +816,7 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
                     size: AppButtonSize.lg,
                     block: true,
                     onPressed: () {
-                      ref
-                          .read(sessionProvider.notifier)
-                          .refreshMerchants();
+                      ref.read(sessionProvider.notifier).refreshMerchants();
                       setState(() {
                         _step = _CpmStep.scan;
                         _amountStr = '';
@@ -1164,9 +1105,7 @@ class _ScanPresetRow extends StatelessWidget {
         final label = '${v ~/ 1000}K';
         return Expanded(
           child: Padding(
-            padding: EdgeInsets.only(
-              right: v != _kPresets.last ? 6 : 0,
-            ),
+            padding: EdgeInsets.only(right: v != _kPresets.last ? 6 : 0),
             child: GestureDetector(
               onTap: () => onTap(v),
               child: Container(

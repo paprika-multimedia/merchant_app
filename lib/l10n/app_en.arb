@@ -15,6 +15,8 @@
   "scanTorch": "Torch",
   "scanGallery": "Gallery",
   "scanCodeFallback": "Enter code instead",
+  "scanSelectImage": "Select image",
+  "scanImageNoQr": "No QR code in image",
   "scanPermissionCta": "Enable camera in Settings",
   "scanOpenSettings": "Open Settings",
 

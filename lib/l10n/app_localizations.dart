@@ -175,6 +175,18 @@ abstract class AppL10n {
   /// **'Masukkan kode saja'**
   String get scanCodeFallback;
 
+  /// No description provided for @scanSelectImage.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih gambar'**
+  String get scanSelectImage;
+
+  /// No description provided for @scanImageNoQr.
+  ///
+  /// In id, this message translates to:
+  /// **'Tidak ada QR pada gambar'**
+  String get scanImageNoQr;
+
   /// No description provided for @scanPermissionCta.
   ///
   /// In id, this message translates to:

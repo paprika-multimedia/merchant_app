@@ -50,6 +50,12 @@ class AppL10nId extends AppL10n {
   String get scanCodeFallback => 'Masukkan kode saja';
 
   @override
+  String get scanSelectImage => 'Pilih gambar';
+
+  @override
+  String get scanImageNoQr => 'Tidak ada QR pada gambar';
+
+  @override
   String get scanPermissionCta => 'Aktifkan kamera di Pengaturan';
 
   @override
