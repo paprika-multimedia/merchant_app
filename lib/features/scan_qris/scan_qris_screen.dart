@@ -427,9 +427,6 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
   Widget _buildConfirmStep(BuildContext context, Merchant? merchant) {
     final t = AppL10n.of(context);
     final fmt = NumberFormat('#,###', 'id_ID');
-    final recents = ref.watch(
-      recentAmountsProvider((widget.merchantId, 'cpm')),
-    );
 
     return Scaffold(
       backgroundColor: AppTokens.bg,
@@ -650,34 +647,9 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
 
                   const SizedBox(height: 14),
 
-                  // Preset chips
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: recents.map((v) {
-                      return GestureDetector(
-                        onTap: () => setState(() => _amountStr = v.toString()),
-                        child: Container(
-                          height: 34,
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          decoration: BoxDecoration(
-                            color: AppTokens.surface,
-                            borderRadius: BorderRadius.circular(17),
-                            border: Border.all(color: AppTokens.border),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            '${t.commonCurrency} ${fmt.format(v)}',
-                            style: const TextStyle(
-                              fontFamily: AppTokens.fontDisplay,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: AppTokens.ink,
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
+                  // Fixed preset chips — always 5K/10K/25K/50K/100K (JSX spec)
+                  _ScanPresetRow(
+                    onTap: (v) => setState(() => _amountStr = v.toString()),
                   ),
 
                   if (_error != null) ...[
@@ -1164,6 +1136,54 @@ class _NoPermissionView extends StatelessWidget {
         ? Uri.parse('app-settings:')
         : Uri.parse('package:com.paprika.paprika_merchant');
     await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Fixed preset chips — 5K / 10K / 25K / 50K / 100K
+// ─────────────────────────────────────────────────────────────────────────────
+
+const _kPresets = [5000, 10000, 25000, 50000, 100000];
+
+class _ScanPresetRow extends StatelessWidget {
+  const _ScanPresetRow({required this.onTap});
+  final void Function(int) onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: _kPresets.map((v) {
+        final label = '${v ~/ 1000}K';
+        return Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(
+              right: v != _kPresets.last ? 6 : 0,
+            ),
+            child: GestureDetector(
+              onTap: () => onTap(v),
+              child: Container(
+                height: 34,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppTokens.surface,
+                  borderRadius: BorderRadius.circular(AppTokens.radiusSm),
+                  border: Border.all(color: AppTokens.border),
+                ),
+                child: Text(
+                  label,
+                  style: const TextStyle(
+                    fontFamily: AppTokens.fontDisplay,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppTokens.ink,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
   }
 }
 

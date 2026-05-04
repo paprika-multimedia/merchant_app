@@ -155,6 +155,42 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
                     CodeInput(
                       onChanged: (v) => setState(() => _code = v),
                       error: _error,
+                      showCounter: false,
+                    ),
+                    const SizedBox(height: 8),
+                    // Inline counter + camera row (JSX §screens-onboarding)
+                    Row(
+                      children: [
+                        Text(
+                          '${_code.length} / 20',
+                          style: const TextStyle(
+                            fontFamily: AppTokens.fontDisplay,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: AppTokens.inkTertiary,
+                          ),
+                        ),
+                        const Spacer(),
+                        AppButton(
+                          label: t.codeCamera,
+                          variant: AppButtonVariant.ghost,
+                          size: AppButtonSize.sm,
+                          leading: const CameraIcon(
+                            size: 14,
+                            color: AppTokens.inkSecondary,
+                          ),
+                          onPressed: () {
+                            if (isMerchant) {
+                              context.pushReplacement(
+                                '/scan/merchant',
+                                extra: {'addMode': widget.addMode},
+                              );
+                            } else {
+                              context.pushReplacement('/scan/company');
+                            }
+                          },
+                        ),
+                      ],
                     ),
                     const Spacer(),
                     AppButton(
@@ -164,23 +200,6 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
                       block: true,
                       disabled: !_canContinue,
                       onPressed: _onContinue,
-                    ),
-                    const SizedBox(height: 12),
-                    Center(
-                      child: AppButton(
-                        label: t.codeCamera,
-                        variant: AppButtonVariant.ghost,
-                        onPressed: () {
-                          if (isMerchant) {
-                            context.pushReplacement(
-                              '/scan/merchant',
-                              extra: {'addMode': widget.addMode},
-                            );
-                          } else {
-                            context.pushReplacement('/scan/company');
-                          }
-                        },
-                      ),
                     ),
                     const SizedBox(height: 28),
                   ],

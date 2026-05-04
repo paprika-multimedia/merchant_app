@@ -11,6 +11,7 @@ import '../../net/dio_client.dart';
 import '../../primitives/card.dart';
 import '../../primitives/chip.dart';
 import '../../primitives/icons.dart';
+import '../../primitives/merchant_avatar.dart';
 import '../../state/session.dart';
 import '../../theme/tokens.dart';
 import '../remove_merchant_sheet/remove_merchant_sheet.dart';
@@ -137,13 +138,13 @@ class _DashboardMerchantScreenState
             ),
           ),
 
-          // Merchant strip
+          // Merchant strip — 40px pills with avatars
           SliverToBoxAdapter(
             child: SizedBox(
-              height: 48,
+              height: 52,
               child: ListView(
                 scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
                 children: [
                   for (final m in merchants)
                     _MerchantChip(
@@ -153,15 +154,14 @@ class _DashboardMerchantScreenState
                   GestureDetector(
                     onTap: () => context.push('/add-merchant'),
                     child: Container(
-                      margin: const EdgeInsets.only(
-                          left: 8, top: 8, bottom: 8),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 4),
+                      height: 40,
+                      margin: const EdgeInsets.only(left: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
                         border: Border.all(color: AppTokens.border),
-                        borderRadius:
-                            BorderRadius.circular(AppTokens.radiusSm),
+                        borderRadius: BorderRadius.circular(20),
                       ),
+                      alignment: Alignment.center,
                       child: const PlusIcon(
                           size: 18, color: AppTokens.inkSecondary),
                     ),
@@ -332,16 +332,25 @@ class _DashboardMerchantScreenState
               ),
             )
           else
-            SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (ctx, i) {
-                  final txn = _transactions[i];
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                    child: _TxnRow(txn: txn),
-                  );
-                },
-                childCount: _transactions.length,
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              sliver: SliverToBoxAdapter(
+                child: AppCard(
+                  padding: 0,
+                  child: Column(
+                    children: [
+                      for (int i = 0; i < _transactions.length; i++) ...[
+                        if (i > 0)
+                          const Divider(
+                            height: 1,
+                            thickness: 1,
+                            color: AppTokens.border,
+                          ),
+                        _TxnRow(txn: _transactions[i]),
+                      ],
+                    ],
+                  ),
+                ),
               ),
             ),
 
@@ -352,6 +361,7 @@ class _DashboardMerchantScreenState
   }
 }
 
+/// 40px pill with MerchantAvatar(28) + name, active = accent bg + surface text.
 class _MerchantChip extends StatelessWidget {
   const _MerchantChip({required this.merchant, required this.active});
   final Merchant merchant;
@@ -362,23 +372,35 @@ class _MerchantChip extends StatelessWidget {
     return GestureDetector(
       onTap: () => context.go('/dashboard/merchant/${merchant.id}'),
       child: Container(
-        margin: const EdgeInsets.only(right: 8, top: 8, bottom: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        height: 40,
+        margin: const EdgeInsets.only(right: 8),
+        padding: const EdgeInsets.only(left: 6, right: 12),
         decoration: BoxDecoration(
           color: active ? AppTokens.accent : AppTokens.surface,
-          borderRadius: BorderRadius.circular(AppTokens.radiusSm),
-          border: Border.all(
-            color: active ? AppTokens.accent : AppTokens.border,
-          ),
+          borderRadius: BorderRadius.circular(20),
+          border: active
+              ? null
+              : Border.all(color: AppTokens.border),
         ),
-        child: Text(
-          merchant.name,
-          style: TextStyle(
-            fontFamily: AppTokens.fontDisplay,
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: active ? Colors.white : AppTokens.ink,
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            MerchantAvatar(
+              name: merchant.name,
+              size: 28,
+              active: active,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              merchant.name,
+              style: TextStyle(
+                fontFamily: AppTokens.fontDisplay,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: active ? Colors.white : AppTokens.ink,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -450,10 +472,23 @@ class _TxnRow extends StatelessWidget {
   const _TxnRow({required this.txn});
   final Transaction txn;
 
+  /// Short relative time from ISO timestamp (mirrors _MerchantRow._relativeTime).
+  static String _relativeTime(String isoAt) {
+    final at = DateTime.tryParse(isoAt);
+    if (at == null) return '';
+    final diff = DateTime.now().difference(at);
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m';
+    if (diff.inHours < 24) return '${diff.inHours}h';
+    if (diff.inDays == 1) return 'Yesterday';
+    final weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    return weekdays[(at.weekday - 1) % 7];
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = AppL10n.of(context);
     final fmt = NumberFormat('#,###', 'id_ID');
+    final timeStr = _relativeTime(txn.createdAt);
 
     final (tone, statusLabel) = switch (txn.status) {
       TransactionStatus.paid => (ChipTone.success, t.txStatusPaid),
@@ -464,8 +499,8 @@ class _TxnRow extends StatelessWidget {
       TransactionStatus.refunded => (ChipTone.neutral, t.txStatusRefunded),
     };
 
-    return AppCard(
-      padding: AppTokens.sp14,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
           Expanded(
@@ -483,7 +518,9 @@ class _TxnRow extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  txn.ref,
+                  timeStr.isNotEmpty
+                      ? '$timeStr · #${txn.ref}'
+                      : '#${txn.ref}',
                   style: const TextStyle(
                     fontFamily: AppTokens.fontMono,
                     fontSize: 11,
@@ -510,7 +547,9 @@ class _TxnRow extends StatelessWidget {
                 label: statusLabel,
                 tone: tone,
                 leading: Icon(
-                  tone == ChipTone.success ? Icons.check_circle_outline : Icons.circle_outlined,
+                  tone == ChipTone.success
+                      ? Icons.check_circle_outline
+                      : Icons.circle_outlined,
                   size: 10,
                 ),
               ),

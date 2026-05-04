@@ -29,12 +29,12 @@ class AppTokens extends ThemeExtension<AppTokens> {
   static const Color accentInk = Color(0xFF1A0B0E);
 
   // ─── Status ────────────────────────────────────────────────────────────────
-  // oklch(0.62 0.14 155) ≈ #2E9E6A
-  static const Color success = Color(0xFF2E9E6A);
+  // oklch(0.62 0.14 155) ≈ #2DA070
+  static const Color success = Color(0xFF2DA070);
   // oklch(0.95 0.04 155) ≈ #E8F7F1
   static const Color successSoft = Color(0xFFE8F7F1);
-  // oklch(0.72 0.14 75) ≈ #B8860B
-  static const Color warning = Color(0xFFB8860B);
+  // oklch(0.72 0.14 75) ≈ #C39438
+  static const Color warning = Color(0xFFC39438);
   // oklch(0.95 0.04 75) ≈ #FDF6DC
   static const Color warningSoft = Color(0xFFFDF6DC);
   // oklch(0.58 0.19 25) ≈ #D94040

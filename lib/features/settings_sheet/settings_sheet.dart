@@ -117,25 +117,52 @@ class SettingsSheet extends ConsumerWidget {
           GestureDetector(
             onTap: () => _showLogoutConfirm(context, ref, companyName),
             child: Container(
-              height: 48,
-              padding: const EdgeInsets.symmetric(horizontal: 14),
+              padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: AppTokens.dangerSoft,
+                color: AppTokens.surface,
                 borderRadius: BorderRadius.circular(AppTokens.radiusSm),
+                border: Border.all(color: AppTokens.border),
               ),
               child: Row(
                 children: [
-                  const LogoutIcon(size: 20, color: AppTokens.danger),
+                  // 34×34 dangerSoft icon plate
+                  Container(
+                    width: 34,
+                    height: 34,
+                    decoration: BoxDecoration(
+                      color: AppTokens.dangerSoft,
+                      borderRadius:
+                          BorderRadius.circular(AppTokens.radiusSm),
+                    ),
+                    alignment: Alignment.center,
+                    child: const LogoutIcon(size: 18, color: AppTokens.danger),
+                  ),
                   const SizedBox(width: 12),
-                  Text(
-                    t.settingsLogout,
-                    style: const TextStyle(
-                      fontFamily: AppTokens.fontDisplay,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: AppTokens.danger,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          t.settingsLogout,
+                          style: const TextStyle(
+                            fontFamily: AppTokens.fontDisplay,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppTokens.ink,
+                          ),
+                        ),
+                        Text(
+                          t.settingsLogoutSub,
+                          style: const TextStyle(
+                            fontFamily: AppTokens.fontDisplay,
+                            fontSize: 12,
+                            color: AppTokens.inkSecondary,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+                  const ChevronIcon(size: 18, color: AppTokens.inkDisabled),
                 ],
               ),
             ),

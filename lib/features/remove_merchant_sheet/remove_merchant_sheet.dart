@@ -7,8 +7,10 @@ import '../../models/merchant.dart';
 import '../../net/api/merchants_api.dart';
 import '../../net/dio_client.dart';
 import '../../primitives/button.dart';
+import '../../primitives/card.dart';
 import '../../primitives/field.dart';
 import '../../primitives/icons.dart';
+import '../../primitives/merchant_avatar.dart';
 import '../../state/session.dart';
 import '../../theme/tokens.dart';
 
@@ -226,15 +228,16 @@ class _RemoveMerchantSheetState extends ConsumerState<RemoveMerchantSheet> {
       children: [
         _DragHandle(),
         const SizedBox(height: 20),
+        // (a) accentSoft plate + accentDeep check icon
         Center(
           child: Container(
             width: 56,
             height: 56,
             decoration: const BoxDecoration(
-              color: AppTokens.successSoft,
+              color: AppTokens.accentSoft,
               shape: BoxShape.circle,
             ),
-            child: const CheckIcon(color: AppTokens.success, size: 28),
+            child: const CheckIcon(color: AppTokens.accentDeep, size: 28),
           ),
         ),
         const SizedBox(height: 16),
@@ -262,7 +265,7 @@ class _RemoveMerchantSheetState extends ConsumerState<RemoveMerchantSheet> {
           ),
         ),
         const SizedBox(height: 24),
-        // Sibling merchants to switch to
+        // (b) Sibling merchants — single card with avatar-rows and dividers
         if (widget.siblingMerchants.isNotEmpty) ...[
           Text(
             t.merchantRemovedSwitch,
@@ -273,19 +276,31 @@ class _RemoveMerchantSheetState extends ConsumerState<RemoveMerchantSheet> {
             ),
           ),
           const SizedBox(height: 8),
-          for (final m in widget.siblingMerchants)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: AppButton(
-                label: m.name,
-                variant: AppButtonVariant.secondary,
-                block: true,
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  context.go('/dashboard/merchant/${m.id}');
-                },
-              ),
+          AppCard(
+            padding: 0,
+            child: Column(
+              children: [
+                for (int i = 0; i < widget.siblingMerchants.length; i++) ...[
+                  if (i > 0)
+                    const Divider(
+                      height: 1,
+                      thickness: 1,
+                      color: AppTokens.border,
+                    ),
+                  _SiblingRow(
+                    merchant: widget.siblingMerchants[i],
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      context.go(
+                        '/dashboard/merchant/${widget.siblingMerchants[i].id}',
+                      );
+                    },
+                  ),
+                ],
+              ],
             ),
+          ),
+          const SizedBox(height: 8),
         ],
         AppButton(
           label: t.merchantRemovedBack,
@@ -311,6 +326,58 @@ class _DragHandle extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppTokens.border,
           borderRadius: BorderRadius.circular(2),
+        ),
+      ),
+    );
+  }
+}
+
+/// A tappable row showing MerchantAvatar + name/#code + ChevronIcon.
+///
+/// Used in the success step's single-card sibling list.
+class _SiblingRow extends StatelessWidget {
+  const _SiblingRow({required this.merchant, required this.onTap});
+
+  final Merchant merchant;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            MerchantAvatar(name: merchant.name, size: 36),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    merchant.name,
+                    style: const TextStyle(
+                      fontFamily: AppTokens.fontDisplay,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppTokens.ink,
+                    ),
+                  ),
+                  if (merchant.code.isNotEmpty)
+                    Text(
+                      '#${merchant.code}',
+                      style: const TextStyle(
+                        fontFamily: AppTokens.fontMono,
+                        fontSize: 11,
+                        color: AppTokens.inkSecondary,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            const ChevronIcon(size: 16, color: AppTokens.inkDisabled),
+          ],
         ),
       ),
     );

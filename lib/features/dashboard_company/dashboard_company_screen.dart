@@ -100,31 +100,27 @@ class DashboardCompanyScreen extends ConsumerWidget {
                 ),
               ),
 
-              // Merchant strip
+              // Merchant strip — 40px pills with avatars
               SliverToBoxAdapter(
                 child: SizedBox(
-                  height: 48,
+                  height: 52,
                   child: ListView(
                     scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
                     children: [
                       for (final m in merchants) _MerchantChip(merchant: m),
                       // Add chip
                       GestureDetector(
                         onTap: () => context.push('/add-merchant'),
                         child: Container(
-                          margin: const EdgeInsets.only(
-                              left: 8, top: 8, bottom: 8),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 4),
+                          height: 40,
+                          margin: const EdgeInsets.only(left: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
                           decoration: BoxDecoration(
-                            border: Border.all(
-                              color: AppTokens.border,
-                              style: BorderStyle.solid,
-                            ),
-                            borderRadius:
-                                BorderRadius.circular(AppTokens.radiusSm),
+                            border: Border.all(color: AppTokens.border),
+                            borderRadius: BorderRadius.circular(20),
                           ),
+                          alignment: Alignment.center,
                           child: const PlusIcon(
                               size: 18, color: AppTokens.inkSecondary),
                         ),
@@ -244,7 +240,7 @@ class DashboardCompanyScreen extends ConsumerWidget {
                   ),
                 ),
 
-              // Fix 6b — notifications promo card
+              // Notifications promo card with dashed border (M12)
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                 sliver: SliverToBoxAdapter(
@@ -252,13 +248,17 @@ class DashboardCompanyScreen extends ConsumerWidget {
                     onTap: () {
                       // TODO: wire to notification permission
                     },
-                    child: Container(
+                    child: CustomPaint(
+                      painter: _DashedBorderPainter(
+                        radius: AppTokens.radiusLg,
+                        color: AppTokens.accentSoft,
+                      ),
+                      child: Container(
                       padding: const EdgeInsets.all(AppTokens.sp16),
                       decoration: BoxDecoration(
                         color: AppTokens.accentWash,
                         borderRadius:
                             BorderRadius.circular(AppTokens.radiusLg),
-                        border: Border.all(color: AppTokens.accentSoft),
                       ),
                       child: Row(
                         children: [
@@ -304,6 +304,7 @@ class DashboardCompanyScreen extends ConsumerWidget {
                           ),
                         ],
                       ),
+                      ),
                     ),
                   ),
                 ),
@@ -319,6 +320,7 @@ class DashboardCompanyScreen extends ConsumerWidget {
   }
 }
 
+/// 40px pill with MerchantAvatar(28) + name, active = accent bg + surface text.
 class _MerchantChip extends ConsumerWidget {
   const _MerchantChip({required this.merchant});
   final Merchant merchant;
@@ -332,23 +334,33 @@ class _MerchantChip extends ConsumerWidget {
         context.push('/dashboard/merchant/${merchant.id}');
       },
       child: Container(
-        margin: const EdgeInsets.only(right: 8, top: 8, bottom: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        height: 40,
+        margin: const EdgeInsets.only(right: 8),
+        padding: const EdgeInsets.only(left: 6, right: 12),
         decoration: BoxDecoration(
           color: active ? AppTokens.accent : AppTokens.surface,
-          borderRadius: BorderRadius.circular(AppTokens.radiusSm),
-          border: Border.all(
-            color: active ? AppTokens.accent : AppTokens.border,
-          ),
+          borderRadius: BorderRadius.circular(20),
+          border: active ? null : Border.all(color: AppTokens.border),
         ),
-        child: Text(
-          merchant.name,
-          style: TextStyle(
-            fontFamily: AppTokens.fontDisplay,
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: active ? Colors.white : AppTokens.ink,
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            MerchantAvatar(
+              name: merchant.name,
+              size: 28,
+              active: active,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              merchant.name,
+              style: TextStyle(
+                fontFamily: AppTokens.fontDisplay,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: active ? Colors.white : AppTokens.ink,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -563,4 +575,53 @@ class _StatPill extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Paints a 1px dashed rounded-rectangle border (dash 4, gap 3).
+///
+/// Used for the notifications promo card (M12).
+class _DashedBorderPainter extends CustomPainter {
+  const _DashedBorderPainter({required this.radius, required this.color});
+
+  final double radius;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1
+      ..style = PaintingStyle.stroke;
+
+    const dashLen = 4.0;
+    const gapLen = 3.0;
+
+    final rrect = RRect.fromRectAndRadius(
+      Rect.fromLTWH(0.5, 0.5, size.width - 1, size.height - 1),
+      Radius.circular(radius),
+    );
+
+    // Convert the rounded-rect path to a metric and draw dashes along it
+    final path = Path()..addRRect(rrect);
+    final metrics = path.computeMetrics();
+
+    for (final metric in metrics) {
+      double distance = 0;
+      bool draw = true;
+      while (distance < metric.length) {
+        final segLen = draw ? dashLen : gapLen;
+        if (draw) {
+          final extracted = metric.extractPath(distance,
+              (distance + segLen).clamp(0, metric.length));
+          canvas.drawPath(extracted, paint);
+        }
+        distance += segLen;
+        draw = !draw;
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_DashedBorderPainter old) =>
+      old.color != color || old.radius != radius;
 }

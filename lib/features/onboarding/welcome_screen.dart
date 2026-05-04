@@ -11,8 +11,6 @@ import '../../l10n/app_localizations.dart';
 ///
 /// Layout (left-aligned): Lockup → 40px display tagline → hero illustration →
 /// two CTAs (primary: Scan QR, secondary: Enter code).
-///
-/// The "Don't have a code?" help row is retained (not in JSX but useful copy).
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
@@ -86,33 +84,6 @@ class WelcomeScreen extends StatelessWidget {
                     onPressed: () => context.push('/code/company'),
                   ),
                   // Help row retained (not in JSX but useful contact copy)
-                  const SizedBox(height: AppTokens.sp22),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        t.welcomeHelp,
-                        style: const TextStyle(
-                          fontFamily: AppTokens.fontDisplay,
-                          fontSize: 13,
-                          color: AppTokens.inkTertiary,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      GestureDetector(
-                        onTap: () {}, // contact admin — placeholder
-                        child: Text(
-                          t.welcomeHelpCta,
-                          style: const TextStyle(
-                            fontFamily: AppTokens.fontDisplay,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: AppTokens.accent,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
                 ],
               ),
             ),

@@ -154,9 +154,6 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
   Widget build(BuildContext context) {
     final t = AppL10n.of(context);
     final fmt = NumberFormat('#,###', 'id_ID');
-    final recents = ref.watch(
-      recentAmountsProvider((widget.merchantId, 'link')),
-    );
 
     return Scaffold(
       backgroundColor: AppTokens.bg,
@@ -177,7 +174,7 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
                 ),
                 Expanded(
                   child: _step == _LinkStep.form
-                      ? _buildForm(t, fmt, recents)
+                      ? _buildForm(t, fmt)
                       : _buildSuccess(t, fmt),
                 ),
               ],
@@ -197,7 +194,7 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
     );
   }
 
-  Widget _buildForm(AppL10n t, NumberFormat fmt, List<int> recents) {
+  Widget _buildForm(AppL10n t, NumberFormat fmt) {
     return Column(
       children: [
         Expanded(
@@ -285,18 +282,9 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                Wrap(
-                  spacing: 8,
-                  children: recents.map((a) {
-                    return GestureDetector(
-                      onTap: () => setState(() => _amountStr = a.toString()),
-                      child: AppChip(
-                        label: fmt.format(a),
-                        tone: ChipTone.neutral,
-                        size: ChipSize.md,
-                      ),
-                    );
-                  }).toList(),
+                // Fixed preset chips — always 5K/10K/25K/50K/100K (JSX spec)
+                _PresetRow(
+                  onTap: (v) => setState(() => _amountStr = v.toString()),
                 ),
                 const SizedBox(height: 16),
                 // Title
@@ -643,6 +631,69 @@ class Share {
   static Future<void> share(String text) async {
     // TODO(share): integrate share_plus or url_launcher share intent
     await Clipboard.setData(ClipboardData(text: text));
+  }
+}
+
+// ─── Fixed preset chips — 5K / 10K / 25K / 50K / 100K ──────────────────────
+
+const _kPresets = [5000, 10000, 25000, 50000, 100000];
+
+class _PresetRow extends StatelessWidget {
+  const _PresetRow({required this.onTap});
+  final void Function(int) onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: _kPresets.map((v) {
+        final label = '${v ~/ 1000}K';
+        return Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(
+              right: v != _kPresets.last ? 6 : 0,
+            ),
+            child: _AmountPresetChip(value: v, label: label, onTap: onTap),
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
+class _AmountPresetChip extends StatelessWidget {
+  const _AmountPresetChip({
+    required this.value,
+    required this.label,
+    required this.onTap,
+  });
+
+  final int value;
+  final String label;
+  final void Function(int) onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => onTap(value),
+      child: Container(
+        height: 34,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: AppTokens.surface,
+          borderRadius: BorderRadius.circular(AppTokens.radiusSm),
+          border: Border.all(color: AppTokens.border),
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(
+            fontFamily: AppTokens.fontDisplay,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: AppTokens.ink,
+          ),
+        ),
+      ),
+    );
   }
 }
 

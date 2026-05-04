@@ -16,12 +16,12 @@ import '../../net/api/transactions_api.dart';
 import '../../net/dio_client.dart';
 import '../../primitives/button.dart';
 import '../../primitives/card.dart';
-import '../../primitives/chip.dart';
 import '../../primitives/field.dart';
 import '../../primitives/icons.dart';
 import '../../primitives/keypad.dart';
 import '../../primitives/screen_header.dart';
 import '../../state/recent_amounts.dart';
+import '../../state/session.dart';
 import '../../theme/tokens.dart';
 
 /// Dynamic QRIS flow — Handoff §4.7.
@@ -184,9 +184,16 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
   Widget build(BuildContext context) {
     final t = AppL10n.of(context);
     final fmt = NumberFormat('#,###', 'id_ID');
-    final recents = ref.watch(
-      recentAmountsProvider((widget.merchantId, 'qris')),
-    );
+
+    // Resolve merchant name for overline (M11)
+    final merchantName = ref
+            .watch(sessionProvider)
+            .value
+            ?.merchants
+            .where((m) => m.id == widget.merchantId)
+            .firstOrNull
+            ?.name ??
+        '';
 
     final VoidCallback backAction = _step == _QrisStep.paid
         ? () => context.go('/dashboard/merchant/${widget.merchantId}')
@@ -205,7 +212,11 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
           children: [
             PaprikaScreenHeader(
               onBack: backAction,
-              overline: Text(t.qrisTitle.toUpperCase()),
+              overline: Text(
+                merchantName.isNotEmpty
+                    ? '${t.qrisTitle.toUpperCase()} · $merchantName'
+                    : t.qrisTitle.toUpperCase(),
+              ),
               title: Text(switch (_step) {
                 _QrisStep.amount => t.qrisHeaderAmount,
                 _QrisStep.qr => t.qrisHeaderWaiting,
@@ -214,7 +225,7 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
             ),
             Expanded(
               child: switch (_step) {
-                _QrisStep.amount => _buildAmount(t, fmt, recents),
+                _QrisStep.amount => _buildAmount(t, fmt, const []),
                 _QrisStep.qr => _buildQr(t, fmt),
                 _QrisStep.paid => _buildPaid(t, fmt),
               },
@@ -227,7 +238,7 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
 
   // ─── Amount step ─────────────────────────────────────────────────────────
 
-  Widget _buildAmount(AppL10n t, NumberFormat fmt, List<int> recents) {
+  Widget _buildAmount(AppL10n t, NumberFormat fmt, List<int> _) {
     return Column(
       children: [
         Expanded(
@@ -314,19 +325,9 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                // Preset chips
-                Wrap(
-                  spacing: 8,
-                  children: recents.map((a) {
-                    return GestureDetector(
-                      onTap: () => setState(() => _amountStr = a.toString()),
-                      child: AppChip(
-                        label: fmt.format(a),
-                        tone: ChipTone.neutral,
-                        size: ChipSize.md,
-                      ),
-                    );
-                  }).toList(),
+                // Fixed preset chips — always 5K/10K/25K/50K/100K (JSX spec)
+                _PresetRow(
+                  onTap: (v) => setState(() => _amountStr = v.toString()),
                 ),
                 const SizedBox(height: 16),
                 // Note field
@@ -625,6 +626,69 @@ class _QrWithMark extends StatelessWidget {
             child: const PaprikaMark(size: 28, tile: false),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ─── Fixed preset chips — 5K / 10K / 25K / 50K / 100K ──────────────────────
+
+const _kPresets = [5000, 10000, 25000, 50000, 100000];
+
+class _PresetRow extends StatelessWidget {
+  const _PresetRow({required this.onTap});
+  final void Function(int) onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: _kPresets.map((v) {
+        final label = '${v ~/ 1000}K';
+        return Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(
+              right: v != _kPresets.last ? 6 : 0,
+            ),
+            child: _AmountPresetChip(value: v, label: label, onTap: onTap),
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
+class _AmountPresetChip extends StatelessWidget {
+  const _AmountPresetChip({
+    required this.value,
+    required this.label,
+    required this.onTap,
+  });
+
+  final int value;
+  final String label;
+  final void Function(int) onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => onTap(value),
+      child: Container(
+        height: 34,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: AppTokens.surface,
+          borderRadius: BorderRadius.circular(AppTokens.radiusSm),
+          border: Border.all(color: AppTokens.border),
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(
+            fontFamily: AppTokens.fontDisplay,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: AppTokens.ink,
+          ),
+        ),
       ),
     );
   }

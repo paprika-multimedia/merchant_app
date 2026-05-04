@@ -16,11 +16,15 @@ class CodeInput extends StatefulWidget {
     required this.onChanged,
     this.initialValue = '',
     this.error,
+    this.showCounter = true,
   });
 
   final ValueChanged<String> onChanged;
   final String initialValue;
   final String? error;
+  /// Whether to render the `n / 20` counter below the input.
+  /// Pass `false` when the parent renders the counter inline (M8).
+  final bool showCounter;
 
   @override
   State<CodeInput> createState() => _CodeInputState();
@@ -130,17 +134,18 @@ class _CodeInputState extends State<CodeInput> {
             ),
           ),
         ],
-        const SizedBox(height: 6),
-        // Character counter
-        Text(
-          '${_value.length} / 20',
-          style: const TextStyle(
-            fontFamily: AppTokens.fontDisplay,
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: AppTokens.inkTertiary,
+        if (widget.showCounter) ...[
+          const SizedBox(height: 6),
+          Text(
+            '${_value.length} / 20',
+            style: const TextStyle(
+              fontFamily: AppTokens.fontDisplay,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: AppTokens.inkTertiary,
+            ),
           ),
-        ),
+        ],
       ],
     );
   }
