@@ -1,0 +1,81 @@
+name: paprika_merchant
+description: "Paprika Merchant — receive and manage payments for your business."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State, routing, HTTP
+  flutter_riverpod: ^2.6.1
+  go_router: ^14.6.2
+  dio: ^5.7.0
+
+  # Models & codegen
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+
+  # Storage
+  flutter_secure_storage: ^9.2.2
+  shared_preferences: ^2.3.3
+
+  # Realtime + QR
+  web_socket_channel: ^3.0.1
+  mobile_scanner: ^5.2.3
+  qr_flutter: ^4.1.0
+
+  # Utilities
+  uuid: ^4.5.1
+  intl: ^0.20.2
+  package_info_plus: ^8.1.1
+  url_launcher: ^6.3.1
+  flutter_svg: ^2.0.10
+  flutter_animate: ^4.5.0
+
+  # Push notifications
+  firebase_core: ^3.8.0
+  firebase_messaging: ^15.1.5
+
+  # Spoken-amount announcement
+  flutter_tts: ^4.2.0
+  audio_session: ^0.1.21
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  build_runner: ^2.4.13
+  freezed: ^2.5.7
+  json_serializable: ^6.9.0
+  mocktail: ^1.0.4
+  flutter_launcher_icons: ^0.14.1
+  flutter_native_splash: ^2.4.3
+
+flutter:
+  uses-material-design: true
+
+  generate: true
+
+  # assets:
+  # Asset directories must contain at least one file before uncommenting.
+  # Add actual image/sound assets then uncomment:
+  #   - assets/images/
+  #   - assets/sounds/
+
+  # fonts:
+  # Inter and JetBrains Mono font files must be placed at the paths below
+  # before building. Uncomment when font files are present.
+  #
+  # - family: Inter
+  #   fonts:
+  #     - asset: assets/fonts/Inter-Variable.ttf
+  # - family: JetBrainsMono
+  #   fonts:
+  #     - asset: assets/fonts/JetBrainsMono-Variable.ttf

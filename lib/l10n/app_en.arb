@@ -1,0 +1,323 @@
+{
+  "@@locale": "en",
+
+  "welcomeTagline": "Take payments. See today. Keep it simple.",
+  "welcomeScan": "Scan company QR",
+  "welcomeCode": "Enter code",
+  "welcomeHelp": "Don't have a code?",
+  "welcomeHelpCta": "Contact your admin",
+
+  "scanCompanyTitle": "Scan company QR",
+  "scanCompanySub": "Point the camera at the QR on your onboarding sheet.",
+  "scanMerchantTitle": "Scan merchant QR",
+  "scanMerchantSub": "Each store has its own QR. Scan it to add it.",
+  "scanSimulate": "Simulate detection",
+  "scanTorch": "Torch",
+  "scanGallery": "Gallery",
+  "scanCodeFallback": "Enter code instead",
+  "scanPermissionCta": "Enable camera in Settings",
+
+  "codeStep": "Step {n} of 2",
+  "@codeStep": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "codeAdd": "Add merchant",
+  "codeTitleCompany": "Enter company code",
+  "codeTitleMerchant": "Enter merchant code",
+  "codeSubCompany": "Find the 20-character code printed below the QR on your onboarding sheet.",
+  "codeSubMerchant": "Each merchant has a unique code. Enter the one for this store.",
+  "codeCounter": "{n} / 20",
+  "@codeCounter": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "codeCamera": "Use camera instead",
+  "codeContinue": "Continue",
+  "codeCompanyLabel": "Company",
+
+  "dashCompanyToday": "Today across company",
+  "dashCompanyMerchants": "{n} merchants",
+  "@dashCompanyMerchants": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "dashCompanyTxns": "{n} transactions",
+  "@dashCompanyTxns": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "dashCompanyUnread": "{n} unread",
+  "@dashCompanyUnread": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "dashCompanyList": "Merchants",
+  "dashCompanyStatMerchants": "Merchants",
+  "dashCompanyStatTxns": "Transactions",
+  "dashCompanyStatUnread": "Unread",
+  "dashCompanyAdd": "Add merchant",
+  "dashCompanyNotif": "Turn on notifications for instant payment alerts",
+  "dashCompanyNotifSub": "Tap a merchant to view live payments, generate a QR, or send a link.",
+
+  "dashMerchantToday": "Today",
+  "dashMerchantReceived": "Received today",
+  "dashMerchantLive": "Live",
+  "dashMerchantAvg": "Avg. ticket",
+  "dashMerchantMonth": "This month",
+  "dashMerchantTxns": "{n} transactions",
+  "@dashMerchantTxns": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "dashMerchantRecent": "Recent activity",
+  "dashMerchantEmpty": "No transactions yet today.",
+  "dashMerchantViewall": "View all",
+
+  "actionQris": "Dynamic QRIS",
+  "actionQrisSub": "One-time QR",
+  "actionLink": "Payment link",
+  "actionLinkSub": "Send via chat",
+  "actionScan": "Scan QRIS",
+  "actionScanSub": "Customer QR",
+  "actionScanDisabled": "Not enabled",
+
+  "txQris": "QRIS payment",
+  "txLink": "Payment link",
+  "txCpm": "Customer QRIS",
+  "txLast": "Last",
+  "txNone": "No activity",
+  "txNew": "{n} new",
+  "@txNew": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "txStatusPaid": "Paid",
+  "txStatusPending": "Pending",
+  "txStatusFailed": "Failed",
+  "txStatusExpired": "Expired",
+  "txStatusCancelled": "Cancelled",
+  "txStatusRefunded": "Refunded",
+
+  "addmerchantHeader": "Add another merchant",
+  "addmerchantTitle": "Register a new merchant under {company}",
+  "@addmerchantTitle": {
+    "placeholders": {
+      "company": { "type": "String" }
+    }
+  },
+  "addmerchantBody": "A company can have many merchants — each stall, outlet or branch has its own QR and notifications.",
+  "addmerchantMethodScan": "Scan merchant QR",
+  "addmerchantMethodScanSub": "Fastest if the paper sheet is nearby.",
+  "addmerchantMethodCode": "Enter merchant code",
+  "addmerchantMethodCodeSub": "20-character code below the QR.",
+  "addmerchantTipLabel": "Tip.",
+  "addmerchantTipBody": "Most companies run a single merchant. Multiple merchants suit franchises, food courts or stalls under one owner.",
+
+  "qrisTitle": "Dynamic QRIS",
+  "qrisAmount": "Amount",
+  "qrisAmountClear": "Clear",
+  "qrisAmountAria": "Clear amount",
+  "qrisHeaderAmount": "Enter amount",
+  "qrisHeaderWaiting": "Waiting for payment",
+  "qrisHeaderPaid": "Payment received",
+  "qrisNote": "Note (optional)",
+  "qrisNotePh": "e.g. Room 3 · May rent",
+  "qrisGenerate": "Generate QR",
+  "qrisShow": "Show to customer",
+  "qrisExpires": "Expires in {n}s",
+  "@qrisExpires": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "qrisExpiresLive": "Waiting for payment · expires in {time}",
+  "@qrisExpiresLive": {
+    "placeholders": {
+      "time": { "type": "String" }
+    }
+  },
+  "qrisShare": "Share",
+  "qrisPrint": "Print",
+  "qrisCopy": "Copy",
+  "qrisCancel": "Cancel",
+  "qrisLive": "Live",
+  "qrisPaid": "Paid",
+  "qrisPaidTitle": "Payment received",
+  "qrisPaidDone": "Done",
+  "qrisPaidAnother": "New payment",
+  "qrisRowFrom": "From",
+  "qrisRowMethod": "Method",
+  "qrisRowRef": "Reference",
+  "qrisRowAt": "At",
+  "qrisRowAtValue": "Today, {time}",
+  "@qrisRowAtValue": {
+    "placeholders": {
+      "time": { "type": "String" }
+    }
+  },
+
+  "linkTitle": "Payment link",
+  "linkAmount": "Amount",
+  "linkNote": "Note (optional)",
+  "linkNotePh": "e.g. May rent · Room 3",
+  "linkCreate": "Create link",
+  "linkShare": "Share",
+  "linkCopy": "Copy",
+  "linkCopied": "Copied",
+  "linkExpires": "Link valid for 24 hours",
+  "linkExpiresIn24h": "Expires in 24h",
+  "linkPrint": "Print QR",
+  "linkHeaderCreate": "Create a link",
+  "linkHeaderShare": "Ready to share",
+  "linkFieldTitle": "Title",
+  "linkFieldTitlePh": "May rent · Room 3",
+  "linkFieldCustomer": "Customer (optional)",
+  "linkFieldCustomerPh": "Name or phone",
+  "linkFieldInvoice": "Invoice number",
+  "linkFieldInvoiceAuto": "AUTO",
+  "linkFieldInvoiceClear": "Clear & enter my own",
+  "linkFieldInvoiceRegen": "Regenerate",
+  "linkFieldInvoicePh": "Type your own invoice number",
+  "linkFieldInvoiceHelp": "Auto-generated by default. Tap \"Clear\" to link your own invoice number.",
+  "linkNoCustomer": "No customer set",
+  "linkShowQr": "Show QR",
+  "linkShareVia": "Share via…",
+  "linkMessage": "Message to share",
+  "linkMessageCopy": "Copy message",
+  "linkMessageReset": "Reset",
+  "linkMessageHelp": "Sent as plain text — works in WhatsApp, SMS, email.",
+  "linkMessageGreeting": "Hi {name},",
+  "@linkMessageGreeting": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "linkMessageGreetingFallback": "Hi,",
+  "linkMessageBodyWithTitle": "your payment for {title}",
+  "@linkMessageBodyWithTitle": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "linkMessageBodyNoTitle": "your payment",
+  "linkMessageBody": "To settle {what}{amt}, please open this link:\nhttps://{link}\n\nThanks — {merchant}",
+  "@linkMessageBody": {
+    "placeholders": {
+      "what": { "type": "String" },
+      "amt": { "type": "String" },
+      "link": { "type": "String" },
+      "merchant": { "type": "String" }
+    }
+  },
+  "linkMessageAmountSuffix": " (IDR {amount})",
+  "@linkMessageAmountSuffix": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "linkQrScan": "Scan to pay",
+  "linkQrTapClose": "Tap anywhere to close",
+  "linkQrPaymentPlaceholder": "Payment",
+  "linkLive": "Live",
+
+  "cpmTitle": "Scan customer QRIS",
+  "cpmAim": "Aim at customer QRIS",
+  "cpmValid": "QRIS valid",
+  "cpmAmountTitle": "Enter amount",
+  "cpmAmountChargeTitle": "Enter amount to charge",
+  "cpmCharge": "Charge",
+  "cpmChargeWithAmount": "Charge IDR {amount}",
+  "@cpmChargeWithAmount": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "cpmSuccess": "Payment successful",
+  "cpmSuccessReceived": "Payment received",
+  "cpmSuccessMethod": "QRIS · CPM",
+  "cpmFailed": "Payment failed",
+  "cpmFailedSub": "Try again or use another method.",
+  "cpmRetry": "Try again",
+  "cpmHeader": "QRIS · CPM",
+  "cpmPointAt": "Point at customer's QR",
+  "cpmPointAtSub": "Ask the customer to open their QRIS in any e-wallet or banking app.",
+  "cpmSimulate": "Simulate QR detected",
+  "cpmScanLabel": "Scan QRIS · {merchant}",
+  "@cpmScanLabel": {
+    "placeholders": {
+      "merchant": { "type": "String" }
+    }
+  },
+  "cpmRowMethod": "Method",
+  "cpmRowMerchant": "Merchant",
+  "cpmRowRef": "Reference",
+  "cpmDone": "Done",
+  "cpmScanAnother": "Scan another",
+
+  "settingsTitle": "Settings",
+  "settingsLanguage": "Language",
+  "settingsAccount": "Account",
+  "settingsLangId": "Bahasa Indonesia",
+  "settingsLangEn": "English",
+  "settingsLogout": "Log out",
+  "settingsLogoutConfirm": "Log out of {name}?",
+  "@settingsLogoutConfirm": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "settingsLogoutSub": "You'll return to the start screen. Balances and transactions stay safe on the server.",
+  "settingsLogoutStay": "Stay signed in",
+  "settingsLogoutGo": "Log out",
+
+  "merchantSettings": "Merchant settings",
+  "merchantShareQr": "Share merchant QR",
+  "merchantShareQrSub": "Let staff add this merchant to their phone",
+  "merchantDanger": "Danger zone",
+  "merchantRemove": "Remove from company",
+  "merchantRemoveSub": "Disconnect this merchant from {name}. Transaction history stays in the company archive.",
+  "@merchantRemoveSub": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "merchantRemoveTitle": "Remove \"{name}\"?",
+  "@merchantRemoveTitle": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "merchantRemoveBody": "This merchant will stop receiving payments on this device. Past transactions remain in the company archive and can be exported later.",
+  "merchantRemoveNote": "You can re-link this merchant later by rescanning its QR code.",
+  "merchantRemoveTypeLabel": "Type",
+  "merchantRemoveConfirm": "Type {name} to confirm",
+  "@merchantRemoveConfirm": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "merchantRemoved": "Merchant removed",
+  "merchantRemovedSub": "\"{name}\" is no longer linked to this device.",
+  "@merchantRemovedSub": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "merchantRemovedSwitch": "Switch to",
+  "merchantRemovedBack": "Back to company dashboard",
+
+  "commonCancel": "Cancel",
+  "commonBack": "Back",
+  "commonContinue": "Continue",
+  "commonDone": "Done",
+  "commonClose": "Close",
+  "commonCurrency": "IDR"
+}

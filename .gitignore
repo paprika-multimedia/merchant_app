@@ -1,0 +1,34 @@
+# Flutter
+.dart_tool/
+.packages
+build/
+*.iml
+
+# Generated files
+*.freezed.dart
+*.g.dart
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Secure/local config
+*.env
+*.jks
+*.keystore
+local.properties
+key.properties
+
+# Coverage
+coverage/
+.test_coverage.dart
+
+# Deletion archive
+.delete_this/

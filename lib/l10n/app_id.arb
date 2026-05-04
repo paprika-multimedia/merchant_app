@@ -1,0 +1,323 @@
+{
+  "@@locale": "id",
+
+  "welcomeTagline": "Terima pembayaran. Pantau hari ini. Tetap sederhana.",
+  "welcomeScan": "Pindai QR perusahaan",
+  "welcomeCode": "Masukkan kode",
+  "welcomeHelp": "Belum punya kode?",
+  "welcomeHelpCta": "Hubungi admin Anda",
+
+  "scanCompanyTitle": "Pindai QR perusahaan",
+  "scanCompanySub": "Arahkan kamera ke QR di lembar onboarding.",
+  "scanMerchantTitle": "Pindai QR merchant",
+  "scanMerchantSub": "Setiap toko punya QR sendiri. Pindai untuk menambahkan.",
+  "scanSimulate": "Simulasikan deteksi",
+  "scanTorch": "Senter",
+  "scanGallery": "Galeri",
+  "scanCodeFallback": "Masukkan kode saja",
+  "scanPermissionCta": "Aktifkan kamera di Pengaturan",
+
+  "codeStep": "Langkah {n} dari 2",
+  "@codeStep": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "codeAdd": "Tambah merchant",
+  "codeTitleCompany": "Masukkan kode perusahaan",
+  "codeTitleMerchant": "Masukkan kode merchant",
+  "codeSubCompany": "Cari kode 20 karakter di bawah QR pada lembar onboarding Anda.",
+  "codeSubMerchant": "Setiap merchant punya kode unik. Masukkan kode untuk toko ini.",
+  "codeCounter": "{n} / 20",
+  "@codeCounter": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "codeCamera": "Pakai kamera saja",
+  "codeContinue": "Lanjut",
+  "codeCompanyLabel": "Perusahaan",
+
+  "dashCompanyToday": "Hari ini di seluruh perusahaan",
+  "dashCompanyMerchants": "{n} merchant",
+  "@dashCompanyMerchants": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "dashCompanyTxns": "{n} transaksi",
+  "@dashCompanyTxns": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "dashCompanyUnread": "{n} baru",
+  "@dashCompanyUnread": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "dashCompanyList": "Merchant",
+  "dashCompanyStatMerchants": "Merchant",
+  "dashCompanyStatTxns": "Transaksi",
+  "dashCompanyStatUnread": "Belum dibaca",
+  "dashCompanyAdd": "Tambah merchant",
+  "dashCompanyNotif": "Aktifkan notifikasi untuk pembayaran instan",
+  "dashCompanyNotifSub": "Ketuk merchant untuk melihat pembayaran live, membuat QR, atau mengirim tautan.",
+
+  "dashMerchantToday": "Hari ini",
+  "dashMerchantReceived": "Diterima hari ini",
+  "dashMerchantLive": "Live",
+  "dashMerchantAvg": "Rata-rata",
+  "dashMerchantMonth": "Bulan ini",
+  "dashMerchantTxns": "{n} transaksi",
+  "@dashMerchantTxns": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "dashMerchantRecent": "Aktivitas terbaru",
+  "dashMerchantEmpty": "Belum ada transaksi hari ini.",
+  "dashMerchantViewall": "Lihat semua",
+
+  "actionQris": "QRIS Dinamis",
+  "actionQrisSub": "QR sekali pakai",
+  "actionLink": "Tautan bayar",
+  "actionLinkSub": "Kirim via chat",
+  "actionScan": "Pindai QRIS",
+  "actionScanSub": "QR pelanggan",
+  "actionScanDisabled": "Belum aktif",
+
+  "txQris": "Pembayaran QRIS",
+  "txLink": "Tautan bayar",
+  "txCpm": "QRIS pelanggan",
+  "txLast": "Terakhir",
+  "txNone": "Belum ada aktivitas",
+  "txNew": "{n} baru",
+  "@txNew": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "txStatusPaid": "Dibayar",
+  "txStatusPending": "Menunggu",
+  "txStatusFailed": "Gagal",
+  "txStatusExpired": "Kedaluwarsa",
+  "txStatusCancelled": "Dibatalkan",
+  "txStatusRefunded": "Dikembalikan",
+
+  "addmerchantHeader": "Tambah merchant lain",
+  "addmerchantTitle": "Daftarkan merchant baru di bawah {company}",
+  "@addmerchantTitle": {
+    "placeholders": {
+      "company": { "type": "String" }
+    }
+  },
+  "addmerchantBody": "Satu perusahaan bisa punya banyak merchant — setiap kios, outlet, atau cabang punya QR dan notifikasi sendiri.",
+  "addmerchantMethodScan": "Pindai QR merchant",
+  "addmerchantMethodScanSub": "Tercepat jika lembar onboarding ada di dekat Anda.",
+  "addmerchantMethodCode": "Masukkan kode merchant",
+  "addmerchantMethodCodeSub": "Kode 20 karakter di bawah QR.",
+  "addmerchantTipLabel": "Tips.",
+  "addmerchantTipBody": "Sebagian besar perusahaan menjalankan satu merchant. Beberapa merchant cocok untuk franchise, food court, atau kios di bawah satu pemilik.",
+
+  "qrisTitle": "QRIS Dinamis",
+  "qrisAmount": "Jumlah",
+  "qrisAmountClear": "Bersihkan",
+  "qrisAmountAria": "Bersihkan jumlah",
+  "qrisHeaderAmount": "Masukkan jumlah",
+  "qrisHeaderWaiting": "Menunggu pembayaran",
+  "qrisHeaderPaid": "Pembayaran diterima",
+  "qrisNote": "Catatan (opsional)",
+  "qrisNotePh": "mis. Kamar 3 · Sewa Mei",
+  "qrisGenerate": "Buat QR",
+  "qrisShow": "Tunjukkan ke pelanggan",
+  "qrisExpires": "Kedaluwarsa dalam {n} dtk",
+  "@qrisExpires": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "qrisExpiresLive": "Menunggu pembayaran · kedaluwarsa {time}",
+  "@qrisExpiresLive": {
+    "placeholders": {
+      "time": { "type": "String" }
+    }
+  },
+  "qrisShare": "Bagikan",
+  "qrisPrint": "Cetak",
+  "qrisCopy": "Salin",
+  "qrisCancel": "Batal",
+  "qrisLive": "Live",
+  "qrisPaid": "Dibayar",
+  "qrisPaidTitle": "Pembayaran diterima",
+  "qrisPaidDone": "Selesai",
+  "qrisPaidAnother": "Pembayaran baru",
+  "qrisRowFrom": "Dari",
+  "qrisRowMethod": "Metode",
+  "qrisRowRef": "Referensi",
+  "qrisRowAt": "Pada",
+  "qrisRowAtValue": "Hari ini, {time}",
+  "@qrisRowAtValue": {
+    "placeholders": {
+      "time": { "type": "String" }
+    }
+  },
+
+  "linkTitle": "Tautan bayar",
+  "linkAmount": "Jumlah",
+  "linkNote": "Catatan (opsional)",
+  "linkNotePh": "mis. Sewa Mei · Kamar 3",
+  "linkCreate": "Buat tautan",
+  "linkShare": "Bagikan",
+  "linkCopy": "Salin",
+  "linkCopied": "Disalin",
+  "linkExpires": "Tautan berlaku 24 jam",
+  "linkExpiresIn24h": "Kedaluwarsa dalam 24 jam",
+  "linkPrint": "Cetak QR",
+  "linkHeaderCreate": "Buat tautan",
+  "linkHeaderShare": "Siap dibagikan",
+  "linkFieldTitle": "Judul",
+  "linkFieldTitlePh": "Sewa Mei · Kamar 3",
+  "linkFieldCustomer": "Pelanggan (opsional)",
+  "linkFieldCustomerPh": "Nama atau nomor HP",
+  "linkFieldInvoice": "Nomor invoice",
+  "linkFieldInvoiceAuto": "OTOMATIS",
+  "linkFieldInvoiceClear": "Bersihkan & isi sendiri",
+  "linkFieldInvoiceRegen": "Buat ulang",
+  "linkFieldInvoicePh": "Ketik nomor invoice Anda",
+  "linkFieldInvoiceHelp": "Dibuat otomatis. Ketuk \"Bersihkan\" untuk pakai nomor invoice Anda sendiri.",
+  "linkNoCustomer": "Belum ada pelanggan",
+  "linkShowQr": "Tampilkan QR",
+  "linkShareVia": "Bagikan via…",
+  "linkMessage": "Pesan untuk dibagikan",
+  "linkMessageCopy": "Salin pesan",
+  "linkMessageReset": "Reset",
+  "linkMessageHelp": "Dikirim sebagai teks biasa — cocok untuk WhatsApp, SMS, email.",
+  "linkMessageGreeting": "Halo {name},",
+  "@linkMessageGreeting": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "linkMessageGreetingFallback": "Halo,",
+  "linkMessageBodyWithTitle": "pembayaran Anda untuk {title}",
+  "@linkMessageBodyWithTitle": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "linkMessageBodyNoTitle": "pembayaran Anda",
+  "linkMessageBody": "Untuk menyelesaikan {what}{amt}, silakan buka tautan ini:\nhttps://{link}\n\nTerima kasih — {merchant}",
+  "@linkMessageBody": {
+    "placeholders": {
+      "what": { "type": "String" },
+      "amt": { "type": "String" },
+      "link": { "type": "String" },
+      "merchant": { "type": "String" }
+    }
+  },
+  "linkMessageAmountSuffix": " (IDR {amount})",
+  "@linkMessageAmountSuffix": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "linkQrScan": "Pindai untuk membayar",
+  "linkQrTapClose": "Ketuk di mana saja untuk menutup",
+  "linkQrPaymentPlaceholder": "Pembayaran",
+  "linkLive": "Live",
+
+  "cpmTitle": "Pindai QRIS pelanggan",
+  "cpmAim": "Arahkan ke QRIS pelanggan",
+  "cpmValid": "QRIS valid",
+  "cpmAmountTitle": "Masukkan jumlah",
+  "cpmAmountChargeTitle": "Masukkan jumlah tagihan",
+  "cpmCharge": "Tagih",
+  "cpmChargeWithAmount": "Tagih IDR {amount}",
+  "@cpmChargeWithAmount": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "cpmSuccess": "Pembayaran berhasil",
+  "cpmSuccessReceived": "Pembayaran diterima",
+  "cpmSuccessMethod": "QRIS · CPM",
+  "cpmFailed": "Pembayaran gagal",
+  "cpmFailedSub": "Coba lagi atau gunakan metode lain.",
+  "cpmRetry": "Coba lagi",
+  "cpmHeader": "QRIS · CPM",
+  "cpmPointAt": "Arahkan ke QR pelanggan",
+  "cpmPointAtSub": "Minta pelanggan membuka QRIS di e-wallet atau aplikasi banking mereka.",
+  "cpmSimulate": "Simulasikan QR terdeteksi",
+  "cpmScanLabel": "Pindai QRIS · {merchant}",
+  "@cpmScanLabel": {
+    "placeholders": {
+      "merchant": { "type": "String" }
+    }
+  },
+  "cpmRowMethod": "Metode",
+  "cpmRowMerchant": "Merchant",
+  "cpmRowRef": "Referensi",
+  "cpmDone": "Selesai",
+  "cpmScanAnother": "Pindai lagi",
+
+  "settingsTitle": "Pengaturan",
+  "settingsLanguage": "Bahasa",
+  "settingsAccount": "Akun",
+  "settingsLangId": "Bahasa Indonesia",
+  "settingsLangEn": "English",
+  "settingsLogout": "Keluar",
+  "settingsLogoutConfirm": "Keluar dari {name}?",
+  "@settingsLogoutConfirm": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "settingsLogoutSub": "Anda akan kembali ke layar awal. Saldo dan transaksi tetap aman di server.",
+  "settingsLogoutStay": "Tetap masuk",
+  "settingsLogoutGo": "Keluar",
+
+  "merchantSettings": "Pengaturan merchant",
+  "merchantShareQr": "Bagikan QR merchant",
+  "merchantShareQrSub": "Biar staf bisa menambahkan merchant ini ke ponsel mereka",
+  "merchantDanger": "Zona berbahaya",
+  "merchantRemove": "Hapus dari perusahaan",
+  "merchantRemoveSub": "Putuskan merchant ini dari {name}. Riwayat transaksi tetap tersimpan di arsip perusahaan.",
+  "@merchantRemoveSub": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "merchantRemoveTitle": "Hapus \"{name}\"?",
+  "@merchantRemoveTitle": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "merchantRemoveBody": "Merchant ini akan berhenti menerima pembayaran di perangkat ini. Transaksi sebelumnya tetap ada di arsip perusahaan dan bisa diekspor nanti.",
+  "merchantRemoveNote": "Anda bisa menghubungkan kembali merchant ini dengan memindai ulang QR-nya.",
+  "merchantRemoveTypeLabel": "Ketik",
+  "merchantRemoveConfirm": "Ketik {name} untuk konfirmasi",
+  "@merchantRemoveConfirm": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "merchantRemoved": "Merchant dihapus",
+  "merchantRemovedSub": "\"{name}\" tidak lagi terhubung dengan perangkat ini.",
+  "@merchantRemovedSub": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "merchantRemovedSwitch": "Ganti ke",
+  "merchantRemovedBack": "Kembali ke dashboard perusahaan",
+
+  "commonCancel": "Batal",
+  "commonBack": "Kembali",
+  "commonContinue": "Lanjut",
+  "commonDone": "Selesai",
+  "commonClose": "Tutup",
+  "commonCurrency": "IDR"
+}
