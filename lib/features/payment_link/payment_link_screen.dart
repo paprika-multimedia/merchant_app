@@ -17,7 +17,6 @@ import '../../primitives/field.dart';
 import '../../primitives/icons.dart';
 import '../../primitives/keypad.dart';
 import '../../primitives/screen_header.dart';
-import '../../state/last_tx_amount.dart';
 import '../../state/recent_amounts.dart';
 import '../../state/session.dart';
 import '../../theme/tokens.dart';
@@ -136,9 +135,6 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
       await ref
           .read(recentAmountsProvider((widget.merchantId, 'link')).notifier)
           .push(_amount);
-      await ref
-          .read(lastTxAmountProvider(widget.merchantId).notifier)
-          .setLast(_amount);
 
       setState(() {
         _txn = txn;
@@ -167,8 +163,14 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
             Column(
               children: [
                 PaprikaScreenHeader(
-                  onBack: () =>
-                      context.go('/dashboard/merchant/${widget.merchantId}'),
+                  onBack: () {
+                    if (_step == _LinkStep.success) {
+                      ref
+                          .read(sessionProvider.notifier)
+                          .refreshMerchants();
+                    }
+                    context.go('/dashboard/merchant/${widget.merchantId}');
+                  },
                   overline: Text(t.linkTitle.toUpperCase()),
                   title: Text(
                     _step == _LinkStep.form

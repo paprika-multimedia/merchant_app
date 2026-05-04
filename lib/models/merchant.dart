@@ -31,6 +31,7 @@ class Merchant with _$Merchant {
     @JsonKey(name: 'today_count') @Default(0) int todayCount,
     @JsonKey(name: 'month_total') @Default(0) int monthTotal,
     @JsonKey(name: 'unread_count') @Default(0) int unreadCount,
+    @JsonKey(name: 'last_transaction_amount') int? lastTransactionAmount,
     @JsonKey(name: 'last_transaction_at') String? lastTransactionAt,
     @JsonKey(name: 'created_at') required String createdAt,
   }) = _Merchant;

@@ -9,7 +9,6 @@ import '../../primitives/card.dart';
 import '../../primitives/icons.dart';
 import '../../primitives/merchant_avatar.dart';
 import '../../state/active_merchant.dart';
-import '../../state/last_tx_amount.dart';
 import '../../state/session.dart';
 import '../../theme/tokens.dart';
 import '../settings_sheet/settings_sheet.dart';
@@ -368,7 +367,7 @@ class _MerchantChip extends ConsumerWidget {
   }
 }
 
-class _MerchantRow extends ConsumerWidget {
+class _MerchantRow extends StatelessWidget {
   const _MerchantRow({required this.merchant});
   final Merchant merchant;
 
@@ -386,11 +385,11 @@ class _MerchantRow extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final t = AppL10n.of(context);
     final timeStr = _relativeTime(merchant.lastTransactionAt);
     final hasLastTx = merchant.lastTransactionAt != null;
-    final lastAmount = ref.watch(lastTxAmountProvider(merchant.id));
+    final lastAmount = merchant.lastTransactionAmount;
     final fmt = NumberFormat('#,###', 'id_ID');
 
     return GestureDetector(
@@ -429,7 +428,7 @@ class _MerchantRow extends ConsumerWidget {
                 ],
               ),
             ),
-            // Right column: last · time + amount from local store
+            // Right column: last · time + amount from backend fields
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
@@ -447,7 +446,9 @@ class _MerchantRow extends ConsumerWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'IDR ${fmt.format(lastAmount)}',
+                  lastAmount != null
+                      ? 'IDR ${fmt.format(lastAmount)}'
+                      : '—',
                   style: TextStyle(
                     fontFamily: AppTokens.fontDisplay,
                     fontSize: 15,

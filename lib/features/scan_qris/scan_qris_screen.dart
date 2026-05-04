@@ -17,7 +17,6 @@ import '../../net/dio_client.dart';
 import '../../primitives/button.dart';
 import '../../primitives/icons.dart';
 import '../../primitives/screen_header.dart';
-import '../../state/last_tx_amount.dart';
 import '../../state/recent_amounts.dart';
 import '../../state/session.dart';
 import '../../theme/tokens.dart';
@@ -157,13 +156,10 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
       final txn = result['transaction'] as Map<String, dynamic>?;
       final ref_ = txn?['ref'] as String?;
 
-      // Push amount to recents and record as last transaction amount
+      // Push amount to recents
       await ref
           .read(recentAmountsProvider((widget.merchantId, 'cpm')).notifier)
           .push(_amount);
-      await ref
-          .read(lastTxAmountProvider(widget.merchantId).notifier)
-          .setLast(_amount);
 
       // Announce payment via TTS
       // Note: payment_announcer.dart handles this via WS event; no direct call needed here
@@ -862,8 +858,13 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
                     variant: AppButtonVariant.primary,
                     size: AppButtonSize.lg,
                     block: true,
-                    onPressed: () =>
-                        context.go('/dashboard/merchant/${widget.merchantId}'),
+                    onPressed: () {
+                      ref
+                          .read(sessionProvider.notifier)
+                          .refreshMerchants();
+                      context.go(
+                          '/dashboard/merchant/${widget.merchantId}');
+                    },
                   ),
                   const SizedBox(height: 10),
                   AppButton(
@@ -872,6 +873,9 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
                     size: AppButtonSize.lg,
                     block: true,
                     onPressed: () {
+                      ref
+                          .read(sessionProvider.notifier)
+                          .refreshMerchants();
                       setState(() {
                         _step = _CpmStep.scan;
                         _amountStr = '';

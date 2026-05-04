@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/company.dart';
 import '../models/merchant.dart';
+import '../net/api/merchants_api.dart';
 import '../net/api/sessions_api.dart';
 import '../net/dio_client.dart';
 import '../storage/secure_storage.dart';
@@ -140,6 +141,28 @@ class SessionNotifier extends AsyncNotifier<SessionData?> {
       merchants: updated,
       deviceId: current.deviceId,
     ));
+  }
+
+  /// Re-fetches the merchants list from the backend and updates session state.
+  ///
+  /// Call this after a payment completes so the dashboard shows the latest
+  /// [Merchant.lastTransactionAmount] and [Merchant.lastTransactionAt] from
+  /// the backend. Errors are silently swallowed — the worst case is a stale
+  /// dashboard that refreshes on the next WS merchant.updated event.
+  Future<void> refreshMerchants() async {
+    final current = state.value;
+    if (current == null) return;
+    try {
+      final dio = await ref.read(dioProvider.future);
+      final merchants = await MerchantsApi(dio).list();
+      state = AsyncValue.data(SessionData(
+        company: current.company,
+        merchants: merchants,
+        deviceId: current.deviceId,
+      ));
+    } catch (_) {
+      // Best-effort — leave current state intact on error
+    }
   }
 
   /// Removes a merchant from the list (e.g. on merchant.removed WS event).

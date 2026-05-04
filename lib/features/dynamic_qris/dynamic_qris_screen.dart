@@ -24,7 +24,6 @@ import '../../primitives/field.dart';
 import '../../primitives/icons.dart';
 import '../../primitives/keypad.dart';
 import '../../primitives/screen_header.dart';
-import '../../state/last_tx_amount.dart';
 import '../../state/recent_amounts.dart';
 import '../../state/session.dart';
 import '../../theme/tokens.dart';
@@ -116,13 +115,10 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
       final qr = result['qr_payload'] as String;
       final exp = DateTime.parse(result['expires_at'] as String);
 
-      // Push amount to recents and record as last transaction amount
+      // Push amount to recents
       await ref
           .read(recentAmountsProvider((widget.merchantId, 'qris')).notifier)
           .push(_amount);
-      await ref
-          .read(lastTxAmountProvider(widget.merchantId).notifier)
-          .setLast(_amount);
 
       setState(() {
         _txn = txn;
@@ -638,8 +634,10 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
             variant: AppButtonVariant.primary,
             size: AppButtonSize.lg,
             block: true,
-            onPressed: () =>
-                context.go('/dashboard/merchant/${widget.merchantId}'),
+            onPressed: () {
+              ref.read(sessionProvider.notifier).refreshMerchants();
+              context.go('/dashboard/merchant/${widget.merchantId}');
+            },
           ),
           const SizedBox(height: 12),
           AppButton(
@@ -647,14 +645,17 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
             variant: AppButtonVariant.secondary,
             size: AppButtonSize.lg,
             block: true,
-            onPressed: () => setState(() {
-              _step = _QrisStep.amount;
-              _txn = null;
-              _qrPayload = null;
-              _amountStr = '';
-              _note = '';
-              _idempotencyKey = null;
-            }),
+            onPressed: () {
+              ref.read(sessionProvider.notifier).refreshMerchants();
+              setState(() {
+                _step = _QrisStep.amount;
+                _txn = null;
+                _qrPayload = null;
+                _amountStr = '';
+                _note = '';
+                _idempotencyKey = null;
+              });
+            },
           ),
         ],
       ),
