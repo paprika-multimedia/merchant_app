@@ -52,31 +52,23 @@ class _AppButtonState extends State<AppButton> {
     };
 
     final (bg, fg, border) = switch (widget.variant) {
-      AppButtonVariant.primary => (
-          AppTokens.accent,
-          Colors.white,
-          null,
-        ),
+      AppButtonVariant.primary => (AppTokens.accent, Colors.white, null),
       AppButtonVariant.secondary => (
-          AppTokens.surface,
-          AppTokens.ink,
-          AppTokens.borderStrong,
-        ),
-      AppButtonVariant.ghost => (
-          Colors.transparent,
-          AppTokens.ink,
-          null,
-        ),
+        AppTokens.surface,
+        AppTokens.ink,
+        AppTokens.borderStrong,
+      ),
+      AppButtonVariant.ghost => (Colors.transparent, AppTokens.ink, null),
       AppButtonVariant.soft => (
-          AppTokens.accentSoft,
-          AppTokens.accentDeep,
-          null,
-        ),
+        AppTokens.accentSoft,
+        AppTokens.accentDeep,
+        null,
+      ),
       AppButtonVariant.danger => (
-          AppTokens.dangerSoft,
-          AppTokens.danger,
-          AppTokens.danger.withValues(alpha: 0.13),
-        ),
+        AppTokens.dangerSoft,
+        AppTokens.danger,
+        AppTokens.danger.withValues(alpha: 0.13),
+      ),
     };
 
     final isPrimary = widget.variant == AppButtonVariant.primary;
@@ -85,7 +77,10 @@ class _AppButtonState extends State<AppButton> {
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        if (widget.leading != null) ...[widget.leading!, const SizedBox(width: 8)],
+        if (widget.leading != null) ...[
+          widget.leading!,
+          const SizedBox(width: 8),
+        ],
         Text(
           widget.label,
           style: TextStyle(
@@ -96,7 +91,10 @@ class _AppButtonState extends State<AppButton> {
             color: widget.disabled ? fg.withValues(alpha: 0.4) : fg,
           ),
         ),
-        if (widget.trailing != null) ...[const SizedBox(width: 8), widget.trailing!],
+        if (widget.trailing != null) ...[
+          const SizedBox(width: 8),
+          widget.trailing!,
+        ],
       ],
     );
 
@@ -138,9 +136,7 @@ class _AppButtonState extends State<AppButton> {
           decoration: BoxDecoration(
             color: bg,
             borderRadius: BorderRadius.circular(r),
-            border: border != null
-                ? Border.all(color: border, width: 1)
-                : null,
+            border: border != null ? Border.all(color: border, width: 1) : null,
             boxShadow: shadows,
           ),
           child: content,

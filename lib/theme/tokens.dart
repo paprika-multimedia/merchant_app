@@ -71,5 +71,6 @@ class AppTokens extends ThemeExtension<AppTokens> {
   AppTokens copyWith() => const AppTokens();
 
   @override
-  AppTokens lerp(ThemeExtension<AppTokens>? other, double t) => const AppTokens();
+  AppTokens lerp(ThemeExtension<AppTokens>? other, double t) =>
+      const AppTokens();
 }

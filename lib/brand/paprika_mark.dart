@@ -94,6 +94,5 @@ class _PaprikaMarkPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_PaprikaMarkPainter old) =>
-      old.strokeColor != strokeColor;
+  bool shouldRepaint(_PaprikaMarkPainter old) => old.strokeColor != strokeColor;
 }

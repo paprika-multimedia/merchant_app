@@ -179,10 +179,7 @@ class _CornerPainter extends CustomPainter {
 class _ScanLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 2,
-      color: AppTokens.accent,
-    )
+    return Container(height: 2, color: AppTokens.accent)
         .animate(onPlay: (c) => c.repeat())
         .moveY(
           begin: 0,

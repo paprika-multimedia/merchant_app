@@ -36,9 +36,7 @@ class SessionNotifier extends AsyncNotifier<SessionData?> {
   }
 
   /// Claims a company and establishes a session.
-  Future<SessionData> claim({
-    required String companyCode,
-  }) async {
+  Future<SessionData> claim({required String companyCode}) async {
     state = const AsyncValue.loading();
     final storage = ref.read(secureStorageProvider);
     final dio = await ref.read(dioProvider.future);
@@ -53,14 +51,8 @@ class SessionNotifier extends AsyncNotifier<SessionData?> {
         model: model,
       );
 
-      await storage.write(
-        SecureStorage.keySessionToken,
-        response.sessionToken,
-      );
-      await storage.write(
-        SecureStorage.keyRefreshToken,
-        response.refreshToken,
-      );
+      await storage.write(SecureStorage.keySessionToken, response.sessionToken);
+      await storage.write(SecureStorage.keyRefreshToken, response.refreshToken);
       await storage.write(SecureStorage.keyDeviceId, response.deviceId);
 
       final data = SessionData(
@@ -89,14 +81,8 @@ class SessionNotifier extends AsyncNotifier<SessionData?> {
     }
 
     final response = await api.refresh(refreshToken);
-    await storage.write(
-      SecureStorage.keySessionToken,
-      response.sessionToken,
-    );
-    await storage.write(
-      SecureStorage.keyRefreshToken,
-      response.refreshToken,
-    );
+    await storage.write(SecureStorage.keySessionToken, response.sessionToken);
+    await storage.write(SecureStorage.keyRefreshToken, response.refreshToken);
   }
 
   /// Logs out the current session, clearing all tokens.
@@ -122,11 +108,13 @@ class SessionNotifier extends AsyncNotifier<SessionData?> {
   void updateMerchants(List<Merchant> merchants) {
     final current = state.value;
     if (current == null) return;
-    state = AsyncValue.data(SessionData(
-      company: current.company,
-      merchants: merchants,
-      deviceId: current.deviceId,
-    ));
+    state = AsyncValue.data(
+      SessionData(
+        company: current.company,
+        merchants: merchants,
+        deviceId: current.deviceId,
+      ),
+    );
   }
 
   /// Updates a single merchant in the list (e.g. on merchant.updated WS event).
@@ -136,11 +124,13 @@ class SessionNotifier extends AsyncNotifier<SessionData?> {
     final updated = current.merchants.map((m) {
       return m.id == merchant.id ? merchant : m;
     }).toList();
-    state = AsyncValue.data(SessionData(
-      company: current.company,
-      merchants: updated,
-      deviceId: current.deviceId,
-    ));
+    state = AsyncValue.data(
+      SessionData(
+        company: current.company,
+        merchants: updated,
+        deviceId: current.deviceId,
+      ),
+    );
   }
 
   /// Re-fetches the merchants list from the backend and updates session state.
@@ -155,11 +145,13 @@ class SessionNotifier extends AsyncNotifier<SessionData?> {
     try {
       final dio = await ref.read(dioProvider.future);
       final merchants = await MerchantsApi(dio).list();
-      state = AsyncValue.data(SessionData(
-        company: current.company,
-        merchants: merchants,
-        deviceId: current.deviceId,
-      ));
+      state = AsyncValue.data(
+        SessionData(
+          company: current.company,
+          merchants: merchants,
+          deviceId: current.deviceId,
+        ),
+      );
     } catch (_) {
       // Best-effort — leave current state intact on error
     }
@@ -169,18 +161,20 @@ class SessionNotifier extends AsyncNotifier<SessionData?> {
   void removeMerchant(String merchantId) {
     final current = state.value;
     if (current == null) return;
-    final updated =
-        current.merchants.where((m) => m.id != merchantId).toList();
-    state = AsyncValue.data(SessionData(
-      company: current.company,
-      merchants: updated,
-      deviceId: current.deviceId,
-    ));
+    final updated = current.merchants.where((m) => m.id != merchantId).toList();
+    state = AsyncValue.data(
+      SessionData(
+        company: current.company,
+        merchants: updated,
+        deviceId: current.deviceId,
+      ),
+    );
   }
 }
 
-final sessionProvider =
-    AsyncNotifierProvider<SessionNotifier, SessionData?>(SessionNotifier.new);
+final sessionProvider = AsyncNotifierProvider<SessionNotifier, SessionData?>(
+  SessionNotifier.new,
+);
 
 /// The current locale ('id' or 'en'), persisted to secure storage.
 class LocaleNotifier extends Notifier<String> {
@@ -195,5 +189,6 @@ class LocaleNotifier extends Notifier<String> {
   }
 }
 
-final localeProvider =
-    NotifierProvider<LocaleNotifier, String>(LocaleNotifier.new);
+final localeProvider = NotifierProvider<LocaleNotifier, String>(
+  LocaleNotifier.new,
+);

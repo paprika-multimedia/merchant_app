@@ -72,7 +72,8 @@ class SessionsApi {
         'device': {
           'platform': platform,
           'model': model,
-          if (pushToken != null) 'push_token': pushToken, // ignore: use_null_aware_elements
+          if (pushToken != null)
+            'push_token': pushToken, // ignore: use_null_aware_elements
         },
       },
     );

@@ -22,10 +22,10 @@ class WsStreamClient {
     required void Function(WsEvent event) onEvent,
     required void Function() onReconnect,
     required void Function() onForceLogout,
-  })  : _storage = storage,
-        _onEvent = onEvent,
-        _onReconnect = onReconnect,
-        _onForceLogout = onForceLogout;
+  }) : _storage = storage,
+       _onEvent = onEvent,
+       _onReconnect = onReconnect,
+       _onForceLogout = onForceLogout;
 
   final SecureStorage _storage;
   final void Function(WsEvent event) _onEvent;
@@ -75,9 +75,7 @@ class WsStreamClient {
     }
 
     // Send auth frame as first message
-    _channel!.sink.add(
-      jsonEncode({'type': 'auth', 'token': token}),
-    );
+    _channel!.sink.add(jsonEncode({'type': 'auth', 'token': token}));
 
     _authenticated = false;
 

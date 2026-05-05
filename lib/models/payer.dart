@@ -12,6 +12,7 @@ abstract class Payer with _$Payer {
   const factory Payer({
     /// Masked phone from issuer — optional, may be omitted by acquirer.
     @JsonKey(name: 'masked_phone') String? maskedPhone,
+
     /// Display-ready wallet/bank name.
     @JsonKey(name: 'issuer_name') String? issuerName,
   }) = _Payer;
@@ -27,6 +28,7 @@ abstract class CpmInfo with _$CpmInfo {
   const factory CpmInfo({
     /// Display-ready bank/wallet name.
     @JsonKey(name: 'issuer_name') required String issuerName,
+
     /// Masked account number.
     @JsonKey(name: 'masked_account') required String maskedAccount,
     // payer_name deliberately omitted — never store, never log, never render.

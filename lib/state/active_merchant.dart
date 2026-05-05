@@ -31,8 +31,8 @@ class ActiveMerchantNotifier extends Notifier<String?> {
 
 final activeMerchantIdProvider =
     NotifierProvider<ActiveMerchantNotifier, String?>(
-  ActiveMerchantNotifier.new,
-);
+      ActiveMerchantNotifier.new,
+    );
 
 /// Convenience provider that resolves the active merchant object from session.
 final activeMerchantProvider = Provider<Merchant?>((ref) {

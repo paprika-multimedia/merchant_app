@@ -28,10 +28,7 @@ void main() {
       // The interceptor mutates options.headers in-place before calling next.
       // We pass a real handler; the interceptor will call handler.next(opts).
       // We capture the options object to inspect headers after the fact.
-      interceptor.onRequest(
-        opts,
-        RequestInterceptorHandler(),
-      );
+      interceptor.onRequest(opts, RequestInterceptorHandler());
       return opts.headers;
     }
 
@@ -48,10 +45,7 @@ void main() {
     });
 
     test('does NOT attach header when key is empty string', () {
-      final opts = RequestOptions(
-        path: '/test',
-        extra: {'idempotencyKey': ''},
-      );
+      final opts = RequestOptions(path: '/test', extra: {'idempotencyKey': ''});
       final headers = runInterceptor(opts);
       expect(headers.containsKey('Idempotency-Key'), isFalse);
     });

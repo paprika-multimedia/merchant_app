@@ -24,10 +24,18 @@ class AmountKeypad extends StatelessWidget {
   final VoidCallback onTripleZero;
 
   static const _keys = [
-    '1', '2', '3',
-    '4', '5', '6',
-    '7', '8', '9',
-    '000', '0', '⌫',
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '000',
+    '0',
+    '⌫',
   ];
 
   @override
@@ -39,18 +47,22 @@ class AmountKeypad extends StatelessWidget {
       childAspectRatio: 2.2,
       mainAxisSpacing: AppTokens.sp4,
       crossAxisSpacing: AppTokens.sp4,
-      children: _keys.map((key) => _KeypadButton(
-        label: key,
-        onTap: () {
-          if (key == '⌫') {
-            onBackspace();
-          } else if (key == '000') {
-            onTripleZero();
-          } else {
-            onDigit(key);
-          }
-        },
-      )).toList(),
+      children: _keys
+          .map(
+            (key) => _KeypadButton(
+              label: key,
+              onTap: () {
+                if (key == '⌫') {
+                  onBackspace();
+                } else if (key == '000') {
+                  onTripleZero();
+                } else {
+                  onDigit(key);
+                }
+              },
+            ),
+          )
+          .toList(),
     );
   }
 }

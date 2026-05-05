@@ -47,8 +47,7 @@ class WsStateNotifier extends Notifier<WsStatus> {
       storage: storage,
       onEvent: _handleEvent,
       onReconnect: _handleReconnect,
-      onForceLogout: () =>
-          ref.read(sessionProvider.notifier).forceLogout(),
+      onForceLogout: () => ref.read(sessionProvider.notifier).forceLogout(),
     );
     _client!.start();
     state = WsStatus.connecting;
@@ -65,8 +64,9 @@ class WsStateNotifier extends Notifier<WsStatus> {
     switch (event) {
       case WsTxnEvent(:final event, :final transaction):
         if (event == 'transaction.paid') {
-          final isNew =
-              ref.read(txnDedupeProvider.notifier).markIfNew(transaction.id);
+          final isNew = ref
+              .read(txnDedupeProvider.notifier)
+              .markIfNew(transaction.id);
           if (isNew) {
             _latestPaidTxn = transaction;
             // Re-notify listeners by triggering a state update
@@ -94,5 +94,6 @@ class WsStateNotifier extends Notifier<WsStatus> {
   }
 }
 
-final wsStateProvider =
-    NotifierProvider<WsStateNotifier, WsStatus>(WsStateNotifier.new);
+final wsStateProvider = NotifierProvider<WsStateNotifier, WsStatus>(
+  WsStateNotifier.new,
+);

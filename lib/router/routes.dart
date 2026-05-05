@@ -22,7 +22,8 @@ final routerProvider = Provider<GoRouter>((ref) {
     initialLocation: '/welcome',
     redirect: (context, state) async {
       final session = ref.read(sessionProvider).value;
-      final isOnboarding = state.matchedLocation.startsWith('/welcome') ||
+      final isOnboarding =
+          state.matchedLocation.startsWith('/welcome') ||
           state.matchedLocation.startsWith('/scan/company') ||
           state.matchedLocation.startsWith('/code/company');
       if (session == null && !isOnboarding) return '/welcome';
@@ -30,10 +31,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     },
     routes: [
       // ─── Onboarding ─────────────────────────────────────────────────────────
-      GoRoute(
-        path: '/welcome',
-        builder: (_, _) => const WelcomeScreen(),
-      ),
+      GoRoute(path: '/welcome', builder: (_, _) => const WelcomeScreen()),
       GoRoute(
         path: '/scan/company',
         builder: (_, _) => const ScanCompanyScreen(),
@@ -57,10 +55,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           final addMode = state.extra is Map
               ? (state.extra as Map)['addMode'] == true
               : false;
-          return CodeScreen(
-            kind: CodeScreenKind.merchant,
-            addMode: addMode,
-          );
+          return CodeScreen(kind: CodeScreenKind.merchant, addMode: addMode);
         },
       ),
 
@@ -71,9 +66,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/merchant/:id',
-        builder: (_, state) => DashboardMerchantScreen(
-          merchantId: state.pathParameters['id']!,
-        ),
+        builder: (_, state) =>
+            DashboardMerchantScreen(merchantId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: '/add-merchant',
@@ -103,8 +97,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
     ],
-    errorBuilder: (_, state) => Scaffold(
-      body: Center(child: Text('Route not found: ${state.error}')),
-    ),
+    errorBuilder: (_, state) =>
+        Scaffold(body: Center(child: Text('Route not found: ${state.error}'))),
   );
 });

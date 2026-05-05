@@ -6,21 +6,10 @@ part 'transaction.freezed.dart';
 part 'transaction.g.dart';
 
 /// Transaction status — mirrors Spec.md §2.3 status semantics.
-enum TransactionStatus {
-  pending,
-  paid,
-  expired,
-  cancelled,
-  failed,
-  refunded,
-}
+enum TransactionStatus { pending, paid, expired, cancelled, failed, refunded }
 
 /// Transaction type — mirrors Spec.md §2.3.
-enum TransactionType {
-  qris,
-  link,
-  cpm,
-}
+enum TransactionType { qris, link, cpm }
 
 /// Transaction resource — mirrors Spec.md §2.3 verbatim.
 @freezed
@@ -37,8 +26,10 @@ abstract class Transaction with _$Transaction {
     String? note,
     @JsonKey(name: 'invoice_number') String? invoiceNumber,
     @JsonKey(name: 'link_url') String? linkUrl,
+
     /// Payer details for qris-type paid transactions.
     Payer? payer,
+
     /// CPM block — present only for type=cpm.
     CpmInfo? cpm,
     @JsonKey(name: 'created_at') required String createdAt,

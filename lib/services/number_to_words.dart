@@ -7,8 +7,18 @@ class NumberToWords {
   // ─── Indonesian ────────────────────────────────────────────────────────────
 
   static const _id = [
-    '', 'satu', 'dua', 'tiga', 'empat', 'lima',
-    'enam', 'tujuh', 'delapan', 'sembilan', 'sepuluh', 'sebelas',
+    '',
+    'satu',
+    'dua',
+    'tiga',
+    'empat',
+    'lima',
+    'enam',
+    'tujuh',
+    'delapan',
+    'sembilan',
+    'sepuluh',
+    'sebelas',
   ];
 
   /// Converts [amount] to Indonesian words, appending "rupiah".
@@ -58,15 +68,39 @@ class NumberToWords {
   // ─── English ───────────────────────────────────────────────────────────────
 
   static const _en = [
-    '', 'one', 'two', 'three', 'four', 'five',
-    'six', 'seven', 'eight', 'nine', 'ten', 'eleven',
-    'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen',
-    'seventeen', 'eighteen', 'nineteen',
+    '',
+    'one',
+    'two',
+    'three',
+    'four',
+    'five',
+    'six',
+    'seven',
+    'eight',
+    'nine',
+    'ten',
+    'eleven',
+    'twelve',
+    'thirteen',
+    'fourteen',
+    'fifteen',
+    'sixteen',
+    'seventeen',
+    'eighteen',
+    'nineteen',
   ];
 
   static const _enTens = [
-    '', '', 'twenty', 'thirty', 'forty', 'fifty',
-    'sixty', 'seventy', 'eighty', 'ninety',
+    '',
+    '',
+    'twenty',
+    'thirty',
+    'forty',
+    'fifty',
+    'sixty',
+    'seventy',
+    'eighty',
+    'ninety',
   ];
 
   /// Converts [amount] to English words, appending "rupiah".

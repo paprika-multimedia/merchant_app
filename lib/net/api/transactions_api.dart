@@ -14,8 +14,7 @@ class TransactionsApi {
   ///
   /// Used after silent push to hydrate state (Spec §5.2).
   Future<Transaction> get(String txnId) async {
-    final r =
-        await _dio.get<Map<String, dynamic>>('/transactions/$txnId');
+    final r = await _dio.get<Map<String, dynamic>>('/transactions/$txnId');
     return Transaction.fromJson(r.data!);
   }
 

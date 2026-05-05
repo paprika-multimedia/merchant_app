@@ -73,7 +73,7 @@ class RecentAmountsNotifier extends Notifier<List<int>> {
 /// Family provider for per-merchant, per-flow recent amounts.
 ///
 /// Arg: `(merchantId, flow)` where flow is 'qris', 'link', or 'cpm'.
-final recentAmountsProvider = NotifierProvider.family<
-    RecentAmountsNotifier,
-    List<int>,
-    (String, String)>((arg) => RecentAmountsNotifier(arg));
+final recentAmountsProvider =
+    NotifierProvider.family<RecentAmountsNotifier, List<int>, (String, String)>(
+      (arg) => RecentAmountsNotifier(arg),
+    );

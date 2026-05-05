@@ -19,5 +19,6 @@ class TxnDedupeNotifier extends Notifier<Set<String>> {
   void reset() => state = {};
 }
 
-final txnDedupeProvider =
-    NotifierProvider<TxnDedupeNotifier, Set<String>>(TxnDedupeNotifier.new);
+final txnDedupeProvider = NotifierProvider<TxnDedupeNotifier, Set<String>>(
+  TxnDedupeNotifier.new,
+);

@@ -63,9 +63,7 @@ abstract class _PaprikaIcon extends StatelessWidget {
     return SizedBox(
       width: effectiveSize,
       height: effectiveSize,
-      child: CustomPaint(
-        painter: painter(effectiveColor, 1.8, effectiveSize),
-      ),
+      child: CustomPaint(painter: painter(effectiveColor, 1.8, effectiveSize)),
     );
   }
 }
@@ -100,8 +98,7 @@ class _HomePainter extends _IconPainter {
 class HomeIcon extends _PaprikaIcon {
   const HomeIcon({super.key, super.size, super.color});
   @override
-  CustomPainter painter(Color c, double sw, double s) =>
-      _HomePainter(c, sw, s);
+  CustomPainter painter(Color c, double sw, double s) => _HomePainter(c, sw, s);
 }
 
 // ─── Plus ────────────────────────────────────────────────────────────────────
@@ -122,8 +119,7 @@ class _PlusPainter extends _IconPainter {
 class PlusIcon extends _PaprikaIcon {
   const PlusIcon({super.key, super.size, super.color});
   @override
-  CustomPainter painter(Color c, double sw, double s) =>
-      _PlusPainter(c, sw, s);
+  CustomPainter painter(Color c, double sw, double s) => _PlusPainter(c, sw, s);
 }
 
 // ─── Back ────────────────────────────────────────────────────────────────────
@@ -147,8 +143,7 @@ class _BackPainter extends _IconPainter {
 class BackIcon extends _PaprikaIcon {
   const BackIcon({super.key, super.size, super.color});
   @override
-  CustomPainter painter(Color c, double sw, double s) =>
-      _BackPainter(c, sw, s);
+  CustomPainter painter(Color c, double sw, double s) => _BackPainter(c, sw, s);
 }
 
 // ─── Close ───────────────────────────────────────────────────────────────────
@@ -193,8 +188,7 @@ class _MorePainter extends _IconPainter {
 class MoreIcon extends _PaprikaIcon {
   const MoreIcon({super.key, super.size, super.color});
   @override
-  CustomPainter painter(Color c, double sw, double s) =>
-      _MorePainter(c, sw, s);
+  CustomPainter painter(Color c, double sw, double s) => _MorePainter(c, sw, s);
 }
 
 // ─── Bell ────────────────────────────────────────────────────────────────────
@@ -210,12 +204,30 @@ class _BellPainter extends _IconPainter {
     // Body — approximated from the SVG path
     final body = Path()
       ..moveTo(_s(6, s), _s(8, s))
-      ..cubicTo(_s(6, s), _s(4.686, s), _s(8.686, s), _s(2, s), _s(12, s),
-          _s(2, s))
-      ..cubicTo(_s(15.314, s), _s(2, s), _s(18, s), _s(4.686, s), _s(18, s),
-          _s(8, s))
-      ..cubicTo(_s(18, s), _s(12, s), _s(20, s), _s(14, s), _s(20, s),
-          _s(14, s))
+      ..cubicTo(
+        _s(6, s),
+        _s(4.686, s),
+        _s(8.686, s),
+        _s(2, s),
+        _s(12, s),
+        _s(2, s),
+      )
+      ..cubicTo(
+        _s(15.314, s),
+        _s(2, s),
+        _s(18, s),
+        _s(4.686, s),
+        _s(18, s),
+        _s(8, s),
+      )
+      ..cubicTo(
+        _s(18, s),
+        _s(12, s),
+        _s(20, s),
+        _s(14, s),
+        _s(20, s),
+        _s(14, s),
+      )
       ..lineTo(_s(4, s), _s(14, s))
       ..cubicTo(_s(4, s), _s(14, s), _s(6, s), _s(12, s), _s(6, s), _s(8, s))
       ..close();
@@ -223,10 +235,22 @@ class _BellPainter extends _IconPainter {
     // Clapper arc
     final clapper = Path()
       ..moveTo(_s(10, s), _s(20, s))
-      ..cubicTo(_s(10, s), _s(21.1, s), _s(10.9, s), _s(22, s), _s(12, s),
-          _s(22, s))
-      ..cubicTo(_s(13.1, s), _s(22, s), _s(14, s), _s(21.1, s), _s(14, s),
-          _s(20, s));
+      ..cubicTo(
+        _s(10, s),
+        _s(21.1, s),
+        _s(10.9, s),
+        _s(22, s),
+        _s(12, s),
+        _s(22, s),
+      )
+      ..cubicTo(
+        _s(13.1, s),
+        _s(22, s),
+        _s(14, s),
+        _s(21.1, s),
+        _s(14, s),
+        _s(20, s),
+      );
     canvas.drawPath(clapper, p);
   }
 }
@@ -234,8 +258,7 @@ class _BellPainter extends _IconPainter {
 class BellIcon extends _PaprikaIcon {
   const BellIcon({super.key, super.size, super.color});
   @override
-  CustomPainter painter(Color c, double sw, double s) =>
-      _BellPainter(c, sw, s);
+  CustomPainter painter(Color c, double sw, double s) => _BellPainter(c, sw, s);
 }
 
 // ─── QR ──────────────────────────────────────────────────────────────────────
@@ -251,19 +274,28 @@ class _QrPainter extends _IconPainter {
     final rr = RRect.fromRectAndRadius;
     // top-left square 3,3,7,7 rx1
     canvas.drawRRect(
-        rr(Rect.fromLTWH(_s(3, s), _s(3, s), _s(7, s), _s(7, s)),
-            Radius.circular(_s(1, s))),
-        p);
+      rr(
+        Rect.fromLTWH(_s(3, s), _s(3, s), _s(7, s), _s(7, s)),
+        Radius.circular(_s(1, s)),
+      ),
+      p,
+    );
     // top-right square 14,3,7,7 rx1
     canvas.drawRRect(
-        rr(Rect.fromLTWH(_s(14, s), _s(3, s), _s(7, s), _s(7, s)),
-            Radius.circular(_s(1, s))),
-        p);
+      rr(
+        Rect.fromLTWH(_s(14, s), _s(3, s), _s(7, s), _s(7, s)),
+        Radius.circular(_s(1, s)),
+      ),
+      p,
+    );
     // bottom-left square 3,14,7,7 rx1
     canvas.drawRRect(
-        rr(Rect.fromLTWH(_s(3, s), _s(14, s), _s(7, s), _s(7, s)),
-            Radius.circular(_s(1, s))),
-        p);
+      rr(
+        Rect.fromLTWH(_s(3, s), _s(14, s), _s(7, s), _s(7, s)),
+        Radius.circular(_s(1, s)),
+      ),
+      p,
+    );
     // bottom-right detail: M14 14h3v3M14 21h3M20 14v7M17 17h4
     final d = Path()
       ..moveTo(_s(14, s), _s(14, s))
@@ -295,25 +327,61 @@ class _LinkPainter extends _IconPainter {
     // M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 1 0-5.66-5.66l-1.5 1.5
     final top = Path()
       ..moveTo(_s(10, s), _s(14, s))
-      ..cubicTo(_s(10, s), _s(14, s), _s(12, s), _s(16, s), _s(15.66, s),
-          _s(14, s))
+      ..cubicTo(
+        _s(10, s),
+        _s(14, s),
+        _s(12, s),
+        _s(16, s),
+        _s(15.66, s),
+        _s(14, s),
+      )
       ..lineTo(_s(18.66, s), _s(11, s))
-      ..cubicTo(_s(20.3, s), _s(9.37, s), _s(20.3, s), _s(6.63, s),
-          _s(18.66, s), _s(5, s))
-      ..cubicTo(_s(17.03, s), _s(3.37, s), _s(14.3, s), _s(3.37, s),
-          _s(12.66, s), _s(5, s))
+      ..cubicTo(
+        _s(20.3, s),
+        _s(9.37, s),
+        _s(20.3, s),
+        _s(6.63, s),
+        _s(18.66, s),
+        _s(5, s),
+      )
+      ..cubicTo(
+        _s(17.03, s),
+        _s(3.37, s),
+        _s(14.3, s),
+        _s(3.37, s),
+        _s(12.66, s),
+        _s(5, s),
+      )
       ..lineTo(_s(11.16, s), _s(6.5, s));
     canvas.drawPath(top, p);
     // M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 1 0 5.66 5.66l1.5-1.5
     final bot = Path()
       ..moveTo(_s(14, s), _s(10, s))
-      ..cubicTo(_s(14, s), _s(10, s), _s(12, s), _s(8, s), _s(8.34, s),
-          _s(10, s))
+      ..cubicTo(
+        _s(14, s),
+        _s(10, s),
+        _s(12, s),
+        _s(8, s),
+        _s(8.34, s),
+        _s(10, s),
+      )
       ..lineTo(_s(5.34, s), _s(13, s))
-      ..cubicTo(_s(3.7, s), _s(14.63, s), _s(3.7, s), _s(17.37, s),
-          _s(5.34, s), _s(19, s))
-      ..cubicTo(_s(6.97, s), _s(20.63, s), _s(9.7, s), _s(20.63, s),
-          _s(11.34, s), _s(19, s))
+      ..cubicTo(
+        _s(3.7, s),
+        _s(14.63, s),
+        _s(3.7, s),
+        _s(17.37, s),
+        _s(5.34, s),
+        _s(19, s),
+      )
+      ..cubicTo(
+        _s(6.97, s),
+        _s(20.63, s),
+        _s(9.7, s),
+        _s(20.63, s),
+        _s(11.34, s),
+        _s(19, s),
+      )
       ..lineTo(_s(12.84, s), _s(17.5, s));
     canvas.drawPath(bot, p);
   }
@@ -322,8 +390,7 @@ class _LinkPainter extends _IconPainter {
 class LinkIcon extends _PaprikaIcon {
   const LinkIcon({super.key, super.size, super.color});
   @override
-  CustomPainter painter(Color c, double sw, double s) =>
-      _LinkPainter(c, sw, s);
+  CustomPainter painter(Color c, double sw, double s) => _LinkPainter(c, sw, s);
 }
 
 // ─── Store ───────────────────────────────────────────────────────────────────
@@ -347,12 +414,21 @@ class _StorePainter extends _IconPainter {
     // Awning arc: M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0
     final awning = Path()
       ..moveTo(_s(3, s), _s(9, s))
-      ..arcToPoint(_p(9, 9, s),
-          radius: Radius.circular(_s(3, s)), clockwise: false)
-      ..arcToPoint(_p(15, 9, s),
-          radius: Radius.circular(_s(3, s)), clockwise: false)
-      ..arcToPoint(_p(21, 9, s),
-          radius: Radius.circular(_s(3, s)), clockwise: false);
+      ..arcToPoint(
+        _p(9, 9, s),
+        radius: Radius.circular(_s(3, s)),
+        clockwise: false,
+      )
+      ..arcToPoint(
+        _p(15, 9, s),
+        radius: Radius.circular(_s(3, s)),
+        clockwise: false,
+      )
+      ..arcToPoint(
+        _p(21, 9, s),
+        radius: Radius.circular(_s(3, s)),
+        clockwise: false,
+      );
     canvas.drawPath(awning, p);
     // door: M10 20v-5h4v5
     canvas.drawLine(_p(10, 20, s), _p(10, 15, s), p);
@@ -412,10 +488,12 @@ class _KeyboardPainter extends _IconPainter {
   void paint(Canvas canvas, Size size) {
     final p = _stroke(color, strokeWidth);
     canvas.drawRRect(
-        RRect.fromRectAndRadius(
-            Rect.fromLTWH(_s(3, s), _s(6, s), _s(18, s), _s(12, s)),
-            Radius.circular(_s(2, s))),
-        p);
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(_s(3, s), _s(6, s), _s(18, s), _s(12, s)),
+        Radius.circular(_s(2, s)),
+      ),
+      p,
+    );
     // Three key dots (h0 means just a dot — draw as small circle)
     final dot = Paint()
       ..color = color
@@ -473,10 +551,12 @@ class _CopyPainter extends _IconPainter {
   void paint(Canvas canvas, Size size) {
     final p = _stroke(color, strokeWidth);
     canvas.drawRRect(
-        RRect.fromRectAndRadius(
-            Rect.fromLTWH(_s(8, s), _s(8, s), _s(12, s), _s(12, s)),
-            Radius.circular(_s(2, s))),
-        p);
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(_s(8, s), _s(8, s), _s(12, s), _s(12, s)),
+        Radius.circular(_s(2, s)),
+      ),
+      p,
+    );
     final path = Path()
       ..moveTo(_s(16, s), _s(8, s))
       ..lineTo(_s(16, s), _s(5, s))
@@ -493,8 +573,7 @@ class _CopyPainter extends _IconPainter {
 class CopyIcon extends _PaprikaIcon {
   const CopyIcon({super.key, super.size, super.color});
   @override
-  CustomPainter painter(Color c, double sw, double s) =>
-      _CopyPainter(c, sw, s);
+  CustomPainter painter(Color c, double sw, double s) => _CopyPainter(c, sw, s);
 }
 
 // ─── Share ───────────────────────────────────────────────────────────────────
@@ -553,20 +632,27 @@ class _PrintPainter extends _IconPainter {
       ..lineTo(_s(4, s), _s(18, s))
       ..conicTo(_s(3, s), _s(18, s), _s(3, s), _s(17, s), 1)
       ..lineTo(_s(3, s), _s(11, s))
-      ..cubicTo(
-          _s(3, s), _s(9.9, s), _s(3.9, s), _s(9, s), _s(5, s), _s(9, s))
+      ..cubicTo(_s(3, s), _s(9.9, s), _s(3.9, s), _s(9, s), _s(5, s), _s(9, s))
       ..lineTo(_s(19, s), _s(9, s))
       ..cubicTo(
-          _s(20.1, s), _s(9, s), _s(21, s), _s(9.9, s), _s(21, s), _s(11, s))
+        _s(20.1, s),
+        _s(9, s),
+        _s(21, s),
+        _s(9.9, s),
+        _s(21, s),
+        _s(11, s),
+      )
       ..lineTo(_s(21, s), _s(17, s))
       ..conicTo(_s(21, s), _s(18, s), _s(20, s), _s(18, s), 1)
       ..lineTo(_s(18, s), _s(18, s));
     canvas.drawPath(body, p);
     canvas.drawRRect(
-        RRect.fromRectAndRadius(
-            Rect.fromLTWH(_s(6, s), _s(14, s), _s(12, s), _s(7, s)),
-            Radius.circular(_s(1, s))),
-        p);
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(_s(6, s), _s(14, s), _s(12, s), _s(7, s)),
+        Radius.circular(_s(1, s)),
+      ),
+      p,
+    );
   }
 }
 
@@ -684,8 +770,7 @@ class _InfoPainter extends _IconPainter {
 class InfoIcon extends _PaprikaIcon {
   const InfoIcon({super.key, super.size, super.color});
   @override
-  CustomPainter painter(Color c, double sw, double s) =>
-      _InfoPainter(c, sw, s);
+  CustomPainter painter(Color c, double sw, double s) => _InfoPainter(c, sw, s);
 }
 
 // ─── Edit ────────────────────────────────────────────────────────────────────
@@ -713,8 +798,7 @@ class _EditPainter extends _IconPainter {
 class EditIcon extends _PaprikaIcon {
   const EditIcon({super.key, super.size, super.color});
   @override
-  CustomPainter painter(Color c, double sw, double s) =>
-      _EditPainter(c, sw, s);
+  CustomPainter painter(Color c, double sw, double s) => _EditPainter(c, sw, s);
 }
 
 // ─── Logout ──────────────────────────────────────────────────────────────────
@@ -731,11 +815,16 @@ class _LogoutPainter extends _IconPainter {
     final box = Path()
       ..moveTo(_s(10, s), _s(4, s))
       ..lineTo(_s(6, s), _s(4, s))
-      ..cubicTo(
-          _s(4.9, s), _s(4, s), _s(4, s), _s(4.9, s), _s(4, s), _s(6, s))
+      ..cubicTo(_s(4.9, s), _s(4, s), _s(4, s), _s(4.9, s), _s(4, s), _s(6, s))
       ..lineTo(_s(4, s), _s(18, s))
       ..cubicTo(
-          _s(4, s), _s(19.1, s), _s(4.9, s), _s(20, s), _s(6, s), _s(20, s))
+        _s(4, s),
+        _s(19.1, s),
+        _s(4.9, s),
+        _s(20, s),
+        _s(6, s),
+        _s(20, s),
+      )
       ..lineTo(_s(10, s), _s(20, s));
     canvas.drawPath(box, p);
     final arrow = Path()
@@ -778,7 +867,11 @@ class _SettingsPainter extends _IconPainter {
         p,
       );
     }
-    canvas.drawCircle(_p(12, 12, s), _s(7.5, s), _stroke(color, strokeWidth * 0.8));
+    canvas.drawCircle(
+      _p(12, 12, s),
+      _s(7.5, s),
+      _stroke(color, strokeWidth * 0.8),
+    );
   }
 }
 
@@ -883,10 +976,12 @@ class _GalleryPainter extends _IconPainter {
   void paint(Canvas canvas, Size size) {
     final p = _stroke(color, strokeWidth);
     canvas.drawRRect(
-        RRect.fromRectAndRadius(
-            Rect.fromLTWH(_s(3, s), _s(3, s), _s(18, s), _s(18, s)),
-            Radius.circular(_s(3, s))),
-        p);
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(_s(3, s), _s(3, s), _s(18, s), _s(18, s)),
+        Radius.circular(_s(3, s)),
+      ),
+      p,
+    );
     canvas.drawCircle(_p(8.5, 8.5, s), _s(1.5, s), p);
     final mountain = Path()
       ..moveTo(_s(21, s), _s(15, s))

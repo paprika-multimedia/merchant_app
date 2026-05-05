@@ -30,9 +30,11 @@ class AppField extends StatefulWidget {
 
   final String? label;
   final String? placeholder;
+
   /// External value — when set, the internal controller tracks this value.
   /// Only one of [value] or [controller] should be set.
   final String? value;
+
   /// External controller — takes precedence over [value] when both are set.
   final TextEditingController? controller;
   final ValueChanged<String>? onChanged;
@@ -97,8 +99,8 @@ class _AppFieldState extends State<AppField> {
     final borderColor = isError
         ? AppTokens.danger
         : _focused
-            ? AppTokens.accent
-            : AppTokens.border;
+        ? AppTokens.accent
+        : AppTokens.border;
     final borderWidth = _focused ? 2.0 : 1.0;
 
     return Column(
@@ -179,8 +181,9 @@ class _AppFieldState extends State<AppField> {
                           ? AppTokens.fontMono
                           : AppTokens.fontDisplay,
                       fontSize: widget.large ? 20 : 15,
-                      fontWeight:
-                          widget.large ? FontWeight.w600 : FontWeight.w500,
+                      fontWeight: widget.large
+                          ? FontWeight.w600
+                          : FontWeight.w500,
                       color: AppTokens.ink,
                       letterSpacing: widget.monospace ? 1.0 : -0.1,
                     ),

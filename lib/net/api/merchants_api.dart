@@ -21,8 +21,7 @@ class MerchantsApi {
 
   /// GET /merchants/:id — fetch a single merchant.
   Future<Merchant> get(String merchantId) async {
-    final r =
-        await _dio.get<Map<String, dynamic>>('/merchants/$merchantId');
+    final r = await _dio.get<Map<String, dynamic>>('/merchants/$merchantId');
     return Merchant.fromJson(r.data!);
   }
 
@@ -49,10 +48,7 @@ class MerchantsApi {
   /// DELETE /merchants/:id — remove merchant from company.
   ///
   /// [confirmName] must match the merchant name (Spec §4.2.2).
-  Future<void> remove(
-    String merchantId, {
-    required String confirmName,
-  }) async {
+  Future<void> remove(String merchantId, {required String confirmName}) async {
     await _dio.delete<void>(
       '/merchants/$merchantId',
       data: {'confirm_name': confirmName},
@@ -134,10 +130,7 @@ class MerchantsApi {
   }) async {
     final r = await _dio.post<Map<String, dynamic>>(
       '/merchants/$merchantId/scan',
-      data: {
-        'qr_payload': qrPayload,
-        'amount': amount,
-      },
+      data: {'qr_payload': qrPayload, 'amount': amount},
       options: Options(extra: {'idempotencyKey': idempotencyKey}),
     );
     return r.data!;
