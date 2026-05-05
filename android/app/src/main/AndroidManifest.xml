@@ -1,4 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Camera (mobile_scanner live QR scanning). Plugin manifest merger usually adds this,
+         but declare explicitly for clarity. -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <!-- Gallery access for "Select image" QR scan flow. Android 13+ uses READ_MEDIA_IMAGES;
+         older versions fall back to READ_EXTERNAL_STORAGE (capped to API 32). -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32"/>
+
     <application
         android:label="paprika_merchant"
         android:name="${applicationName}"
