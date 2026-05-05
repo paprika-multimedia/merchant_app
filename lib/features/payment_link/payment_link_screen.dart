@@ -165,9 +165,7 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
                 PaprikaScreenHeader(
                   onBack: () {
                     if (_step == _LinkStep.success) {
-                      ref
-                          .read(sessionProvider.notifier)
-                          .refreshMerchants();
+                      ref.read(sessionProvider.notifier).refreshMerchants();
                     }
                     context.go('/dashboard/merchant/${widget.merchantId}');
                   },
@@ -517,13 +515,13 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
           ),
           const SizedBox(height: 16),
 
-          // Action buttons
+          // B22: Both Share and Show QR are secondary; Done is the primary action
           Row(
             children: [
               Expanded(
                 child: AppButton(
                   label: t.linkShareVia,
-                  variant: AppButtonVariant.primary,
+                  variant: AppButtonVariant.secondary,
                   onPressed: () {
                     if (_txn?.linkUrl != null) {
                       Share.share(
@@ -655,9 +653,7 @@ class _PresetRow extends StatelessWidget {
         final label = '${v ~/ 1000}K';
         return Expanded(
           child: Padding(
-            padding: EdgeInsets.only(
-              right: v != _kPresets.last ? 6 : 0,
-            ),
+            padding: EdgeInsets.only(right: v != _kPresets.last ? 6 : 0),
             child: _AmountPresetChip(value: v, label: label, onTap: onTap),
           ),
         );

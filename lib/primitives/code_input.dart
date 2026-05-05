@@ -22,6 +22,7 @@ class CodeInput extends StatefulWidget {
   final ValueChanged<String> onChanged;
   final String initialValue;
   final String? error;
+
   /// Whether to render the `n / 20` counter below the input.
   /// Pass `false` when the parent renders the counter inline (M8).
   final bool showCounter;
@@ -58,9 +59,7 @@ class _CodeInputState extends State<CodeInput> {
         .substring(0, min(20, raw.length > 20 ? 20 : raw.length));
 
     // Re-strip after uppercase to handle edge cases
-    final final_ = cleaned
-        .toUpperCase()
-        .replaceAll(RegExp(r'[^A-Z0-9]'), '');
+    final final_ = cleaned.toUpperCase().replaceAll(RegExp(r'[^A-Z0-9]'), '');
     final clamped = final_.length > 20 ? final_.substring(0, 20) : final_;
 
     if (clamped != _value) {
@@ -100,16 +99,18 @@ class _CodeInputState extends State<CodeInput> {
                   maxLength: 20,
                   inputFormatters: [
                     TextInputFormatter.withFunction((old, neu) {
-                      final cleaned = neu.text
-                          .toUpperCase()
-                          .replaceAll(RegExp(r'[^A-Z0-9]'), '');
+                      final cleaned = neu.text.toUpperCase().replaceAll(
+                        RegExp(r'[^A-Z0-9]'),
+                        '',
+                      );
                       final clamped = cleaned.length > 20
                           ? cleaned.substring(0, 20)
                           : cleaned;
                       return TextEditingValue(
                         text: clamped,
-                        selection:
-                            TextSelection.collapsed(offset: clamped.length),
+                        selection: TextSelection.collapsed(
+                          offset: clamped.length,
+                        ),
                       );
                     }),
                   ],
@@ -182,13 +183,13 @@ class _SlotDisplay extends StatelessWidget {
           for (int g = 0; g < 4; g++) ...[
             if (g > 0)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Text(
                   '-',
                   style: TextStyle(
                     fontFamily: AppTokens.fontMono,
                     fontSize: 18,
-                    color: AppTokens.inkDisabled,
+                    color: AppTokens.inkTertiary,
                     letterSpacing: 2,
                   ),
                 ),

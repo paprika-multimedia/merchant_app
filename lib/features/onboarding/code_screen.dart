@@ -110,16 +110,11 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // B9: header carries no title (title moved to body as 28px headline)
+            // B11: overline moved to body — pass null here
             PaprikaScreenHeader(
               onBack: () => context.pop(),
-              overline: widget.addMode
-                  ? null
-                  : Text(t.codeStep(step).toUpperCase()),
-              title: Text(
-                widget.addMode
-                    ? t.codeAdd
-                    : (isMerchant ? t.codeTitleMerchant : t.codeTitleCompany),
-              ),
+              overline: null,
             ),
             Expanded(
               child: Padding(
@@ -127,13 +122,33 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // B11: step overline rendered in body, above headline
+                    if (!widget.addMode)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Text(
+                          t.codeStep(step).toUpperCase(),
+                          style: const TextStyle(
+                            fontFamily: AppTokens.fontDisplay,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: AppTokens.inkSecondary,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                    // B10: 28px/700 body headline
                     Text(
-                      isMerchant ? t.codeTitleMerchant : t.codeTitleCompany,
+                      widget.addMode
+                          ? t.codeAdd
+                          : (isMerchant ? t.codeTitleMerchant : t.codeTitleCompany),
                       style: const TextStyle(
                         fontFamily: AppTokens.fontDisplay,
-                        fontSize: 24,
+                        fontSize: 28,
                         fontWeight: FontWeight.w700,
                         color: AppTokens.ink,
+                        letterSpacing: -0.6,
+                        height: 1.15,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -175,9 +190,9 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
                           label: t.codeCamera,
                           variant: AppButtonVariant.ghost,
                           size: AppButtonSize.sm,
-                          leading: const CameraIcon(
-                            size: 14,
-                            color: AppTokens.inkSecondary,
+                          leading: const QrIcon(
+                            size: 16,
+                            color: AppTokens.accent,
                           ),
                           onPressed: () {
                             if (isMerchant) {

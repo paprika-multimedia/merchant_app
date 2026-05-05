@@ -17,7 +17,7 @@ import '../theme/tokens.dart';
 class PaprikaScreenHeader extends StatelessWidget {
   const PaprikaScreenHeader({
     super.key,
-    required this.title,
+    this.title,
     this.overline,
     this.onBack,
     this.trailing,
@@ -25,8 +25,10 @@ class PaprikaScreenHeader extends StatelessWidget {
     this.padding = const EdgeInsets.symmetric(horizontal: 16),
   });
 
-  /// Main title widget (usually a [Text]).
-  final Widget title;
+  /// Main title widget (usually a [Text]). If null or [SizedBox.shrink],
+  /// the header column renders only the overline (useful when the title is
+  /// shown as a body-level headline instead).
+  final Widget? title;
 
   /// Optional uppercase secondary label above the title (e.g. "STEP 1 OF 2").
   final Widget? overline;
@@ -76,18 +78,19 @@ class PaprikaScreenHeader extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         child: overline!,
                       ),
-                    DefaultTextStyle(
-                      style: const TextStyle(
-                        fontFamily: AppTokens.fontDisplay,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700,
-                        color: AppTokens.ink,
-                        letterSpacing: -0.3,
+                    if (title != null)
+                      DefaultTextStyle(
+                        style: const TextStyle(
+                          fontFamily: AppTokens.fontDisplay,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
+                          color: AppTokens.ink,
+                          letterSpacing: -0.3,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        child: title!,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      child: title,
-                    ),
                   ],
                 ),
               ),

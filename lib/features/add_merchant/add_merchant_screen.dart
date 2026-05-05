@@ -72,8 +72,9 @@ class AddMerchantScreen extends ConsumerWidget {
                             height: 44,
                             decoration: BoxDecoration(
                               color: AppTokens.accentSoft,
+                              // B20: radiusMd (was radiusSm)
                               borderRadius: BorderRadius.circular(
-                                AppTokens.radiusSm,
+                                AppTokens.radiusMd,
                               ),
                             ),
                             child: const QrIcon(color: AppTokens.accent),
@@ -103,9 +104,10 @@ class AddMerchantScreen extends ConsumerWidget {
                               ],
                             ),
                           ),
+                          // B20: inkTertiary (was inkDisabled)
                           const ChevronIcon(
                             size: 20,
-                            color: AppTokens.inkDisabled,
+                            color: AppTokens.inkTertiary,
                           ),
                         ],
                       ),
@@ -125,8 +127,9 @@ class AddMerchantScreen extends ConsumerWidget {
                             height: 44,
                             decoration: BoxDecoration(
                               color: AppTokens.surfaceAlt,
+                              // B20: radiusMd (was radiusSm)
                               borderRadius: BorderRadius.circular(
-                                AppTokens.radiusSm,
+                                AppTokens.radiusMd,
                               ),
                             ),
                             child: const KeyboardIcon(
@@ -158,9 +161,10 @@ class AddMerchantScreen extends ConsumerWidget {
                               ],
                             ),
                           ),
+                          // B20: inkTertiary (was inkDisabled)
                           const ChevronIcon(
                             size: 20,
-                            color: AppTokens.inkDisabled,
+                            color: AppTokens.inkTertiary,
                           ),
                         ],
                       ),

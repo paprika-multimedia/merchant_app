@@ -79,8 +79,7 @@ class WelcomeScreen extends StatelessWidget {
                     variant: AppButtonVariant.secondary,
                     size: AppButtonSize.lg,
                     block: true,
-                    leading: const KeyboardIcon(
-                        size: 18, color: AppTokens.ink),
+                    leading: const KeyboardIcon(size: 18, color: AppTokens.ink),
                     onPressed: () => context.push('/code/company'),
                   ),
                   // Help row retained (not in JSX but useful contact copy)
@@ -105,20 +104,20 @@ class _WelcomeHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 260,
+      width: 280,
       height: 240,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // Back card — rotated +6deg, right side
+          // Back card — 192×192 rotated +6deg, right side (JSX: padding 16, FakeQR 160)
           Positioned(
             right: 0,
             top: 30,
             child: Transform.rotate(
               angle: 0.105, // ~6 degrees in radians
               child: Container(
-                width: 148,
-                height: 148,
+                width: 192,
+                height: 192,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: AppTokens.surface,
@@ -136,19 +135,19 @@ class _WelcomeHero extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: _FakeQr(size: 116, color: AppTokens.ink),
+                child: _FakeQr(size: 160, color: AppTokens.ink),
               ),
             ),
           ),
-          // Front card — rotated -4deg, left/bottom
+          // Front card — 152×152 rotated -4deg, left/bottom (JSX: padding 16, FakeQR 120)
           Positioned(
             left: 0,
             bottom: 10,
             child: Transform.rotate(
               angle: -0.070, // ~-4 degrees in radians
               child: Container(
-                width: 112,
-                height: 112,
+                width: 152,
+                height: 152,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: AppTokens.surface,
@@ -166,7 +165,7 @@ class _WelcomeHero extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: _FakeQr(size: 80, color: AppTokens.accent),
+                child: _FakeQr(size: 120, color: AppTokens.accent),
               ),
             ),
           ),
@@ -221,9 +220,12 @@ class _WelcomeHero extends StatelessWidget {
   }
 }
 
-/// Simple fake QR pattern — 3×3 grid of corner squares + random inner blocks.
+/// Fake QR pattern — 25×25 grid matching JSX FakeQR.
 ///
-/// Pure Dart geometry, no image assets needed.
+/// Three 7×7 finder squares (top-left, top-right, bottom-left) each drawn as
+/// a dark outer square, 5×5 white inner, 3×3 dark center.
+/// Data cells use deterministic pseudo-random: filled when
+/// `((row * 31 + col * 17) % 7) >= 3`.
 class _FakeQr extends StatelessWidget {
   const _FakeQr({required this.size, required this.color});
 
@@ -244,52 +246,93 @@ class _FakeQrPainter extends CustomPainter {
   const _FakeQrPainter(this.color);
   final Color color;
 
+  // Grid dimension matching JSX FakeQR
+  static const int _grid = 25;
+  // Finder square outer size in cells
+  static const int _finderSize = 7;
+
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
+    final u = size.width / _grid; // module size
+
+    final darkPaint = Paint()
       ..color = color.withValues(alpha: 0.85)
       ..style = PaintingStyle.fill;
 
-    final s = size.width;
-    final u = s / 7; // unit cell size
+    final whitePaint = Paint()
+      ..color = AppTokens.surface
+      ..style = PaintingStyle.fill;
 
-    // Three finder squares (corner QR markers)
-    for (final (col, row) in [(0, 0), (4, 0), (0, 4)]) {
-      final rect = RRect.fromRectAndRadius(
-        Rect.fromLTWH(col * u, row * u, 3 * u, 3 * u),
-        Radius.circular(u * 0.4),
-      );
-      canvas.drawRRect(rect, paint);
-      // Inner white square
-      final inner = RRect.fromRectAndRadius(
-        Rect.fromLTWH(
-            col * u + u * 0.4, row * u + u * 0.4, 3 * u - u * 0.8, 3 * u - u * 0.8),
-        Radius.circular(u * 0.2),
-      );
-      canvas.drawRRect(inner, Paint()..color = AppTokens.surface..style = PaintingStyle.fill);
-      // Center dot
-      final center = Rect.fromLTWH(
-          col * u + u, row * u + u, u, u);
+    // Three finder square top-left corners (in module coords)
+    const finderOrigins = [(0, 0), (18, 0), (0, 18)];
+
+    for (final (ox, oy) in finderOrigins) {
+      // 7×7 dark outer
       canvas.drawRRect(
-        RRect.fromRectAndRadius(center, Radius.circular(u * 0.15)),
-        paint,
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(ox * u, oy * u, _finderSize * u, _finderSize * u),
+          Radius.circular(u * 0.8),
+        ),
+        darkPaint,
+      );
+      // 5×5 white inner (1-cell inset)
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(
+            (ox + 1) * u,
+            (oy + 1) * u,
+            5 * u,
+            5 * u,
+          ),
+          Radius.circular(u * 0.4),
+        ),
+        whitePaint,
+      );
+      // 3×3 dark center (2-cell inset)
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(
+            (ox + 2) * u,
+            (oy + 2) * u,
+            3 * u,
+            3 * u,
+          ),
+          Radius.circular(u * 0.3),
+        ),
+        darkPaint,
       );
     }
 
-    // Data cells — a few fixed blocks to look like QR data
-    final dataCells = [
-      (3, 0), (4, 1), (6, 0), (5, 2), (6, 2),
-      (3, 3), (4, 3), (5, 3), (6, 3),
-      (3, 4), (5, 4),
-      (4, 5), (6, 5),
-      (3, 6), (5, 6), (6, 6),
-    ];
-    for (final (col, row) in dataCells) {
-      canvas.drawRect(
-        Rect.fromLTWH(col * u + u * 0.1, row * u + u * 0.1, u * 0.8, u * 0.8),
-        paint,
-      );
+    // Data region — skip finder zones, use deterministic pseudo-random
+    for (int row = 0; row < _grid; row++) {
+      for (int col = 0; col < _grid; col++) {
+        if (_isFinderCell(col, row)) continue;
+        // Deterministic fill: same formula as JSX
+        if (((row * 31 + col * 17) % 7) >= 3) {
+          canvas.drawRect(
+            Rect.fromLTWH(
+              col * u + u * 0.1,
+              row * u + u * 0.1,
+              u * 0.8,
+              u * 0.8,
+            ),
+            darkPaint,
+          );
+        }
+      }
     }
+  }
+
+  /// Returns true for cells that are inside a finder square region
+  /// (including the 1-cell quiet zone around each finder).
+  bool _isFinderCell(int col, int row) {
+    // Top-left finder: cols 0-7, rows 0-7
+    if (col <= 7 && row <= 7) return true;
+    // Top-right finder: cols 17-24, rows 0-7
+    if (col >= 17 && row <= 7) return true;
+    // Bottom-left finder: cols 0-7, rows 17-24
+    if (col <= 7 && row >= 17) return true;
+    return false;
   }
 
   @override

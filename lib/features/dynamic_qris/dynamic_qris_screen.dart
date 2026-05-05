@@ -264,7 +264,8 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
     final fmt = NumberFormat('#,###', 'id_ID');
 
     // Resolve merchant name for overline (M11)
-    final merchantName = ref
+    final merchantName =
+        ref
             .watch(sessionProvider)
             .value
             ?.merchants
@@ -509,15 +510,23 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
                           fontFamily: AppTokens.fontDisplay,
                         ),
                       )
-                    : Text(
-                        t.qrisExpiresLive(
-                          '$mins:${secs.toString().padLeft(2, '0')}',
-                        ),
-                        style: const TextStyle(
-                          fontFamily: AppTokens.fontDisplay,
-                          fontSize: 13,
-                          color: AppTokens.inkSecondary,
-                        ),
+                    // B21: pulsing accent dot + expiry text
+                    : Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const _PulsingDot(),
+                          const SizedBox(width: 6),
+                          Text(
+                            t.qrisExpiresLive(
+                              '$mins:${secs.toString().padLeft(2, '0')}',
+                            ),
+                            style: const TextStyle(
+                              fontFamily: AppTokens.fontDisplay,
+                              fontSize: 13,
+                              color: AppTokens.inkSecondary,
+                            ),
+                          ),
+                        ],
                       ),
               ],
             ),
@@ -727,9 +736,7 @@ class _PresetRow extends StatelessWidget {
         final label = '${v ~/ 1000}K';
         return Expanded(
           child: Padding(
-            padding: EdgeInsets.only(
-              right: v != _kPresets.last ? 6 : 0,
-            ),
+            padding: EdgeInsets.only(right: v != _kPresets.last ? 6 : 0),
             child: _AmountPresetChip(value: v, label: label, onTap: onTap),
           ),
         );
@@ -768,6 +775,56 @@ class _AmountPresetChip extends StatelessWidget {
             fontSize: 13,
             fontWeight: FontWeight.w600,
             color: AppTokens.ink,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// B21: 10×10 accent dot with a 1200ms opacity pulse (0.4 → 1.0, reversing).
+class _PulsingDot extends StatefulWidget {
+  const _PulsingDot();
+
+  @override
+  State<_PulsingDot> createState() => _PulsingDotState();
+}
+
+class _PulsingDotState extends State<_PulsingDot>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _opacity;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      duration: const Duration(milliseconds: 1200),
+      vsync: this,
+    )..repeat(reverse: true);
+    _opacity = Tween<double>(begin: 0.4, end: 1.0).animate(
+      CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _opacity,
+      builder: (context, _) => Opacity(
+        opacity: _opacity.value,
+        child: Container(
+          width: 10,
+          height: 10,
+          decoration: const BoxDecoration(
+            color: AppTokens.accent,
+            shape: BoxShape.circle,
           ),
         ),
       ),

@@ -23,12 +23,9 @@ class DashboardCompanyScreen extends ConsumerWidget {
     final session = ref.watch(sessionProvider);
 
     return session.when(
-      loading: () => const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      ),
-      error: (e, _) => Scaffold(
-        body: Center(child: Text(e.toString())),
-      ),
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
+      error: (e, _) => Scaffold(body: Center(child: Text(e.toString()))),
       data: (data) {
         if (data == null) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -43,7 +40,7 @@ class DashboardCompanyScreen extends ConsumerWidget {
         // Aggregates
         final todayTotal = merchants.fold(0, (s, m) => s + m.todayTotal);
         final todayCount = merchants.fold(0, (s, m) => s + m.todayCount);
-        final unreadCount = merchants.fold(0, (s, m) => s + m.unreadCount);
+        // unreadCount removed — JSX MiniStat only shows merchants + txns (B15)
 
         return Scaffold(
           backgroundColor: AppTokens.bg,
@@ -83,8 +80,9 @@ class DashboardCompanyScreen extends ConsumerWidget {
                             height: 40,
                             decoration: BoxDecoration(
                               color: AppTokens.surface,
-                              borderRadius:
-                                  BorderRadius.circular(AppTokens.radiusSm),
+                              borderRadius: BorderRadius.circular(
+                                AppTokens.radiusSm,
+                              ),
                               border: Border.all(color: AppTokens.border),
                             ),
                             alignment: Alignment.center,
@@ -122,7 +120,9 @@ class DashboardCompanyScreen extends ConsumerWidget {
                           ),
                           alignment: Alignment.center,
                           child: const PlusIcon(
-                              size: 18, color: AppTokens.inkSecondary),
+                            size: 18,
+                            color: AppTokens.inkSecondary,
+                          ),
                         ),
                       ),
                     ],
@@ -132,8 +132,7 @@ class DashboardCompanyScreen extends ConsumerWidget {
 
               // Hero card
               SliverPadding(
-                padding:
-                    const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                 sliver: SliverToBoxAdapter(
                   child: AppCard(
                     color: AppTokens.accent,
@@ -151,31 +150,47 @@ class DashboardCompanyScreen extends ConsumerWidget {
                             letterSpacing: 0.5,
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'IDR ${NumberFormat('#,###', 'id_ID').format(todayTotal)}',
-                          style: const TextStyle(
-                            fontFamily: AppTokens.fontDisplay,
-                            fontSize: 32,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                          ),
+                        const SizedBox(height: 6),
+                        // B14: IDR prefix at 16px/500/opacity-0.7, value at 30px/700
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.alphabetic,
+                          children: [
+                            const Text(
+                              'IDR',
+                              style: TextStyle(
+                                fontFamily: AppTokens.fontDisplay,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white70,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              NumberFormat('#,###', 'id_ID').format(todayTotal),
+                              style: const TextStyle(
+                                fontFamily: AppTokens.fontDisplay,
+                                fontSize: 30,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                                letterSpacing: -0.8,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 12),
+                        // B15: MiniStat — stacked label/value, no chip background
                         Row(
                           children: [
-                            _StatPill(
-                                label: t.dashCompanyStatMerchants,
-                                value: '${merchants.length}'),
-                            const SizedBox(width: 8),
-                            _StatPill(
-                                label: t.dashCompanyStatTxns,
-                                value: '$todayCount'),
-                            const SizedBox(width: 8),
-                            if (unreadCount > 0)
-                              _StatPill(
-                                  label: t.dashCompanyStatUnread,
-                                  value: '$unreadCount'),
+                            _MiniStat(
+                              label: t.dashCompanyStatMerchants,
+                              value: '${merchants.length}',
+                            ),
+                            const SizedBox(width: 16),
+                            _MiniStat(
+                              label: t.dashCompanyStatTxns,
+                              value: '$todayCount',
+                            ),
                           ],
                         ),
                       ],
@@ -228,16 +243,13 @@ class DashboardCompanyScreen extends ConsumerWidget {
                 )
               else
                 SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (ctx, i) {
-                      final m = merchants[i];
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                        child: _MerchantRow(merchant: m),
-                      );
-                    },
-                    childCount: merchants.length,
-                  ),
+                  delegate: SliverChildBuilderDelegate((ctx, i) {
+                    final m = merchants[i];
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                      child: _MerchantRow(merchant: m),
+                    );
+                  }, childCount: merchants.length),
                 ),
 
               // Notifications promo card with dashed border (M12)
@@ -254,64 +266,65 @@ class DashboardCompanyScreen extends ConsumerWidget {
                         color: AppTokens.accentSoft,
                       ),
                       child: Container(
-                      padding: const EdgeInsets.all(AppTokens.sp16),
-                      decoration: BoxDecoration(
-                        color: AppTokens.accentWash,
-                        borderRadius:
-                            BorderRadius.circular(AppTokens.radiusLg),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 34,
-                            height: 34,
-                            decoration: BoxDecoration(
-                              color: AppTokens.accentSoft,
-                              borderRadius:
-                                  BorderRadius.circular(AppTokens.sp10),
-                            ),
-                            alignment: Alignment.center,
-                            child: const BellIcon(
-                              size: 18,
-                              color: AppTokens.accentDeep,
-                            ),
+                        padding: const EdgeInsets.all(AppTokens.sp16),
+                        decoration: BoxDecoration(
+                          color: AppTokens.accentWash,
+                          borderRadius: BorderRadius.circular(
+                            AppTokens.radiusLg,
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  t.dashCompanyNotif,
-                                  style: const TextStyle(
-                                    fontFamily: AppTokens.fontDisplay,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppTokens.accentInk,
-                                  ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 34,
+                              height: 34,
+                              decoration: BoxDecoration(
+                                color: AppTokens.accentSoft,
+                                borderRadius: BorderRadius.circular(
+                                  AppTokens.sp10,
                                 ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  t.dashCompanyNotifSub,
-                                  style: const TextStyle(
-                                    fontFamily: AppTokens.fontDisplay,
-                                    fontSize: 12,
-                                    color: AppTokens.inkSecondary,
-                                  ),
-                                ),
-                              ],
+                              ),
+                              alignment: Alignment.center,
+                              child: const BellIcon(
+                                size: 18,
+                                color: AppTokens.accentDeep,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    t.dashCompanyNotif,
+                                    style: const TextStyle(
+                                      fontFamily: AppTokens.fontDisplay,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppTokens.accentInk,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    t.dashCompanyNotifSub,
+                                    style: const TextStyle(
+                                      fontFamily: AppTokens.fontDisplay,
+                                      fontSize: 12,
+                                      color: AppTokens.inkSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
 
-              const SliverPadding(
-                  padding: EdgeInsets.only(bottom: 32)),
+              const SliverPadding(padding: EdgeInsets.only(bottom: 32)),
             ],
           ),
         );
@@ -345,11 +358,7 @@ class _MerchantChip extends ConsumerWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            MerchantAvatar(
-              name: merchant.name,
-              size: 28,
-              active: active,
-            ),
+            MerchantAvatar(name: merchant.name, size: 28, active: active),
             const SizedBox(width: 8),
             Text(
               merchant.name,
@@ -393,8 +402,7 @@ class _MerchantRow extends StatelessWidget {
     final fmt = NumberFormat('#,###', 'id_ID');
 
     return GestureDetector(
-      onTap: () =>
-          context.push('/dashboard/merchant/${merchant.id}'),
+      onTap: () => context.push('/dashboard/merchant/${merchant.id}'),
       child: AppCard(
         padding: AppTokens.sp14,
         child: Row(
@@ -433,9 +441,7 @@ class _MerchantRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  hasLastTx
-                      ? '${t.txLast} · $timeStr'
-                      : t.txNone,
+                  hasLastTx ? '${t.txLast} · $timeStr' : t.txNone,
                   style: const TextStyle(
                     fontFamily: AppTokens.fontDisplay,
                     fontSize: 11,
@@ -446,26 +452,19 @@ class _MerchantRow extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  lastAmount != null
-                      ? 'IDR ${fmt.format(lastAmount)}'
-                      : '—',
+                  lastAmount != null ? 'IDR ${fmt.format(lastAmount)}' : '—',
                   style: TextStyle(
                     fontFamily: AppTokens.fontDisplay,
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    color: hasLastTx
-                        ? AppTokens.ink
-                        : AppTokens.inkTertiary,
+                    color: hasLastTx ? AppTokens.ink : AppTokens.inkTertiary,
                     letterSpacing: -0.2,
                   ),
                 ),
               ],
             ),
             const SizedBox(width: 8),
-            const ChevronIcon(
-              color: AppTokens.inkTertiary,
-              size: 14,
-            ),
+            const ChevronIcon(color: AppTokens.inkTertiary, size: 14),
           ],
         ),
       ),
@@ -478,10 +477,7 @@ class _MerchantRow extends StatelessWidget {
 /// Mirrors AppShell header in screens-dashboard.jsx (isCompanyLevel=true state,
 /// background: T.accent, color: #fff).
 class _CompanyHeaderBar extends StatelessWidget {
-  const _CompanyHeaderBar({
-    required this.companyName,
-    required this.label,
-  });
+  const _CompanyHeaderBar({required this.companyName, required this.label});
 
   final String companyName;
   final String label;
@@ -554,28 +550,41 @@ class _CompanyHeaderBar extends StatelessWidget {
   }
 }
 
-class _StatPill extends StatelessWidget {
-  const _StatPill({required this.label, required this.value});
+/// B15: MiniStat — stacked uppercase label + value, used on the accent hero card.
+///
+/// No chip background. Labels in white/55% opacity, value in white/700.
+/// Matches JSX `MiniStat({ dark: true })`.
+class _MiniStat extends StatelessWidget {
+  const _MiniStat({required this.label, required this.value});
   final String label;
   final String value;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        '$value $label',
-        style: const TextStyle(
-          fontFamily: AppTokens.fontDisplay,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: Colors.white,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label.toUpperCase(),
+          style: const TextStyle(
+            fontFamily: AppTokens.fontDisplay,
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: Colors.white54,
+            letterSpacing: 0.8,
+          ),
         ),
-      ),
+        const SizedBox(height: 2),
+        Text(
+          value,
+          style: const TextStyle(
+            fontFamily: AppTokens.fontDisplay,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -614,8 +623,10 @@ class _DashedBorderPainter extends CustomPainter {
       while (distance < metric.length) {
         final segLen = draw ? dashLen : gapLen;
         if (draw) {
-          final extracted = metric.extractPath(distance,
-              (distance + segLen).clamp(0, metric.length));
+          final extracted = metric.extractPath(
+            distance,
+            (distance + segLen).clamp(0, metric.length),
+          );
           canvas.drawPath(extracted, paint);
         }
         distance += segLen;
