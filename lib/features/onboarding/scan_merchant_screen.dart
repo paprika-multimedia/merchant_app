@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
@@ -35,9 +36,18 @@ class ScanMerchantScreen extends ConsumerStatefulWidget {
 }
 
 class _ScanMerchantScreenState extends ConsumerState<ScanMerchantScreen> {
-  final MobileScannerController _scanner = MobileScannerController();
+  final MobileScannerController _scanner = MobileScannerController(
+    detectionSpeed: DetectionSpeed.noDuplicates,
+    formats: const [BarcodeFormat.qrCode],
+  );
   bool _detected = false;
   String? _error;
+  DateTime? _lastInvalidToast;
+
+  static final _merchantRe = RegExp(
+    r'paprika://merchant/([A-Za-z0-9]+)',
+    caseSensitive: false,
+  );
 
   @override
   void dispose() {
@@ -47,16 +57,44 @@ class _ScanMerchantScreenState extends ConsumerState<ScanMerchantScreen> {
 
   Future<void> _onDetect(BarcodeCapture capture) async {
     if (_detected) return;
+    String? sawAnyQr;
     for (final barcode in capture.barcodes) {
       final raw = barcode.rawValue ?? '';
-      final match = RegExp(r'paprika://merchant/([A-Z0-9]+)').firstMatch(raw);
+      if (raw.isEmpty) continue;
+      sawAnyQr = raw;
+      final match = _merchantRe.firstMatch(raw);
       if (match != null) {
         _detected = true;
-        final code = match.group(1)!;
+        HapticFeedback.mediumImpact();
+        final code = match.group(1)!.toUpperCase();
         await _claimMerchant(code);
         return;
       }
     }
+    if (sawAnyQr != null) {
+      _showInvalidQrToast();
+    }
+  }
+
+  void _showInvalidQrToast() {
+    final now = DateTime.now();
+    if (_lastInvalidToast != null &&
+        now.difference(_lastInvalidToast!) < const Duration(seconds: 2)) {
+      return;
+    }
+    _lastInvalidToast = now;
+    HapticFeedback.lightImpact();
+    if (!mounted) return;
+    final t = AppL10n.of(context);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(t.scanImageNoQr),
+          duration: const Duration(milliseconds: 1500),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
   }
 
   Future<void> _claimMerchant(String code) async {
@@ -99,9 +137,9 @@ class _ScanMerchantScreenState extends ConsumerState<ScanMerchantScreen> {
     if (capture != null && capture.barcodes.isNotEmpty) {
       await _onDetect(capture);
     } else if (mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(t.scanImageNoQr)));
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(t.scanImageNoQr)));
     }
   }
 
@@ -115,7 +153,9 @@ class _ScanMerchantScreenState extends ConsumerState<ScanMerchantScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          MobileScanner(controller: _scanner, onDetect: _onDetect),
+          Positioned.fill(
+            child: MobileScanner(controller: _scanner, onDetect: _onDetect),
+          ),
           ScannerOverlay(
             title: t.scanMerchantTitle,
             subtitle: t.scanMerchantSub,

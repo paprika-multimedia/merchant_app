@@ -179,13 +179,48 @@ class _CornerPainter extends CustomPainter {
 class _ScanLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(height: 2, color: AppTokens.accent)
-        .animate(onPlay: (c) => c.repeat())
-        .moveY(
-          begin: 0,
-          end: ScannerOverlay._reticleSize,
-          duration: 1600.ms,
-          curve: Curves.linear,
-        );
+    // Scanline lives inside the 260x260 reticle. Use a small inset so the
+    // glow doesn't bleed past the corner brackets, and bounce between the
+    // top and bottom rather than snapping back from the bottom.
+    const travel = ScannerOverlay._reticleSize - 8;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      child: Align(
+        alignment: Alignment.topCenter,
+        child:
+            Container(
+                  height: 2,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [
+                        Colors.transparent,
+                        AppTokens.accent,
+                        Colors.transparent,
+                      ],
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppTokens.accent.withValues(alpha: 0.55),
+                        blurRadius: 14,
+                      ),
+                    ],
+                  ),
+                )
+                .animate(onPlay: (c) => c.repeat())
+                .moveY(
+                  begin: 4,
+                  end: travel,
+                  duration: 1400.ms,
+                  curve: Curves.easeInOut,
+                )
+                .then()
+                .moveY(
+                  begin: travel,
+                  end: 4,
+                  duration: 1400.ms,
+                  curve: Curves.easeInOut,
+                ),
+      ),
+    );
   }
 }
