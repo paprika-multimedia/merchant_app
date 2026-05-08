@@ -12,18 +12,39 @@ class PaprikaLockup extends StatelessWidget {
   final double size;
 
   @override
-  Widget build(BuildContext context) {
-    final gap = (size * 0.4).roundToDouble();
-    final markSize = (size * 1.45).roundToDouble();
+Widget build(BuildContext context) {
+  final gap = (size * 0.4).roundToDouble();
+  final markSize = (size * 2.0).roundToDouble();
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        PaprikaMark(size: markSize, tile: false),
-        SizedBox(width: gap),
-        PaprikaWordmark(size: size),
-      ],
-    );
-  }
+  return Row(
+    mainAxisSize: MainAxisSize.min,
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: [
+      // Kotak orange
+      Container(
+        width: markSize,
+        height: markSize,
+        decoration: BoxDecoration(
+          color: const Color(0xFFF04058),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Center(
+          child: PaprikaMark(
+            size: markSize * 0.55,
+            tile: false,
+            foreground: Colors.white,
+          ),
+        ),
+      ),
+
+      SizedBox(width: gap),
+
+      // Text hitam
+      PaprikaWordmark(
+        size: size,
+        color: Colors.black,
+      ),
+    ],
+  );
+}
 }
