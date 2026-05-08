@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -52,15 +50,11 @@ class _CodeInputState extends State<CodeInput> {
   }
 
   void _handleChange(String raw) {
-    // Strip non-alphanumeric, force uppercase, cap at 20
-    final cleaned = raw
-        .toUpperCase()
-        .replaceAll(RegExp(r'[^A-Z0-9]'), '')
-        .substring(0, min(20, raw.length > 20 ? 20 : raw.length));
-
-    // Re-strip after uppercase to handle edge cases
-    final final_ = cleaned.toUpperCase().replaceAll(RegExp(r'[^A-Z0-9]'), '');
-    final clamped = final_.length > 20 ? final_.substring(0, 20) : final_;
+    // Strip non-alphanumeric, force uppercase, cap at 20.
+    // Bound substring on the cleaned length, not raw.length — replaceAll
+    // can shrink the string and cause RangeError otherwise.
+    final cleaned = raw.toUpperCase().replaceAll(RegExp(r'[^A-Z0-9]'), '');
+    final clamped = cleaned.length > 20 ? cleaned.substring(0, 20) : cleaned;
 
     if (clamped != _value) {
       setState(() => _value = clamped);
@@ -177,44 +171,51 @@ class _SlotDisplay extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTokens.radiusMd),
         border: Border.all(color: AppTokens.border),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          for (int g = 0; g < 4; g++) ...[
-            if (g > 0)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: Text(
-                  '-',
-                  style: TextStyle(
-                    fontFamily: AppTokens.fontMono,
-                    fontSize: 18,
-                    color: AppTokens.inkTertiary,
-                    letterSpacing: 2,
-                  ),
-                ),
-              ),
-            Row(
-              children: groups[g].map((char) {
-                final isEmpty = char.isEmpty;
-                return SizedBox(
-                  width: 18,
+      // FittedBox scales the slot row down on narrow phones so the 20 slots
+      // + 3 separators never overflow the field's horizontal padding.
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.center,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (int g = 0; g < 4; g++) ...[
+              if (g > 0)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: Text(
-                    isEmpty ? '·' : char,
-                    textAlign: TextAlign.center,
+                    '-',
                     style: TextStyle(
                       fontFamily: AppTokens.fontMono,
                       fontSize: 18,
-                      fontWeight: FontWeight.w600,
+                      color: AppTokens.inkTertiary,
                       letterSpacing: 2,
-                      color: isEmpty ? AppTokens.inkDisabled : AppTokens.ink,
                     ),
                   ),
-                );
-              }).toList(),
-            ),
+                ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: groups[g].map((char) {
+                  final isEmpty = char.isEmpty;
+                  return SizedBox(
+                    width: 18,
+                    child: Text(
+                      isEmpty ? '·' : char,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: AppTokens.fontMono,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 2,
+                        color: isEmpty ? AppTokens.inkDisabled : AppTokens.ink,
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
