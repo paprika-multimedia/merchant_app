@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../l10n/app_localizations.dart';
@@ -94,17 +95,16 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
         ? t.linkMessageAmountSuffix(fmt.format(_amount))
         : '';
     final link = _txn?.linkUrl ?? '';
-    final merchant =
-        ref
-            .read(sessionProvider)
-            .value
-            ?.merchants
-            .firstWhere(
-              (m) => m.id == widget.merchantId,
-              orElse: () => throw StateError('merchant'),
-            )
-            .name ??
-        '';
+    final merchants = ref.read(sessionProvider).value?.merchants;
+    String merchant = '';
+    if (merchants != null) {
+      for (final m in merchants) {
+        if (m.id == widget.merchantId) {
+          merchant = m.name;
+          break;
+        }
+      }
+    }
     return '$greeting\n${t.linkMessageBody(what, amt, link, merchant)}';
   }
 
@@ -524,9 +524,7 @@ class _PaymentLinkScreenState extends ConsumerState<PaymentLinkScreen> {
                   variant: AppButtonVariant.secondary,
                   onPressed: () {
                     if (_txn?.linkUrl != null) {
-                      Share.share(
-                        _msg,
-                      ); // Placeholder — real share via url_launcher
+                      Share.share(_msg, subject: _txn!.title);
                     }
                   },
                 ),
@@ -627,14 +625,6 @@ class _QrOverlay extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-/// Placeholder for Share — real implementation uses url_launcher / share_plus.
-class Share {
-  static Future<void> share(String text) async {
-    // TODO(share): integrate share_plus or url_launcher share intent
-    await Clipboard.setData(ClipboardData(text: text));
   }
 }
 

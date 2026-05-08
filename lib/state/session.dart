@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -31,8 +32,34 @@ class SessionNotifier extends AsyncNotifier<SessionData?> {
     final storage = ref.read(secureStorageProvider);
     final token = await storage.read(SecureStorage.keySessionToken);
     if (token == null) return null;
-    // Logged in — session will be hydrated by the app's startup fetch
-    return null; // Caller must call hydrate() after startup
+
+    // Cold-start hydration. Token is persisted; rebuild SessionData from the
+    // company snapshot we wrote on last claim plus a fresh merchants fetch.
+    // Network failures leave tokens intact so a later launch can recover; an
+    // expired/revoked token is handled by the auth interceptor (forceLogout).
+    try {
+      final companyJson = await storage.read(SecureStorage.keyCompanyJson);
+      final deviceId = await storage.read(SecureStorage.keyDeviceId);
+      if (companyJson == null || deviceId == null) {
+        // Token without companion data — treat as corrupt, force re-onboard.
+        await storage.deleteAll();
+        return null;
+      }
+      final company = Company.fromJson(
+        jsonDecode(companyJson) as Map<String, dynamic>,
+      );
+      final dio = await ref.read(dioProvider.future);
+      final merchants = await MerchantsApi(dio).list();
+      return SessionData(
+        company: company,
+        merchants: merchants,
+        deviceId: deviceId,
+      );
+    } catch (_) {
+      // Network/server error — defer to the next launch. The user lands on
+      // /welcome but tokens remain so a successful retry will skip claim.
+      return null;
+    }
   }
 
   /// Claims a company and establishes a session.
@@ -54,6 +81,10 @@ class SessionNotifier extends AsyncNotifier<SessionData?> {
       await storage.write(SecureStorage.keySessionToken, response.sessionToken);
       await storage.write(SecureStorage.keyRefreshToken, response.refreshToken);
       await storage.write(SecureStorage.keyDeviceId, response.deviceId);
+      await storage.write(
+        SecureStorage.keyCompanyJson,
+        jsonEncode(response.company.toJson()),
+      );
 
       final data = SessionData(
         company: response.company,

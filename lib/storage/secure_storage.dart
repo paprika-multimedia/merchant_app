@@ -19,6 +19,7 @@ class SecureStorage {
   static const keySessionToken = 'session_token';
   static const keyRefreshToken = 'refresh_token';
   static const keyDeviceId = 'device_id';
+  static const keyCompanyJson = 'paprika-company';
   static const keyLang = 'paprika-lang';
 
   static String recentAmountsKey(String merchantId, String flow) =>

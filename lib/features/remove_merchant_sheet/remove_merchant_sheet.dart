@@ -57,11 +57,13 @@ class _RemoveMerchantSheetState extends ConsumerState<RemoveMerchantSheet> {
         dio,
       ).remove(widget.merchant.id, confirmName: _confirmText.trim());
       ref.read(sessionProvider.notifier).removeMerchant(widget.merchant.id);
+      if (!mounted) return;
       setState(() => _step = _SheetStep.success);
     } catch (e) {
+      if (!mounted) return;
       setState(() => _error = e.toString());
     } finally {
-      setState(() => _loading = false);
+      if (mounted) setState(() => _loading = false);
     }
   }
 

@@ -6,7 +6,6 @@ import 'package:uuid/uuid.dart';
 import '../../l10n/app_localizations.dart';
 import '../../net/dio_client.dart';
 import '../../net/api/merchants_api.dart';
-import '../../net/api/sessions_api.dart';
 import '../../primitives/button.dart';
 import '../../primitives/code_input.dart';
 import '../../primitives/icons.dart';
@@ -47,27 +46,20 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
     });
 
     try {
-      final dio = await ref.read(dioProvider.future);
-
       if (widget.kind == CodeScreenKind.company) {
-        final api = SessionsApi(dio);
-        // Claim company — SessionsApi.claim handles the full response
-        final response = await api.claim(
-          companyCode: _code,
-          platform: 'android', // TODO(platform-detect): use Platform.isIOS
-          model: 'device',
-        );
-        // Persist tokens + session
-        final storage = ref.read(secureStorageProvider);
-        await storage.write('session_token', response.sessionToken);
-        await storage.write('refresh_token', response.refreshToken);
-        await storage.write('device_id', response.deviceId);
+        // Drive the full claim through SessionNotifier so sessionProvider
+        // is populated (tokens, company, merchants, deviceId) before we
+        // navigate. The previous inline path bypassed Riverpod state, which
+        // left every downstream screen seeing session==null.
+        await ref
+            .read(sessionProvider.notifier)
+            .claim(companyCode: _code);
 
-        // Navigate to merchant code entry
         if (!mounted) return;
         context.push('/code/merchant');
       } else {
         // Merchant claim
+        final dio = await ref.read(dioProvider.future);
         final merchant = await MerchantsApi(
           dio,
         ).claim(_code, idempotencyKey: const Uuid().v4());
@@ -90,6 +82,7 @@ class _CodeScreenState extends ConsumerState<CodeScreen> {
         }
       }
     } on Exception catch (e) {
+      if (!mounted) return;
       setState(() {
         _loading = false;
         _error = e.toString();

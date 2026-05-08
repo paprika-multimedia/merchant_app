@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'l10n/app_localizations.dart';
 import 'router/routes.dart';
+import 'state/active_merchant.dart';
 import 'state/session.dart';
+import 'state/ws_state.dart';
 import 'theme/tokens.dart';
 
 /// Root of the Paprika Merchant App widget tree.
@@ -19,6 +21,12 @@ class PaprikaApp extends ConsumerWidget {
     final router = ref.watch(routerProvider);
     final localeCode = ref.watch(localeProvider);
     final locale = Locale(localeCode);
+
+    // Bootstrap side-effect providers exactly once. Without these reads the
+    // notifiers would never run their build() — the WS client would stay
+    // disconnected and persisted active-merchant would never restore.
+    ref.watch(_appBootstrapProvider);
+    ref.watch(wsStateProvider);
 
     return MaterialApp.router(
       title: 'Paprika',
@@ -65,3 +73,10 @@ class PaprikaApp extends ConsumerWidget {
     );
   }
 }
+
+/// One-shot startup work that doesn't fit in `main()` (because it depends on
+/// the ProviderScope) and shouldn't gate the first frame. Currently restores
+/// the persisted active merchant. Add other one-shot init here.
+final _appBootstrapProvider = FutureProvider<void>((ref) async {
+  await ref.read(activeMerchantIdProvider.notifier).restore();
+});

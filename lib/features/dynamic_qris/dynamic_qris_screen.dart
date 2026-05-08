@@ -26,6 +26,7 @@ import '../../primitives/keypad.dart';
 import '../../primitives/screen_header.dart';
 import '../../state/recent_amounts.dart';
 import '../../state/session.dart';
+import '../../state/ws_state.dart';
 import '../../theme/tokens.dart';
 
 /// Dynamic QRIS flow — Handoff §4.7.
@@ -234,8 +235,8 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
   // ─── Cancel ─────────────────────────────────────────────────────────────────
 
   Future<void> _cancel() async {
-    final txnId = _txn?.id;
-    if (txnId == null) {
+    final txn = _txn;
+    if (txn == null) {
       setState(() {
         _step = _QrisStep.amount;
         _txn = null;
@@ -243,13 +244,23 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
       });
       return;
     }
-    try {
-      final dio = await ref.read(dioProvider.future);
-      await TransactionsApi(
-        dio,
-      ).cancel(txnId, idempotencyKey: const Uuid().v4());
-    } catch (_) {}
+    // If the transaction is already expired (or otherwise terminal) the server
+    // will reject DELETE — skip the round trip and reset locally.
+    final isTerminal =
+        txn.status == TransactionStatus.expired ||
+        txn.status == TransactionStatus.cancelled ||
+        txn.status == TransactionStatus.failed ||
+        txn.status == TransactionStatus.paid;
+    if (!isTerminal) {
+      try {
+        final dio = await ref.read(dioProvider.future);
+        await TransactionsApi(
+          dio,
+        ).cancel(txn.id, idempotencyKey: const Uuid().v4());
+      } catch (_) {}
+    }
     _expireTimer?.cancel();
+    if (!mounted) return;
     setState(() {
       _step = _QrisStep.amount;
       _txn = null;
@@ -262,6 +273,32 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
   Widget build(BuildContext context) {
     final t = AppL10n.of(context);
     final fmt = NumberFormat('#,###', 'id_ID');
+
+    // Listen for live WS events tied to the current transaction.
+    ref.listen<WsState>(wsStateProvider, (prev, next) {
+      final txnId = _txn?.id;
+      if (txnId == null) return;
+      final paid = next.lastPaidTxn;
+      if (paid != null &&
+          paid.id == txnId &&
+          paid != prev?.lastPaidTxn &&
+          _step != _QrisStep.paid) {
+        _expireTimer?.cancel();
+        if (!mounted) return;
+        setState(() {
+          _txn = paid;
+          _step = _QrisStep.paid;
+        });
+      } else if (next.lastExpiredTxnId == txnId &&
+          next.lastExpiredTxnId != prev?.lastExpiredTxnId &&
+          _step == _QrisStep.qr) {
+        _expireTimer?.cancel();
+        if (!mounted) return;
+        setState(() {
+          _txn = _txn?.copyWith(status: TransactionStatus.expired);
+        });
+      }
+    });
 
     // Resolve merchant name for overline (M11)
     final merchantName =

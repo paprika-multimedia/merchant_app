@@ -52,8 +52,16 @@ class AuthInterceptor extends Interceptor {
 
     // Attempt a single-flight refresh
     if (_refreshing) {
-      // Another request is already refreshing — wait for it
-      await _refreshCompleter!.future;
+      // Another request is already refreshing — wait for it. If the in-flight
+      // refresh fails it calls completeError, which would otherwise rethrow
+      // out of onError and leave Dio's handler pipeline in an inconsistent
+      // state — so propagate the original 401 instead.
+      try {
+        await _refreshCompleter!.future;
+      } catch (_) {
+        handler.next(err);
+        return;
+      }
       // Replay original request with new token
       final retried = await _retry(err.requestOptions);
       if (retried != null) {
