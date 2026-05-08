@@ -25,7 +25,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isOnboarding =
           state.matchedLocation.startsWith('/welcome') ||
           state.matchedLocation.startsWith('/scan/company') ||
-          state.matchedLocation.startsWith('/code/company');
+          state.matchedLocation.startsWith('/code/company') ||
+          state.matchedLocation.startsWith('/scan/merchant') ||
+          state.matchedLocation.startsWith('/code/merchant');
       if (session == null && !isOnboarding) return '/welcome';
       return null;
     },
