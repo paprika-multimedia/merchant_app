@@ -79,27 +79,39 @@ final routerProvider = Provider<GoRouter>((ref) {
       // ─── Payment actions ─────────────────────────────────────────────────────
       GoRoute(
         path: '/dynamic-qris',
-        builder: (_, state) {
-          final merchantId = (state.extra as Map?)?['merchantId'] as String?;
-          return DynamicQrisScreen(merchantId: merchantId ?? '');
-        },
+        redirect: _requireMerchantId,
+        builder: (_, state) => DynamicQrisScreen(
+          merchantId: (state.extra as Map)['merchantId'] as String,
+        ),
       ),
       GoRoute(
         path: '/payment-link',
-        builder: (_, state) {
-          final merchantId = (state.extra as Map?)?['merchantId'] as String?;
-          return PaymentLinkScreen(merchantId: merchantId ?? '');
-        },
+        redirect: _requireMerchantId,
+        builder: (_, state) => PaymentLinkScreen(
+          merchantId: (state.extra as Map)['merchantId'] as String,
+        ),
       ),
       GoRoute(
         path: '/scan-cpm',
-        builder: (_, state) {
-          final merchantId = (state.extra as Map?)?['merchantId'] as String?;
-          return ScanQrisScreen(merchantId: merchantId ?? '');
-        },
+        redirect: _requireMerchantId,
+        builder: (_, state) => ScanQrisScreen(
+          merchantId: (state.extra as Map)['merchantId'] as String,
+        ),
       ),
     ],
     errorBuilder: (_, state) =>
         Scaffold(body: Center(child: Text('Route not found: ${state.error}'))),
   );
 });
+
+/// Redirects to the company dashboard if the route was pushed without a
+/// `merchantId` in `extra`. Avoids silent coalescing to an empty string,
+/// which previously produced `firstWhere`-throws and `/merchants//qris`-style
+/// malformed URLs deep inside the payment flows.
+String? _requireMerchantId(BuildContext _, GoRouterState state) {
+  final extra = state.extra;
+  if (extra is! Map) return '/dashboard/company';
+  final id = extra['merchantId'];
+  if (id is! String || id.isEmpty) return '/dashboard/company';
+  return null;
+}

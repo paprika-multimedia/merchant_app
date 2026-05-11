@@ -60,6 +60,11 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
   // Camera controller (only alive during scan step)
   MobileScannerController? _scannerCtrl;
 
+  // Single-shot guard: mobile_scanner can fire onDetect multiple times for the
+  // same QR before stop() takes effect. Without this we re-stop the controller
+  // and re-setState after the screen has already advanced to confirm.
+  bool _detected = false;
+
   int get _amount => int.tryParse(_amountStr) ?? 0;
   bool get _canCharge => _amount >= 1000;
 
@@ -102,8 +107,12 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
   }
 
   void _onDetect(BarcodeCapture capture) {
+    if (_detected) return;
+    if (capture.barcodes.isEmpty) return;
     final raw = capture.barcodes.first.rawValue;
     if (raw == null || raw.isEmpty) return;
+
+    _detected = true;
 
     // Haptic feedback on detect
     HapticFeedback.lightImpact();
@@ -127,6 +136,7 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
       _amountStr = '';
       _error = null;
       _idempotencyKey = null;
+      _detected = false;
     });
     _scannerCtrl?.start();
   }
@@ -824,6 +834,7 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
                         _txnRef = null;
                         _idempotencyKey = null;
                         _error = null;
+                        _detected = false;
                       });
                       _startScanner();
                     },

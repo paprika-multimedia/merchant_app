@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +10,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../l10n/app_localizations.dart';
 import '../../primitives/button.dart';
 import '../../primitives/icons.dart';
+import '../../state/session.dart';
 import '../../theme/tokens.dart';
 import '_scanner_overlay.dart';
 
@@ -58,12 +61,40 @@ class _ScanCompanyScreenState extends ConsumerState<ScanCompanyScreen> {
         _detected = true;
         HapticFeedback.mediumImpact();
         final code = match.group(1)!.toUpperCase();
-        context.push('/scan/merchant', extra: {'companyCode': code});
+        unawaited(_claimAndContinue(code));
         return;
       }
     }
     if (sawAnyQr != null) {
       _showInvalidQrToast();
+    }
+  }
+
+  /// Claims the company and advances to the merchant-scan step.
+  ///
+  /// The QR-scan path previously pushed `/scan/merchant` with the company
+  /// code in `extra`, but the merchant screen never read it — the company
+  /// was never claimed and `sessionProvider` stayed null, leaving the user
+  /// to be redirected back to /welcome by the router guard.
+  Future<void> _claimAndContinue(String code) async {
+    try {
+      await ref
+          .read(sessionProvider.notifier)
+          .claim(companyCode: code);
+      if (!mounted) return;
+      context.push('/scan/merchant');
+    } catch (e) {
+      if (!mounted) return;
+      _detected = false;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+            duration: const Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
     }
   }
 
