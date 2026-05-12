@@ -33,7 +33,7 @@ import '../../theme/tokens.dart';
 /// (Handoff §9 — "Scan QRIS requires the camera").
 enum _CpmStep { scan, confirm, paid }
 
-class ScanQrisScreen extends ConsumerStatefulWidget {
+class ScanQrisScreen extends ConsumerStatefulWidget {  
   const ScanQrisScreen({super.key, required this.merchantId});
 
   final String merchantId;
@@ -694,6 +694,7 @@ class _ScanQrisScreenState extends ConsumerState<ScanQrisScreen> {
                   Container(
                         width: 84,
                         height: 84,
+                        alignment: Alignment.center,
                         decoration: const BoxDecoration(
                           color: AppTokens.successSoft,
                           shape: BoxShape.circle,

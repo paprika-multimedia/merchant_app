@@ -627,6 +627,7 @@ class _DynamicQrisScreenState extends ConsumerState<DynamicQrisScreen> {
           Container(
             width: 80,
             height: 80,
+            alignment: Alignment.center,
             decoration: const BoxDecoration(
               color: AppTokens.successSoft,
               shape: BoxShape.circle,
