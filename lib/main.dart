@@ -23,6 +23,7 @@ void main() async {
   //    Pass --dart-define=ENABLE_FIREBASE=false to skip entirely (simulator dev).
   //    Even when enabled, failure here is non-fatal — push notifications simply
   //    won't work, but the rest of the app functions normally.
+  
   if (AppConfig.enableFirebase) {
     await _initFirebase();
   }

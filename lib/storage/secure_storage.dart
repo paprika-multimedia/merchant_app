@@ -35,7 +35,7 @@ class SecureStorage {
       _storage.write(key: key, value: value);
 
   /// Deletes a key.
-  Future<void> delete(String key) => _storage.delete(key: key);
+  Future<void> delete(String key) => _storage.delete( key: key);
 
   /// Deletes all stored values. Used on logout.
   Future<void> deleteAll() => _storage.deleteAll();
