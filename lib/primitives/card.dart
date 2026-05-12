@@ -17,6 +17,7 @@ class AppCard extends StatelessWidget {
   final VoidCallback? onTap;
   final Color? color;
 
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
