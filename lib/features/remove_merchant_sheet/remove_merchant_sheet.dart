@@ -92,17 +92,41 @@ class _RemoveMerchantSheetState extends ConsumerState<RemoveMerchantSheet> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _DragHandle(),
-        const SizedBox(height: 16),
-        Text(
-          t.merchantSettings,
-          style: const TextStyle(
-            fontFamily: AppTokens.fontDisplay,
-            fontSize: 17,
-            fontWeight: FontWeight.w700,
-            color: AppTokens.ink,
-          ),
-        ),
         const SizedBox(height: 20),
+        Row(
+          children: [
+            MerchantAvatar(name: widget.merchant.name, size: 48),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    t.merchantSettings.toUpperCase(),
+                    style: const TextStyle(
+                      fontFamily: AppTokens.fontDisplay,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: AppTokens.inkTertiary,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    widget.merchant.name,
+                    style: const TextStyle(
+                      fontFamily: AppTokens.fontDisplay,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppTokens.ink,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
         // Share QR (placeholder)
         _SettingsRow(
           iconWidget: const QrIcon(size: 20, color: AppTokens.ink),
@@ -110,14 +134,14 @@ class _RemoveMerchantSheetState extends ConsumerState<RemoveMerchantSheet> {
           sub: t.merchantShareQrSub,
           onTap: () {},
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
         Text(
-          t.merchantDanger,
+          t.merchantDanger.toUpperCase(),
           style: const TextStyle(
             fontFamily: AppTokens.fontDisplay,
             fontSize: 12,
             fontWeight: FontWeight.w700,
-            color: AppTokens.danger,
+            color: AppTokens.inkTertiary,
             letterSpacing: 0.5,
           ),
         ),
@@ -147,12 +171,12 @@ class _RemoveMerchantSheetState extends ConsumerState<RemoveMerchantSheet> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _DragHandle(),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
         Text(
           t.merchantRemoveTitle(widget.merchant.name),
           style: const TextStyle(
             fontFamily: AppTokens.fontDisplay,
-            fontSize: 17,
+            fontSize: 20,
             fontWeight: FontWeight.w700,
             color: AppTokens.ink,
           ),
@@ -167,15 +191,7 @@ class _RemoveMerchantSheetState extends ConsumerState<RemoveMerchantSheet> {
             height: 1.5,
           ),
         ),
-        const SizedBox(height: 16),
-        AppField(
-          label: t.merchantRemoveTypeLabel,
-          placeholder: t.merchantRemoveConfirm(widget.merchant.name),
-          onChanged: (v) => setState(() => _confirmText = v),
-          error: _error,
-        ),
-        const SizedBox(height: 12),
-        // Fix 6c — re-link note below the type-name field
+        const SizedBox(height: 20),
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
@@ -201,22 +217,56 @@ class _RemoveMerchantSheetState extends ConsumerState<RemoveMerchantSheet> {
             ],
           ),
         ),
-        const SizedBox(height: 16),
-        AppButton(
-          label: t.merchantRemove,
-          variant: AppButtonVariant.danger,
-          size: AppButtonSize.lg,
-          block: true,
-          disabled: !_nameMatches || _loading,
-          onPressed: _remove,
+        const SizedBox(height: 20),
+        RichText(
+          text: TextSpan(
+            text: '${t.merchantRemoveTypeLabel} ',
+            style: const TextStyle(
+              fontFamily: AppTokens.fontDisplay,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppTokens.inkSecondary,
+            ),
+            children: [
+              TextSpan(
+                text: widget.merchant.name,
+                style: const TextStyle(
+                  color: AppTokens.ink,
+                ),
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 8),
-        Center(
-          child: AppButton(
-            label: t.commonCancel,
-            variant: AppButtonVariant.ghost,
-            onPressed: () => setState(() => _step = _SheetStep.settings),
-          ),
+        AppField(
+          placeholder: widget.merchant.name,
+          onChanged: (v) => setState(() => _confirmText = v),
+          error: _error,
+        ),
+        const SizedBox(height: 24),
+        Row(
+          children: [
+            Expanded(
+              child: AppButton(
+                label: t.commonCancel,
+                variant: AppButtonVariant.secondary,
+                size: AppButtonSize.lg,
+                block: true,
+                onPressed: () => setState(() => _step = _SheetStep.settings),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: AppButton(
+                label: t.merchantRemove,
+                variant: AppButtonVariant.danger,
+                size: AppButtonSize.lg,
+                block: true,
+                disabled: !_nameMatches || _loading,
+                onPressed: _remove,
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -234,6 +284,7 @@ class _RemoveMerchantSheetState extends ConsumerState<RemoveMerchantSheet> {
           child: Container(
             width: 56,
             height: 56,
+            alignment: Alignment.center,
             decoration: const BoxDecoration(
               color: AppTokens.accentSoft,
               shape: BoxShape.circle,

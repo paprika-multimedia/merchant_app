@@ -81,14 +81,19 @@ class _AppButtonState extends State<AppButton> {
           widget.leading!,
           const SizedBox(width: 8),
         ],
-        Text(
-          widget.label,
-          style: TextStyle(
-            fontFamily: AppTokens.fontDisplay,
-            fontWeight: FontWeight.w600,
-            fontSize: fs,
-            letterSpacing: -0.1,
-            color: widget.disabled ? fg.withValues(alpha: 0.4) : fg,
+        Flexible(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              widget.label,
+              style: TextStyle(
+                fontFamily: AppTokens.fontDisplay,
+                fontWeight: FontWeight.w600,
+                fontSize: fs,
+                letterSpacing: -0.1,
+                color: widget.disabled ? fg.withValues(alpha: 0.4) : fg,
+              ),
+            ),
           ),
         ),
         if (widget.trailing != null) ...[
