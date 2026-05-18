@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../models/merchant.dart';
@@ -33,7 +34,7 @@ class RemoveMerchantSheet extends ConsumerStatefulWidget {
       _RemoveMerchantSheetState();
 }
 
-enum _SheetStep { settings, confirm, success }
+enum _SheetStep { settings, confirm, success, shareQr }
 
 class _RemoveMerchantSheetState extends ConsumerState<RemoveMerchantSheet> {
   _SheetStep _step = _SheetStep.settings;
@@ -82,6 +83,7 @@ class _RemoveMerchantSheetState extends ConsumerState<RemoveMerchantSheet> {
         _SheetStep.settings => _buildSettings(t),
         _SheetStep.confirm => _buildConfirm(t),
         _SheetStep.success => _buildSuccess(t),
+        _SheetStep.shareQr => _buildShareQr(t),
       },
     );
   }
@@ -127,12 +129,12 @@ class _RemoveMerchantSheetState extends ConsumerState<RemoveMerchantSheet> {
           ],
         ),
         const SizedBox(height: 24),
-        // Share QR (placeholder)
+        // Share QR
         _SettingsRow(
           iconWidget: const QrIcon(size: 20, color: AppTokens.ink),
           label: t.merchantShareQr,
           sub: t.merchantShareQrSub,
-          onTap: () {},
+          onTap: () => setState(() => _step = _SheetStep.shareQr),
         ),
         const SizedBox(height: 24),
         Text(
@@ -160,6 +162,63 @@ class _RemoveMerchantSheetState extends ConsumerState<RemoveMerchantSheet> {
             variant: AppButtonVariant.ghost,
             onPressed: () => Navigator.of(context).pop(),
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildShareQr(AppL10n t) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _DragHandle(),
+        const SizedBox(height: 20),
+        Center(
+          child: Text(
+            t.merchantShareQr,
+            style: const TextStyle(
+              fontFamily: AppTokens.fontDisplay,
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: AppTokens.ink,
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Center(
+          child: Text(
+            t.merchantShareQrSub,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontFamily: AppTokens.fontDisplay,
+              fontSize: 14,
+              color: AppTokens.inkSecondary,
+            ),
+          ),
+        ),
+        const SizedBox(height: 32),
+        Center(
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppTokens.border, width: 1),
+            ),
+            child: QrImageView(
+              data: 'paprika://merchant/${widget.merchant.code}',
+              size: 200,
+              backgroundColor: Colors.white,
+            ),
+          ),
+        ),
+        const SizedBox(height: 32),
+        AppButton(
+          label: t.commonBack,
+          variant: AppButtonVariant.secondary,
+          block: true,
+          onPressed: () => setState(() => _step = _SheetStep.settings),
         ),
       ],
     );
