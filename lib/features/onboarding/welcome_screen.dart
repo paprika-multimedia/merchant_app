@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../brand/paprika_lockup.dart';
 import '../../primitives/button.dart';
 import '../../primitives/icons.dart';
 import '../../theme/tokens.dart';
@@ -32,7 +31,10 @@ class WelcomeScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Left-aligned lockup (size 26 matches JSX)
-                    const PaprikaLockup(size: 26),
+                    Image.asset(
+                      'assets/images/paprika-logo.png',
+                      height: 36,
+                    ), // Ubah nilai height di sini
                     const SizedBox(height: 56),
                     // 40px display headline, left-aligned
                     Text(
@@ -278,12 +280,7 @@ class _FakeQrPainter extends CustomPainter {
       // 5×5 white inner (1-cell inset)
       canvas.drawRRect(
         RRect.fromRectAndRadius(
-          Rect.fromLTWH(
-            (ox + 1) * u,
-            (oy + 1) * u,
-            5 * u,
-            5 * u,
-          ),
+          Rect.fromLTWH((ox + 1) * u, (oy + 1) * u, 5 * u, 5 * u),
           Radius.circular(u * 0.4),
         ),
         whitePaint,
@@ -291,12 +288,7 @@ class _FakeQrPainter extends CustomPainter {
       // 3×3 dark center (2-cell inset)
       canvas.drawRRect(
         RRect.fromRectAndRadius(
-          Rect.fromLTWH(
-            (ox + 2) * u,
-            (oy + 2) * u,
-            3 * u,
-            3 * u,
-          ),
+          Rect.fromLTWH((ox + 2) * u, (oy + 2) * u, 3 * u, 3 * u),
           Radius.circular(u * 0.3),
         ),
         darkPaint,

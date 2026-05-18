@@ -203,10 +203,7 @@ class _DashboardMerchantScreenState
                           border: Border.all(color: AppTokens.border),
                         ),
                         alignment: Alignment.center,
-                        child: const SettingsIcon(
-                          size: 18,
-                          color: AppTokens.ink,
-                        ),
+                        child: const MoreIcon(size: 18, color: AppTokens.ink),
                       ),
                     ),
                   ],
@@ -235,6 +232,7 @@ class _DashboardMerchantScreenState
                       margin: const EdgeInsets.only(left: 8),
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
+                        color: AppTokens.surface,
                         border: Border.all(color: AppTokens.border),
                         borderRadius: BorderRadius.circular(20),
                       ),
@@ -263,7 +261,7 @@ class _DashboardMerchantScreenState
                     Row(
                       children: [
                         Text(
-                          t.dashMerchantReceived,
+                          t.dashMerchantReceived.toUpperCase(),
                           style: const TextStyle(
                             fontFamily: AppTokens.fontDisplay,
                             fontSize: 12,
@@ -523,13 +521,13 @@ class _MerchantHeaderBar extends StatelessWidget {
             width: 26,
             height: 26,
             decoration: BoxDecoration(
-              color: accent ? AppTokens.accent : AppTokens.surfaceAlt,
+              color: accent ? AppTokens.accentSoft : AppTokens.surfaceAlt,
               borderRadius: BorderRadius.circular(7),
             ),
             alignment: Alignment.center,
             child: StoreIcon(
               size: 16,
-              color: accent ? AppTokens.surface : AppTokens.ink,
+              color: accent ? AppTokens.accent : AppTokens.ink,
             ),
           ),
           const SizedBox(width: 10),
@@ -544,7 +542,7 @@ class _MerchantHeaderBar extends StatelessWidget {
                     fontFamily: AppTokens.fontDisplay,
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
-                    color: accent ? AppTokens.surface : AppTokens.inkSecondary,
+                    color: accent ? AppTokens.accent : AppTokens.inkSecondary,
                     letterSpacing: 0.8,
                     height: 1,
                   ),
@@ -555,7 +553,7 @@ class _MerchantHeaderBar extends StatelessWidget {
                     fontFamily: AppTokens.fontDisplay,
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: accent ? AppTokens.surface : AppTokens.ink,
+                    color: AppTokens.ink,
                     letterSpacing: -0.1,
                     height: 1.2,
                   ),
