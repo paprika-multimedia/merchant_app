@@ -107,24 +107,6 @@ class DashboardCompanyScreen extends ConsumerWidget {
                     padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
                     children: [
                       for (final m in merchants) _MerchantChip(merchant: m),
-                      // Add chip
-                      GestureDetector(
-                        onTap: () => context.push('/add-merchant'),
-                        child: Container(
-                          height: 40,
-                          margin: const EdgeInsets.only(left: 8),
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: AppTokens.border),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          alignment: Alignment.center,
-                          child: const PlusIcon(
-                            size: 18,
-                            color: AppTokens.inkSecondary,
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -203,15 +185,39 @@ class DashboardCompanyScreen extends ConsumerWidget {
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                 sliver: SliverToBoxAdapter(
-                  child: Text(
-                    t.dashCompanyList,
-                    style: const TextStyle(
-                      fontFamily: AppTokens.fontDisplay,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: AppTokens.inkSecondary,
-                      letterSpacing: 0.3,
-                    ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '${t.dashCompanyList.toUpperCase()} · ${merchants.length}',
+                        style: const TextStyle(
+                          fontFamily: AppTokens.fontDisplay,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: AppTokens.inkSecondary,
+                          letterSpacing: 0.8,
+                          height: 1,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => context.push('/add-merchant'),
+                        child: Row(
+                          children: [
+                            const PlusIcon(size: 14, color: AppTokens.accent),
+                            const SizedBox(width: 4),
+                            Text(
+                              t.dashCompanyAdd,
+                              style: const TextStyle(
+                                fontFamily: AppTokens.fontDisplay,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: AppTokens.accent,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
