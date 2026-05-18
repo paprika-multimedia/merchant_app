@@ -203,10 +203,7 @@ class _DashboardMerchantScreenState
                           border: Border.all(color: AppTokens.border),
                         ),
                         alignment: Alignment.center,
-                        child: const SettingsIcon(
-                          size: 18,
-                          color: AppTokens.ink,
-                        ),
+                        child: const MoreIcon(size: 18, color: AppTokens.ink),
                       ),
                     ),
                   ],
@@ -264,7 +261,7 @@ class _DashboardMerchantScreenState
                     Row(
                       children: [
                         Text(
-                          t.dashMerchantReceived,
+                          t.dashMerchantReceived.toUpperCase(),
                           style: const TextStyle(
                             fontFamily: AppTokens.fontDisplay,
                             fontSize: 12,

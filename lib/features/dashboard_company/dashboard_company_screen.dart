@@ -107,6 +107,24 @@ class DashboardCompanyScreen extends ConsumerWidget {
                     padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
                     children: [
                       for (final m in merchants) _MerchantChip(merchant: m),
+                      GestureDetector(
+                        onTap: () => context.push('/add-merchant'),
+                        child: Container(
+                          height: 40,
+                          margin: const EdgeInsets.only(left: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: AppTokens.surface,
+                            border: Border.all(color: AppTokens.border),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          alignment: Alignment.center,
+                          child: const PlusIcon(
+                            size: 18,
+                            color: AppTokens.inkSecondary,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
