@@ -68,12 +68,13 @@ class WsStateNotifier extends Notifier<WsState> {
   @override
   WsState build() {
     // React to session changes
-    final session = ref.watch(sessionProvider);
-    if (session.value != null) {
-      _ensureStarted();
-    } else {
-      _stop();
-    }
+    ref.listen(sessionProvider, (previous, next) {
+      if (next.value != null) {
+        _ensureStarted();
+      } else {
+        _stop();
+      }
+    });
 
     ref.onDispose(_stop);
     return const WsState();
