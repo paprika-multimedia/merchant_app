@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../models/merchant.dart';
@@ -33,7 +34,7 @@ class RemoveMerchantSheet extends ConsumerStatefulWidget {
       _RemoveMerchantSheetState();
 }
 
-enum _SheetStep { settings, confirm, success }
+enum _SheetStep { settings, confirm, success, shareQr }
 
 class _RemoveMerchantSheetState extends ConsumerState<RemoveMerchantSheet> {
   _SheetStep _step = _SheetStep.settings;
@@ -82,6 +83,7 @@ class _RemoveMerchantSheetState extends ConsumerState<RemoveMerchantSheet> {
         _SheetStep.settings => _buildSettings(t),
         _SheetStep.confirm => _buildConfirm(t),
         _SheetStep.success => _buildSuccess(t),
+        _SheetStep.shareQr => _buildShareQr(t),
       },
     );
   }
@@ -92,32 +94,56 @@ class _RemoveMerchantSheetState extends ConsumerState<RemoveMerchantSheet> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _DragHandle(),
-        const SizedBox(height: 16),
-        Text(
-          t.merchantSettings,
-          style: const TextStyle(
-            fontFamily: AppTokens.fontDisplay,
-            fontSize: 17,
-            fontWeight: FontWeight.w700,
-            color: AppTokens.ink,
-          ),
-        ),
         const SizedBox(height: 20),
-        // Share QR (placeholder)
+        Row(
+          children: [
+            MerchantAvatar(name: widget.merchant.name, size: 48),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    t.merchantSettings.toUpperCase(),
+                    style: const TextStyle(
+                      fontFamily: AppTokens.fontDisplay,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: AppTokens.inkTertiary,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    widget.merchant.name,
+                    style: const TextStyle(
+                      fontFamily: AppTokens.fontDisplay,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppTokens.ink,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+        // Share QR
         _SettingsRow(
           iconWidget: const QrIcon(size: 20, color: AppTokens.ink),
           label: t.merchantShareQr,
           sub: t.merchantShareQrSub,
-          onTap: () {},
+          onTap: () => setState(() => _step = _SheetStep.shareQr),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
         Text(
-          t.merchantDanger,
+          t.merchantDanger.toUpperCase(),
           style: const TextStyle(
             fontFamily: AppTokens.fontDisplay,
             fontSize: 12,
             fontWeight: FontWeight.w700,
-            color: AppTokens.danger,
+            color: AppTokens.inkTertiary,
             letterSpacing: 0.5,
           ),
         ),
@@ -141,18 +167,75 @@ class _RemoveMerchantSheetState extends ConsumerState<RemoveMerchantSheet> {
     );
   }
 
+  Widget _buildShareQr(AppL10n t) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _DragHandle(),
+        const SizedBox(height: 20),
+        Center(
+          child: Text(
+            t.merchantShareQr,
+            style: const TextStyle(
+              fontFamily: AppTokens.fontDisplay,
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: AppTokens.ink,
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Center(
+          child: Text(
+            t.merchantShareQrSub,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontFamily: AppTokens.fontDisplay,
+              fontSize: 14,
+              color: AppTokens.inkSecondary,
+            ),
+          ),
+        ),
+        const SizedBox(height: 32),
+        Center(
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppTokens.border, width: 1),
+            ),
+            child: QrImageView(
+              data: 'paprika://merchant/${widget.merchant.code}',
+              size: 200,
+              backgroundColor: Colors.white,
+            ),
+          ),
+        ),
+        const SizedBox(height: 32),
+        AppButton(
+          label: t.commonBack,
+          variant: AppButtonVariant.secondary,
+          block: true,
+          onPressed: () => setState(() => _step = _SheetStep.settings),
+        ),
+      ],
+    );
+  }
+
   Widget _buildConfirm(AppL10n t) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _DragHandle(),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
         Text(
           t.merchantRemoveTitle(widget.merchant.name),
           style: const TextStyle(
             fontFamily: AppTokens.fontDisplay,
-            fontSize: 17,
+            fontSize: 20,
             fontWeight: FontWeight.w700,
             color: AppTokens.ink,
           ),
@@ -167,15 +250,7 @@ class _RemoveMerchantSheetState extends ConsumerState<RemoveMerchantSheet> {
             height: 1.5,
           ),
         ),
-        const SizedBox(height: 16),
-        AppField(
-          label: t.merchantRemoveTypeLabel,
-          placeholder: t.merchantRemoveConfirm(widget.merchant.name),
-          onChanged: (v) => setState(() => _confirmText = v),
-          error: _error,
-        ),
-        const SizedBox(height: 12),
-        // Fix 6c — re-link note below the type-name field
+        const SizedBox(height: 20),
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
@@ -201,22 +276,56 @@ class _RemoveMerchantSheetState extends ConsumerState<RemoveMerchantSheet> {
             ],
           ),
         ),
-        const SizedBox(height: 16),
-        AppButton(
-          label: t.merchantRemove,
-          variant: AppButtonVariant.danger,
-          size: AppButtonSize.lg,
-          block: true,
-          disabled: !_nameMatches || _loading,
-          onPressed: _remove,
+        const SizedBox(height: 20),
+        RichText(
+          text: TextSpan(
+            text: '${t.merchantRemoveTypeLabel} ',
+            style: const TextStyle(
+              fontFamily: AppTokens.fontDisplay,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppTokens.inkSecondary,
+            ),
+            children: [
+              TextSpan(
+                text: widget.merchant.name,
+                style: const TextStyle(
+                  color: AppTokens.ink,
+                ),
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 8),
-        Center(
-          child: AppButton(
-            label: t.commonCancel,
-            variant: AppButtonVariant.ghost,
-            onPressed: () => setState(() => _step = _SheetStep.settings),
-          ),
+        AppField(
+          placeholder: widget.merchant.name,
+          onChanged: (v) => setState(() => _confirmText = v),
+          error: _error,
+        ),
+        const SizedBox(height: 24),
+        Row(
+          children: [
+            Expanded(
+              child: AppButton(
+                label: t.commonCancel,
+                variant: AppButtonVariant.secondary,
+                size: AppButtonSize.lg,
+                block: true,
+                onPressed: () => setState(() => _step = _SheetStep.settings),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: AppButton(
+                label: t.merchantRemove,
+                variant: AppButtonVariant.danger,
+                size: AppButtonSize.lg,
+                block: true,
+                disabled: !_nameMatches || _loading,
+                onPressed: _remove,
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -234,6 +343,7 @@ class _RemoveMerchantSheetState extends ConsumerState<RemoveMerchantSheet> {
           child: Container(
             width: 56,
             height: 56,
+            alignment: Alignment.center,
             decoration: const BoxDecoration(
               color: AppTokens.accentSoft,
               shape: BoxShape.circle,
