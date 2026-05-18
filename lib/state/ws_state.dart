@@ -67,6 +67,7 @@ class WsStateNotifier extends Notifier<WsState> {
 
  @override
   WsState build() {
+    // React to session changes
     // Use listen() instead of watch() to avoid circular dependency.
     // We handle session changes in the listener callback, not during build.
     ref.listen(sessionProvider, (previous, next) {

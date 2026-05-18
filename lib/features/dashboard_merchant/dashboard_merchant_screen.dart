@@ -15,6 +15,7 @@ import '../../primitives/merchant_avatar.dart';
 import '../../state/session.dart';
 import '../../theme/tokens.dart';
 import '../remove_merchant_sheet/remove_merchant_sheet.dart';
+import '../settings_sheet/settings_sheet.dart';
 
 /// Merchant Dashboard — Handoff §4.5.
 class DashboardMerchantScreen extends ConsumerStatefulWidget {
@@ -35,21 +36,36 @@ class _DashboardMerchantScreenState
   @override
   void initState() {
     super.initState();
-    _fetchTransactions();
-    _markSeen();
+    _refreshMerchantData();
   }
 
-  Future<void> _fetchTransactions() async {
-    setState(() => _loadingTxns = true);
+  @override
+  void didUpdateWidget(covariant DashboardMerchantScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.merchantId != widget.merchantId) {
+      _refreshMerchantData();
+    }
+  }
+
+  Future<void> _refreshMerchantData() async {
+    setState(() {
+      _transactions = [];
+      _loadingTxns = true;
+    });
     try {
-      final dio = await ref.read(dioProvider.future);
-      final txns = await MerchantsApi(
-        dio,
-      ).listTransactions(widget.merchantId, limit: 10);
-      if (mounted) setState(() => _transactions = txns);
+      await _fetchTransactions();
+      await _markSeen();
     } finally {
       if (mounted) setState(() => _loadingTxns = false);
     }
+  }
+
+  Future<void> _fetchTransactions() async {
+    final dio = await ref.read(dioProvider.future);
+    final txns = await MerchantsApi(
+      dio,
+    ).listTransactions(widget.merchantId, limit: 10);
+    if (mounted) setState(() => _transactions = txns);
   }
 
   Future<void> _markSeen() async {
@@ -90,22 +106,25 @@ class _DashboardMerchantScreenState
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
                 child: Row(
                   children: [
-                    // B19: Company pill with StoreIcon plate + overline + name
-                    GestureDetector(
-                      onTap: () => context.go('/dashboard/company'),
-                      child: _MerchantCompanyPill(
-                        companyName: session?.company.name ?? '',
-                        label: t.codeCompanyLabel,
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          if (context.canPop()) {
+                            context.pop();
+                          } else {
+                            context.go('/dashboard/company');
+                          }
+                        },
+                        child: _MerchantHeaderBar(
+                          companyName: session?.company.name ?? '',
+                          label: t.codeCompanyLabel,
+                          accent: true,
+                        ),
                       ),
                     ),
-                    const Spacer(),
-                    // Merchant options
-                    IconButton(
-                      icon: const MoreIcon(
-                        size: 20,
-                        color: AppTokens.inkSecondary,
-                      ),
-                      onPressed: () => showModalBottomSheet(
+                    const SizedBox(width: 10),
+                    GestureDetector(
+                      onTap: () => showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
                         useSafeArea: true,
@@ -114,14 +133,81 @@ class _DashboardMerchantScreenState
                             top: Radius.circular(AppTokens.radius2xl),
                           ),
                         ),
-                        builder: (_) => RemoveMerchantSheet(
-                          merchant: merchant,
-                          siblingMerchants: merchants
-                              .where((m) => m.id != merchant.id)
-                              .toList(),
+                        builder: (_) => SafeArea(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              ListTile(
+                                leading: const SettingsIcon(
+                                  size: 20,
+                                  color: AppTokens.ink,
+                                ),
+                                title: Text(t.settingsTitle),
+                                onTap: () {
+                                  Navigator.of(context).pop();
+                                  showModalBottomSheet(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    useSafeArea: true,
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(
+                                          AppTokens.radius2xl,
+                                        ),
+                                      ),
+                                    ),
+                                    builder: (_) => const SettingsSheet(),
+                                  );
+                                },
+                              ),
+                              ListTile(
+                                leading: const TrashIcon(
+                                  size: 20,
+                                  color: AppTokens.danger,
+                                ),
+                                title: Text(t.merchantRemove),
+                                onTap: () {
+                                  Navigator.of(context).pop();
+                                  showModalBottomSheet(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    useSafeArea: true,
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(
+                                          AppTokens.radius2xl,
+                                        ),
+                                      ),
+                                    ),
+                                    builder: (_) => RemoveMerchantSheet(
+                                      merchant: merchant,
+                                      siblingMerchants: merchants
+                                          .where((m) => m.id != merchant.id)
+                                          .toList(),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      tooltip: t.merchantSettings,
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: AppTokens.surface,
+                          borderRadius: BorderRadius.circular(
+                            AppTokens.radiusSm,
+                          ),
+                          border: Border.all(color: AppTokens.border),
+                        ),
+                        alignment: Alignment.center,
+                        child: const SettingsIcon(
+                          size: 18,
+                          color: AppTokens.ink,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -312,15 +398,36 @@ class _DashboardMerchantScreenState
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
             sliver: SliverToBoxAdapter(
-              child: Text(
-                t.dashMerchantRecent,
-                style: const TextStyle(
-                  fontFamily: AppTokens.fontDisplay,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: AppTokens.inkSecondary,
-                  letterSpacing: 0.3,
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    t.dashMerchantRecent,
+                    style: const TextStyle(
+                      fontFamily: AppTokens.fontDisplay,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppTokens.inkSecondary,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => context.push(
+                      '/transactions',
+                      extra: {'merchantId': merchant.id},
+                    ),
+                    child: Text(
+                      t.dashMerchantViewall,
+                      style: const TextStyle(
+                        fontFamily: AppTokens.fontDisplay,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppTokens.accent,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -378,18 +485,20 @@ class _DashboardMerchantScreenState
   }
 }
 
-/// B19: Compact company pill for the merchant dashboard header.
+/// 40px full-width header bar: Store icon + "COMPANY" overline + company name.
 ///
-/// Matches JSX AppShell merchant-level header: 26×26 StoreIcon plate on left,
-/// "COMPANY" overline + company name column to the right.
-class _MerchantCompanyPill extends StatelessWidget {
-  const _MerchantCompanyPill({
+/// Mirrors AppShell header in screens-dashboard.jsx (isCompanyLevel=true state,
+/// background: T.accent, color: #fff).
+class _MerchantHeaderBar extends StatelessWidget {
+  const _MerchantHeaderBar({
     required this.companyName,
     required this.label,
+    this.accent = false,
   });
 
   final String companyName;
   final String label;
+  final bool accent;
 
   @override
   Widget build(BuildContext context) {
@@ -397,60 +506,64 @@ class _MerchantCompanyPill extends StatelessWidget {
       height: 40,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: AppTokens.accentWash,
+        color: accent ? AppTokens.accentWash : AppTokens.surface,
         borderRadius: BorderRadius.circular(AppTokens.radiusSm),
+        border: Border.all(color: accent ? AppTokens.accent : AppTokens.border),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x0A1A0F0C),
+            color: Color(0x141A0F0C),
             blurRadius: 2,
             offset: Offset(0, 1),
           ),
         ],
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
         children: [
-          // 26×26 StoreIcon plate
           Container(
             width: 26,
             height: 26,
             decoration: BoxDecoration(
-              color: AppTokens.accentSoft,
-              borderRadius: BorderRadius.circular(AppTokens.radiusSm),
+              color: accent ? AppTokens.accent : AppTokens.surfaceAlt,
+              borderRadius: BorderRadius.circular(7),
             ),
             alignment: Alignment.center,
-            child: const StoreIcon(size: 16, color: AppTokens.accentDeep),
+            child: StoreIcon(
+              size: 16,
+              color: accent ? AppTokens.surface : AppTokens.ink,
+            ),
           ),
-          const SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                label.toUpperCase(),
-                style: const TextStyle(
-                  fontFamily: AppTokens.fontDisplay,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: AppTokens.accentDeep,
-                  letterSpacing: 0.8,
-                  height: 1,
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  label.toUpperCase(),
+                  style: TextStyle(
+                    fontFamily: AppTokens.fontDisplay,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: accent ? AppTokens.surface : AppTokens.inkSecondary,
+                    letterSpacing: 0.8,
+                    height: 1,
+                  ),
                 ),
-              ),
-              Text(
-                companyName,
-                style: const TextStyle(
-                  fontFamily: AppTokens.fontDisplay,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: AppTokens.accentDeep,
-                  letterSpacing: -0.1,
-                  height: 1.2,
+                Text(
+                  companyName,
+                  style: TextStyle(
+                    fontFamily: AppTokens.fontDisplay,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: accent ? AppTokens.surface : AppTokens.ink,
+                    letterSpacing: -0.1,
+                    height: 1.2,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -475,7 +588,10 @@ class _MerchantChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: active ? AppTokens.accent : AppTokens.surface,
           borderRadius: BorderRadius.circular(20),
-          border: active ? null : Border.all(color: AppTokens.border),
+          border: Border.all(
+            color: active ? AppTokens.accent : AppTokens.border,
+            width: active ? 1.5 : 1,
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -491,6 +607,26 @@ class _MerchantChip extends StatelessWidget {
                 color: active ? Colors.white : AppTokens.ink,
               ),
             ),
+            if (merchant.unreadCount > 0) ...[
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppTokens.accent,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppTokens.accent),
+                ),
+                child: Text(
+                  merchant.unreadCount > 99 ? '99+' : '${merchant.unreadCount}',
+                  style: const TextStyle(
+                    fontFamily: AppTokens.fontDisplay,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -595,12 +731,36 @@ class _TxnRow extends StatelessWidget {
     final timeStr = _relativeTime(txn.createdAt);
 
     final (tone, statusLabel, dotColor) = switch (txn.status) {
-      TransactionStatus.paid => (ChipTone.success, t.txStatusPaid, AppTokens.success),
-      TransactionStatus.pending => (ChipTone.warning, t.txStatusPending, AppTokens.warning),
-      TransactionStatus.failed => (ChipTone.danger, t.txStatusFailed, AppTokens.danger),
-      TransactionStatus.expired => (ChipTone.neutral, t.txStatusExpired, AppTokens.inkSecondary),
-      TransactionStatus.cancelled => (ChipTone.neutral, t.txStatusCancelled, AppTokens.inkSecondary),
-      TransactionStatus.refunded => (ChipTone.neutral, t.txStatusRefunded, AppTokens.inkSecondary),
+      TransactionStatus.paid => (
+        ChipTone.success,
+        t.txStatusPaid,
+        AppTokens.success,
+      ),
+      TransactionStatus.pending => (
+        ChipTone.warning,
+        t.txStatusPending,
+        AppTokens.warning,
+      ),
+      TransactionStatus.failed => (
+        ChipTone.danger,
+        t.txStatusFailed,
+        AppTokens.danger,
+      ),
+      TransactionStatus.expired => (
+        ChipTone.neutral,
+        t.txStatusExpired,
+        AppTokens.inkSecondary,
+      ),
+      TransactionStatus.cancelled => (
+        ChipTone.neutral,
+        t.txStatusCancelled,
+        AppTokens.inkSecondary,
+      ),
+      TransactionStatus.refunded => (
+        ChipTone.neutral,
+        t.txStatusRefunded,
+        AppTokens.inkSecondary,
+      ),
     };
 
     return Padding(
@@ -651,11 +811,7 @@ class _TxnRow extends StatelessWidget {
                 tone: tone,
                 leading: Text(
                   '●',
-                  style: TextStyle(
-                    color: dotColor,
-                    fontSize: 8,
-                    height: 1,
-                  ),
+                  style: TextStyle(color: dotColor, fontSize: 8, height: 1),
                 ),
               ),
             ],
